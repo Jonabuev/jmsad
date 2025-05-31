@@ -35,10 +35,11 @@ test/Scripts/activate.bat
 Thumbs.db
 
 # 📦 JS / React build
-node_modules/
-dist/
-build/
-.npm/
+# frontend
+/front/node_modules/
+/front/.next/
+/front/.env.local
+
 
 # 🚫 Другие потенциально лишние
 *.bak
