@@ -1,0 +1,408 @@
+{
+  "welcome": "Welcome",
+  "logout": "Logout",
+  "header": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "footer": {
+    "privacyPolicy": "Privacy Policy",
+    "copyright": "© 2024 All rights reserved"
+  },
+  "navigation": {
+    "registry": "Registry",
+    "forum": "Forum",
+    "analytics": "Analytics",
+    "profile": "Profile",
+    "register": "Register",
+    "catalog": "Catalog",
+    "login": "Login",
+    "language": "Language"
+  },
+  "profile": {
+    "generalInfo": "General Information",
+    "iin": "IIN",
+    "role": "Role",
+    "rating": "Rating",
+    "phone": "Phone",
+    "email": "Email",
+    "verified": "Verified",
+    "myApartments": "My Apartments",
+    "addProperty": "Add Property",
+    "rentalStatus": "Rental Status",
+    "house": "house",
+    "apartment": "apartment",
+    "rooms": "Rooms",
+    "complaints": "Complaints",
+    "addComplaint": "Add Complaint",
+    "sentComplaints": "Sent Complaints",
+    "receivedComplaints": "Received Complaints",
+    "description": "Description",
+    "status": "Status",
+    "date": "Date",
+    "action": "Action",
+    "details": "Details",
+    "dispute": "Dispute",
+    "edit": "Edit",
+    "logout": "Logout",
+    "info": "Info",
+    "apartments": "Apartments",
+    "notverify": "Not Verified",
+    "active": "Active",
+    "ended": "Ended",
+    "declined": "Declined",
+    "cancelled": "Cancelled",
+    "noAddedHomes": "No added homes",
+    "noComplaints": "You have no complaints",
+    "pending": "Under review",
+    "reviewed": "Reviewed",
+    "rejected": "Rejected",
+    "adminComplaints": "Complaints for administrator review"
+  },
+  "verify": {
+    "identityVerification": "Identity verification"
+  },
+  "rentalTable": {
+    "rentalRequests": "Rental requests (incoming)",
+    "noRequests": "No rental requests.",
+    "tenant": "Tenant",
+    "address": "Address",
+    "date": "Request date",
+    "status": "Status",
+    "accept": "Accept",
+    "decline": "Decline",
+    "statuses": {
+      "pending": "Pending confirmation",
+      "active": "Active",
+      "ended": "Ended",
+      "declined": "Declined",
+      "cancelled": "Cancelled"
+    }
+  },
+  "complaint": {
+    "title": "Complaint",
+    "description": "Description",
+    "rating": "Rating",
+    "status": "Status",
+    "reviewed": "Reviewed",
+    "rejected": "Rejected",
+    "pending": "Under review",
+    "complainant": "Landlord",
+    "accused": "Tenant",
+    "property": "Property",
+    "reasons": "Reasons",
+    "evidence": "Evidence",
+    "viewFile": "View file",
+    "approve": "Approve",
+    "reject": "Reject",
+    "reason": {
+      "Жалобы от соседей / нарушение порядка": "Complaints from neighbors / disturbing the order",
+      "Нарушение условий договора": "Breach of contract terms",
+      "Порча имущества": "Property damage",
+      "Просрочка платежей": "Payment delays",
+      "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
+    }
+  },
+  "form": {
+    "title": "New Property",
+    "address": "Address (Street)",
+    "property_type": "Property Type",
+    "rooms": "Number of Rooms",
+    "select_type": "Select type",
+    "apartment": "Apartment",
+    "house": "House",
+    "room": "Room",
+    "submit": "Add Property"
+  },
+  "registration": {
+    "registration1": "Registration",
+    "user_type": "User type",
+    "individual": "Individual",
+    "legal_entity": "Legal entity",
+    "role": "Role",
+    "tenant": "Tenant",
+    "landlord": "Landlord",
+    "full_name": "Full name / Company name",
+    "iin": "IIN",
+    "bin": "BIN",
+    "phone": "Phone",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "documents": "Documents",
+    "submit": "Register",
+    "field_required": "This field is required",
+    "password_mismatch": "Passwords do not match",
+    "successful_registration": "Registration successful"
+  },
+  "Scomplaint": {
+    "title": "Submit a Complaint",
+    "selectRental": "Select a Rental",
+    "chooseOption": "-- Choose --",
+    "description": "Complaint Description",
+    "describeComplaint": "Describe the nature of the complaint",
+    "reasons": "Reasons for the complaint:",
+    "rating": "Rating:",
+    "evidence": "Evidence (optional):",
+    "submit": "Submit Complaint",
+    "submitting": "Submitting...",
+    "success": "Complaint submitted successfully",
+    "submitError": "Error while submitting the complaint",
+    "unexpectedError": "An unexpected error occurred",
+    "authRequired": "Authentication required",
+    "loadRentalsError": "Failed to load rentals list.",
+    "loadReasonsError": "Failed to load complaint reasons.",
+    "noActiveRental": "You have no active rental with this user",
+    "reason": {
+      "Жалобы от соседей / нарушение порядка": "Complaints from neighbors / disturbing the order",
+      "Нарушение условий договора": "Breach of contract terms",
+      "Порча имущества": "Property damage",
+      "Просрочка платежей": "Payment delays",
+      "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
+    }
+  },
+  "editProfile": {
+    "loading": "Loading...",
+    "fullName": "Full Name",
+    "iin": "IIN",
+    "phone": "Phone Number",
+    "email": "Email",
+    "uploadNew": "Upload New",
+    "saveChanges": "Save Changes"
+  },
+  "rentalCatalog": {
+    "title": "Housing Catalog",
+    "find": "Find",
+    "rent": "Rent",
+    "selectDates": "Select rental dates",
+    "requestSent": "Request sent for review",
+    "requestFailed": "Failed to send request"
+  },
+  "search": {
+    "placeholder": "Search by IIN or username",
+    "apply_filters": "Apply filters",
+    "no_complaints": "No complaints found",
+    "tenant": "Tenant",
+    "iin": "IIN",
+    "complaints_count": "Number of complaints",
+    "entry_date": "Entry date",
+    "rating": "Rating",
+    "profile": "Profile",
+    "tenant_registry": "Tenant Registry"
+  },
+  "forum": {
+    "title": "Complaints Forum",
+    "filter": {
+      "popular": "Popular",
+      "new": "New",
+      "old": "Old"
+    },
+    "postedBy": "Posted by",
+    "description": "Description",
+    "accused": "Accused",
+    "property": "Property",
+    "support": "Support",
+    "comments": "Comments",
+    "addComment": "Add a comment...",
+    "send": "Send"
+  },
+  "analytics": {
+    "title": "Tenant Reliability Analytics",
+    "username": "Username",
+    "complaint_count": "Number of complaints",
+    "rating": "Rating",
+    "prediction": "Prediction",
+    "logreg_chart": "Unreliability probability by rating"
+  },
+  "model_predictions": {
+    "title": "BERT Model Predictions",
+    "accuracy": "Model Accuracy",
+    "description": "Description",
+    "prob_reliable": "P(Reliable)",
+    "prob_unreliable": "P(Unreliable)",
+    "prediction": "Prediction",
+    "true_label": "True Label",
+    "unreliable": "Unreliable",
+    "loading": "Loading..."
+  },
+  "cta": {
+    "register_message_part1": "Sign up to get",
+    "register_message_part2": "full access!",
+    "register_button": "Register →",
+    "already_registered": "Already registered?",
+    "login_link": "Log in"
+  },
+  "hero": {
+    "free_and_available": "FREE & AVAILABLE",
+    "check_potential_tenant": "Check potential tenant",
+    "start_checking": "Start checking"
+  },
+  "features": {
+    "registry": "Registry",
+    "registry_description": "Avoid bad tenants with complaints, payment delays, or property damage by checking their history.",
+    "forum": "Forum",
+    "forum_description": "Share experiences and insights with other landlords, and receive support from them.",
+    "analytics": "Analytics",
+    "analytics_description": "Track tenant reliability analysis. View areas with good tenants on the map.",
+    "help": "Help",
+    "help_description": "Have questions about the complaint's validity? Need legal advice? Want to ask a question? Chat with the bot, and our managers will contact you!",
+    "go_to": "Go to",
+    "rules": "Rules"
+  },
+  "termsPolicy": {
+    "title": "Terms and Policy",
+    "section1": {
+      "title": "1. Accuracy of Published Information",
+      "description": "Each user is obligated to publish only truthful, verified information.",
+      "prohibited": {
+        "title": "What is prohibited:",
+        "items": [
+          "Deliberate distortion of facts, falsification of complaints or events.",
+          "Posting complaints on behalf of third parties without their written consent.",
+          "Using false documents or forged materials (screenshots, photos, contracts, etc.)."
+        ]
+      },
+      "allowed": {
+        "title": "What is allowed:",
+        "items": [
+          "Complaints supported by facts, contracts, photo/video evidence, correspondence.",
+          "Posting reviews about personal experiences with the tenant."
+        ]
+      },
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Warning → 30-day account suspension → permanent ban for repeated violations. In case of severe violations — permanent ban."
+      }
+    },
+    "section2": {
+      "title": "2. Confidentiality and Protection of Personal Data",
+      "prohibited": {
+        "title": "What is prohibited:",
+        "items": [
+          "Disclosure of passport data, scans of identification documents, and other confidential data without justification.",
+          "Posting data of third parties without their participation in the rental contract.",
+          "Using user data for harassment, manipulation, or threats."
+        ]
+      },
+      "allowed": {
+        "title": "What is allowed:",
+        "items": [
+          "Indicating the full name, phone number, and ID number of the tenant within the complaint with the rental contract.",
+          "Using edited documents without disclosing personal data."
+        ]
+      },
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Warning → Deletion of post → Temporary suspension → Possible data transfer to authorized authorities."
+      }
+    },
+    "section3": {
+      "title": "3. Respectful Communication and Ethics",
+      "prohibited": {
+        "title": "What is prohibited:",
+        "items": ["Profanity, threats, bullying, and extortion."]
+      },
+      "allowed": {
+        "title": "What is encouraged:",
+        "items": ["Constructive criticism and objective presentation of facts."]
+      },
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Warning → Temporary comment restriction → Account suspension."
+      }
+    },
+    "section4": {
+      "title": "4. Hate Speech and Discrimination",
+      "description": "Racism, sexism, xenophobia, and other forms of intolerance are strictly prohibited.",
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Immediate account suspension without warning."
+      }
+    },
+    "section5": {
+      "title": "5. Prohibition of Advertising, Spam, and Self-Promotion",
+      "prohibited": {
+        "title": "What is prohibited:",
+        "items": ["Advertising links, referral codes, spam."]
+      },
+      "allowed": {
+        "title": "Exceptions:",
+        "items": [
+          "Recommendations from lawyers and partner organizations in special sections."
+        ]
+      },
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Post deletion → Temporary ban → Permanent ban."
+      }
+    },
+    "section6": {
+      "title": "6. Creation and Use of Fake Accounts",
+      "description": "Creating multiple accounts for manipulation and using other people's data is prohibited.",
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Immediate ban of all associated accounts."
+      }
+    },
+    "section7": {
+      "title": "7. Using the Site for Illegal Purposes",
+      "description": "Using the platform for extortion, threats, and falsifying evidence is prohibited.",
+      "sanctions": {
+        "title": "Sanctions:",
+        "description": "Immediate ban and data transfer to law enforcement authorities."
+      }
+    },
+    "section8": {
+      "title": "8. Contesting Reviews and Complaints",
+      "description": "Anyone can request a review of a complaint. Moderation is obligated to ensure the transparency of the review process."
+    },
+    "section9": {
+      "title": "9. Respect for the Work of Administration and Moderation",
+      "description": "Moderator decisions must be followed."
+    },
+    "section10": {
+      "title": "10. Updating and Compliance with the Rules",
+      "description": "Users automatically agree to the rules upon registration. Rules may be changed without notification."
+    },
+    "warningsSystem": {
+      "title": "Warning System",
+      "table": {
+        "headers": ["Violation", "First Measure", "Repeat", "Severe Violation"],
+        "rows": [
+          {
+            "violation": "False Complaint",
+            "firstMeasure": "Warning",
+            "repeat": "30-day ban",
+            "severe": "Permanent ban"
+          },
+          {
+            "violation": "Insults",
+            "firstMeasure": "Chat restriction",
+            "repeat": "7-day ban",
+            "severe": "30-day ban"
+          },
+          {
+            "violation": "Threats, extortion",
+            "firstMeasure": "30-day ban",
+            "repeat": "Permanent ban",
+            "severe": "Report to law enforcement"
+          },
+          {
+            "violation": "Data Disclosure",
+            "firstMeasure": "Delete post",
+            "repeat": "Ban",
+            "severe": "Permanent ban"
+          },
+          {
+            "violation": "Advertising/Spam",
+            "firstMeasure": "Warning",
+            "repeat": "3-day ban",
+            "severe": "Ban"
+          }
+        ]
+      }
+    }
+  }
+}
