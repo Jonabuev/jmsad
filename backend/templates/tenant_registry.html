@@ -1,0 +1,48 @@
+<form method="get">
+    <label for="region">Фильтр по региону:</label>
+    <input type="text" name="region" id="region">
+
+    <label for="iin">Фильтр по IIN:</label>
+    <input type="text" name="iin" id="iin">
+
+    <label for="username">Фильтр по Username:</label>
+    <input type="text" name="username" id="username">
+
+    <label for="start_date">Дата с:</label>
+    <input type="date" name="start_date" id="start_date">
+
+    <label for="end_date">Дата по:</label>
+    <input type="date" name="end_date" id="end_date">
+
+    <button type="submit">Применить фильтры</button>
+</form>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Арендатор</th>
+            <th>Жалоба</th>
+            <th>Дата внесения</th>
+            <th>Адрес</th>
+            <th>Регион</th>
+            <th>Причина жалобы</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for complaint in complaints %}
+            <tr>
+                <td>{{ complaint.tenant_identity.username }}</td>
+                <td>{{ complaint.description }}</td>
+                <td>{{ complaint.created_at }}</td>
+                <td>{{ complaint.property.address }}</td>
+                <td>{{ complaint.property.region }}</td>
+                <td>
+                    {% for reason in complaint.reason.all %}
+                        {{ reason.reason }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,11 @@
+<h1>Мои апартаменты</h1>
+
+{% if houses %}
+    <ul>
+        {% for house in houses %}
+            <li>Город: {{ house.city }}, Адрес: {{ house.address }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас пока нет апартаментов.</p>
+{% endif %}

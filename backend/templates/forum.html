@@ -1,0 +1,107 @@
+<div class="complaints-container">
+    <!-- Фильтрация -->
+    <div class="filter-options">
+      <form method="GET" action="{% url 'forum' %}">
+        <input type="hidden" name="filter" value="popular">
+        <button type="submit">Popular</button>
+      </form>
+
+      <form method="GET" action="{% url 'forum' %}">
+        <input type="hidden" name="filter" value="new">
+        <button type="submit">New</button>
+      </form>
+
+      <form method="GET" action="{% url 'forum' %}">
+        <input type="hidden" name="filter" value="old">
+        <button type="submit">Old</button>
+      </form>
+    </div>
+  
+    <!-- Список жалоб -->
+    <div class="complaints-list">
+      {% for complaint in complaints %}
+        {% if complaint.status == 'reviewed' %}
+            <div class="complaint-item">
+            <div class="complaint-header">
+                <span>Posted by: {{ complaint.landlord_identity.username }}</span>
+            </div>
+            <div class="complaint-body">
+                <p>Description: {{ complaint.description }}</p>
+                <p>Tenant - {{ complaint.tenant_identity.username }}</p>
+            </div>
+    
+            
+            <!-- Опции жалобы: поддержка, комментирование -->
+            <div class="complaint-footer">
+                <form method="POST" action="{% url 'support_complaint' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="complaint_id" value="{{ complaint.id }}">
+                    <button type="submit" id="support-btn-{{ complaint.id }}">
+                    Support (<span id="support-count-{{ complaint.id }}">{{ complaint.support_count }}</span>)
+                    </button>
+                </form>
+                {% if user.is_superuser %}
+                    <form method="POST" action="{% url 'spor_complaint_status' complaint.id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="pending">Убрать</button>
+                    </form>
+                {% endif %}
+                <button class="comment-btn" onclick="showComments('{{ complaint.id }}')" >Comments ({{ complaint.comments.count }})</button>
+
+            </div>
+    
+            <!-- Комментарии -->
+            <div class="comments-section" id="comments-{{ complaint.id }}" style="display: none;">
+                {% for comment in complaint.comments.all %}
+                <div class="comment-item">
+                    <div class="comment-avatar">
+                    {% if comment.user.avatar %}
+                        <img src="{{ comment.user.avatar.url }}" alt="Avatar" style="width: 100px;">
+                    {% else %}
+                        <img src="/media/avatars/def.jpg" alt="Avatar" style="width: 100px;">
+                    {% endif %}
+                    </div>
+                    <div class="comment-details">
+                    <span>{{ comment.user.username }} 
+                        {% for user_entry in user_ratings %} 
+                            {% if user_entry.user == comment.user %}
+                                (Rating: {{ user_entry.average_rating }})
+                            {% endif %}
+                        {% endfor %}
+
+                    <p>{{ comment.text }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <!-- Форма добавления комментария -->
+                <div class="add-comment-form">
+                <form method="POST" action="{% url 'forum_add' complaint.id %}">
+                    {% csrf_token %}
+                    <textarea name="comment_text" placeholder="Add a comment..."></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+                </div>
+            </div>
+            </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+</div>
+
+<script>
+  
+    
+
+    function showComments(complaintId) {
+        // Получаем элемент с комментариями
+        var commentsSection = document.getElementById('comments-' + complaintId);
+
+        // Переключаем отображение комментариев
+        if (commentsSection.style.display === 'none') {
+            commentsSection.style.display = 'block';
+        } else {
+            commentsSection.style.display = 'none';
+        }
+    }
+</script>

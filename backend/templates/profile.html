@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    {% if user.is_superuser %}
+        
+        {% if user.avatar %}
+        <img src='{{ user.avatar.url }}' alt="User Avatar" style="width: 150px; height: 150px; border-radius: 50%;">
+        {% else %}
+        <img src="/media/avatars/def.jpg" alt="Default Avatar" style="width: 150px; height: 150px; border-radius: 50%;">
+        {% endif %}
+        <p>
+            {{ user.username }}, {{ user.identifier }}, {{ user.phone_number }}, {{ user.email }}
+        </p>
+        Активен ли:{{ user.is_active }} ------ Почта подтверждена ли :{{ user.email_confirmed }} ------ Последний вход: {{ user.last_login }}
+    {% else %}
+        <h1>{{ user.role }}</h1>
+    
+        {% if reputation %}
+        <h1>Ваш рейтинг: {{ average_rating }}</h1>
+        {% else %}
+        <h1> Ваш рейтинг: 0</h1>
+        {% endif %}
+        
+        {% if user.role|lower == 'landlord' %}
+        <a href="{% url 'create_apartment' %}">
+            <button type="button">create_apartment</button>
+        </a>
+        <h1>Мои апартаменты</h1>
+        
+        {% if houses %}
+        <ul>
+            {% for house in houses %}
+            <li>Город: {{ house.city }}, Адрес: {{ house.address }}, {{ house.created_at }}, {{ house.region }}, {{ house.type_p }}, {{ house.num_of_rooms }}, 
+                {% if house.comment %}
+                                {{ house.comment }}
+                            {% else %}
+                                Описания нет
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>У вас пока нет апартаментов.</p>
+            {% endif %}
+        {% endif %}
+
+        
+        
+            <h2>Complaints Sent</h2>
+        <ul>
+            {% for complaint in complaint_send.all %}
+                <li>To: {{ complaint.tenant_identity.username }} - Статус: {{ complaint.status }} - Описание: {{ complaint.description }} - Поддержка: {{ complaint.support_count }}</li>
+                {% if complaint.status == 'rejected' %}
+                <form method="POST" action="{% url 'spor_complaint_status' complaint.id %}">
+                    {% csrf_token %}
+                        <textarea name="new_description" placeholder="Введите новое описание"></textarea>
+                        <button type="submit" name="status" value="pending">Оспорить</button>
+                    </form>
+                    {% endif %}
+                    {% endfor %}
+                    
+                </ul>
+                
+                <h2>Complaints Received</h2>
+                <ul>
+                    {% for complaint in complaint_recceived.all %}
+                    <li>From: {{ complaint.tenant_identity.username }}  - Статус:{{ complaint.status }} - Описание:{{ complaint.description }} - Поддержка:{{complaint.support_count}}</li>
+                    {% if complaint.status == 'rejected' %}
+                    <form method="POST" action="{% url 'spor_complaint_status' complaint.id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="pending">Оспорить</button>
+                    </form>
+                    {% endif %}
+                    
+                    {% endfor %}
+                </ul>
+                
+    {% endif %}
+    <a href="{% url 'edit_profile' %}">
+        <button type="button">edit_profile</button>
+    </a>
+
+    {% if user.is_superuser %}
+        <h2>Жалобы для проверки администратором</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Жалоба</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaintadmin %}
+                    <tr>
+                        <td>{{ complaint.description }}</td>
+                        <td>{{ complaint.status }}</td>
+                        <td>
+                            {% if complaint.status == 'pending' %}
+                                <form method="POST" action="{% url 'update_complaint_status' complaint.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" name="status" value="reviewed">Одобрить</button>
+                                    <button type="submit" name="status" value="rejected">Отклонить</button>
+                                </form>
+                            {% else %}
+                                <span>Статус обновлен: {{ complaint.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+</body>
+</html>
