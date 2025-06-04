@@ -1512,6 +1512,9 @@ from rest_framework import status
 from .models import PasswordChangeRequest, CustomUser  # Импортируем CustomUser
 from .serializers import RequestPasswordChangeSerializer, ConfirmPasswordChangeSerializer
 from .utils import generate_code, send_confirmation_code
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 
 User = CustomUser
 
@@ -1583,6 +1586,12 @@ class ConfirmPasswordChangeView(APIView):
         # Проверяем, не истек ли срок действия кода (10 минут)
         if req_obj.is_expired():
             return Response({'error': 'Срок действия кода истек'}, status=400)
+        
+        try:
+            validate_password(new_password, user)
+        except ValidationError as e:
+            return Response({'error': e.messages}, status=400)
+
 
         # Меняем пароль
         user.set_password(new_password)
