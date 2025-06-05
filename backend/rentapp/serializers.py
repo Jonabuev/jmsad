@@ -110,7 +110,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 # serializers.py
 
 from rest_framework import serializers
-from .models import Complaint, CustomUser
+from .models import Complaint, CustomUser, ComplaintImage
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
@@ -141,6 +141,12 @@ class ComplaintReasonSerializer(serializers.ModelSerializer):
         model = ComplaintReason
         fields = ['id', 'reason']
 
+
+class ComplaintImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplaintImage
+        fields = ['id', 'image']
+
 class RentalComplaintSerializer(serializers.ModelSerializer):
     complainant = UserSerializer(read_only=True)
     accused = UserSerializer(read_only=True)
@@ -149,6 +155,7 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     evidence = serializers.FileField(read_only=True)
     user=CustomUserSerializer(read_only=True)
+
     class Meta:
         model = RentalComplaint
         fields = [
@@ -165,11 +172,14 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
             'evidence',
             'comments',
             'created_at',
-            'user'
+            'user',
+            'court_decision_score', 
+            'images'
         ]
 
     def get_property(self, obj):
         return HouseSerializer(obj.rental.house).data if obj.rental and obj.rental.house else None
+
     
 
 class RentalApartments(serializers.ModelSerializer):

@@ -24,6 +24,8 @@ const SubmitComplaintForm: React.FC = () => {
     rating: "3",
     reason: [] as number[],
     evidence: null as File | null,
+    evidenceImages: [] as File[],
+    damageCost: "",
   });
 
   const [rentals, setRentals] = useState<RentalOption[]>([]);
@@ -103,6 +105,10 @@ const SubmitComplaintForm: React.FC = () => {
     data.append("rating", formData.rating);
     formData.reason.forEach((id) => data.append("reason", String(id)));
     if (formData.evidence) data.append("evidence", formData.evidence);
+    formData.evidenceImages.forEach((file) => {
+      data.append("evidence_images", file); // ключ должен соответствовать Django view
+    });
+    data.append("damage_cost", formData.damageCost);
 
     try {
       await axios.post(
@@ -238,6 +244,40 @@ const SubmitComplaintForm: React.FC = () => {
           </div>
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("Scomplaint.additionalPhotos")}
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              if (e.target.files) {
+                setFormData((prev) => ({
+                  ...prev,
+                  evidenceImages: e.target.files ? Array.from(e.target.files).slice(0, 10) : [],
+                }));
+              }
+            }}
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("Scomplaint.damageCost")}
+          </label>
+          <input
+            type="number"
+            name="damageCost"
+            value={formData.damageCost}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, damageCost: e.target.value }))
+            }
+            required
+            className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Scomplaint.evidence")}

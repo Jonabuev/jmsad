@@ -70,7 +70,7 @@ from rest_framework import status
 
 from .models import RentalComplaint
 from .serializers import MyRentalSerializer
-from .models import Rental
+from .models import Rental, ComplaintImage
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -93,14 +93,16 @@ def createRentalComplaint(request):
 
     # Создаём жалобу
     new_rating = float(request.data.get('rating', 3))
+    dmg = request.data.get('damage_cost') 
     complaint = RentalComplaint(
         rental=rental,
         complainant=user,
         accused=accused,
         description=request.data.get('description'),
-        rating=new_rating
+        rating=new_rating,
+        court_decision_score = dmg
         )
-
+    
     # Получаем текущий рейтинг из модели (если его нет — считаем за 0)
     current_rating = accused.rating or 0
 
@@ -123,7 +125,10 @@ def createRentalComplaint(request):
     if reasons_ids:
         complaint.reasons.set(reasons_ids)
 
-
+    # Пример: все картинки приходят под ключом 'images' как список
+    images = request.FILES.getlist('evidence_images')  # ключ 'images' может быть другим, зависит от фронта
+    for img in images:
+       ComplaintImage.objects.create(complaint=complaint, image=img)
 
 
     return Response({'message': 'Жалоба успешно создана.', 'id': complaint.id}, status=status.HTTP_201_CREATED)

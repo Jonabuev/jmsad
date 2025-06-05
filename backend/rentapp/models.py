@@ -428,12 +428,20 @@ class RentalComplaint(models.Model):
     support_count = models.IntegerField(default=0)
     rating = models.PositiveSmallIntegerField(default=3)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    court_decision_score = models.IntegerField(default=0)
+
 
     def __str__(self):
         return f"Жалоба от {self.complainant} на {self.accused} по аренде {self.rental.id}"
 
 
-
+class ComplaintImage(models.Model):
+    complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='complaint_images/')
+    
+    def __str__(self):
+        return f"Изображение для жалобы {self.complaint.id}"
+    
 class Comment(models.Model):
     complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
