@@ -751,13 +751,24 @@ class ForumView(generics.ListAPIView):
 
     def get_queryset(self):
         filter_type = self.request.query_params.get('filter', 'popular')
+        region = self.request.query_params.get('region')
+        city = self.request.query_params.get('city')
+        district = self.request.query_params.get('district')
+
         qs = RentalComplaint.objects.filter(status='reviewed')
+
+        if region:
+            qs = qs.filter(property__region__icontains=region)
+        if city:
+            qs = qs.filter(property__city__icontains=city)
+        if district:
+            qs = qs.filter(property__district__icontains=district)
+
         if filter_type == 'new':
             return qs.order_by('-created_at')
         elif filter_type == 'old':
             return qs.order_by('created_at')
-        else:  # popular
-            return qs.order_by('-support_count')
+        return qs.order_by('-support_count')
 
 
 from rest_framework import status

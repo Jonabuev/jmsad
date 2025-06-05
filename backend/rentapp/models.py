@@ -123,59 +123,72 @@ class House(models.Model):
 
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    region = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    district = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.latitude or not self.longitude:
-            self.latitude, self.longitude = self.get_coordinates()
+        if not self.latitude or not self.longitude or not self.region or not self.city:
+            lat, lon, region, city, district = self.get_coordinates()
+            self.latitude = lat
+            self.longitude = lon
+            self.region = region
+            self.city = city
+            self.district = district
         super().save(*args, **kwargs)
 
     def get_coordinates(self):
         API_KEY = "c2b5bfe1-4f8f-4d16-baa8-2c2aa6c94384"
-        full_address = f"{self.address}, Алматы, Казахстан"
+        full_address = f"{self.address}, Казахстан"
         url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_KEY}&geocode={full_address}&format=json&lang=ru_RU"
-        
+
         headers = {
             'Accept': 'application/json',
             'User-Agent': 'Mozilla/5.0',
             'Referer': 'http://localhost:8000'
         }
-        
+
         retries = 3
         for attempt in range(retries):
             try:
-                print(f"Попытка {attempt + 1}: Отправка запроса к {url}")
                 response = requests.get(url, headers=headers, timeout=10)
-                print(f"Статус ответа: {response.status_code}")
-                
-                if response.status_code == 403:
-                    print(f"Ошибка 403: {response.text}")
-                    return None, None
-                    
                 response.raise_for_status()
                 data = response.json()
-                
-                if not data['response']['GeoObjectCollection']['featureMember']:
-                    print(f"Не найдены координаты для адреса: {full_address}")
-                    return None, None
-                    
-                pos = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos']
+
+                features = data['response']['GeoObjectCollection']['featureMember']
+                if not features:
+                    return None, None, None, None, None
+
+                geo_obj = features[0]['GeoObject']
+                pos = geo_obj['Point']['pos']
                 lon, lat = map(float, pos.split())
-                print(f"Успешно получены координаты для {full_address}: {lat}, {lon}")
-                return lat, lon
-                
-            except requests.RequestException as e:
-                print(f"Ошибка при запросе к API: {e}")
-                if attempt < retries - 1:
-                    time.sleep(2)
-                else:
-                    print(f"Не удалось получить координаты после {retries} попыток для адреса: {full_address}")
-                    return None, None
-            except (KeyError, ValueError) as e:
-                print(f"Ошибка при обработке ответа API: {e}")
-                print(f"Полученные данные: {data if 'data' in locals() else 'нет данных'}")
-                return None, None
-                
-        return None, None
+
+                components = geo_obj['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+                region = city = district = None
+
+                for comp in components:
+                    kind = comp.get("kind")
+                    name = comp.get("name")
+                    if kind == "province":
+                        region = name
+                    elif kind == "locality":
+                        city = name
+                    elif kind == "district":
+                        district = name
+
+                # Защита от повторов
+                if city == region:
+                    region = None
+
+                return lat, lon, region, city, district
+
+            except Exception as e:
+                print(f"Ошибка: {e}")
+                time.sleep(1)
+                continue
+
+        return None, None, None, None, None
+
 
     def __str__(self):
         return f'{self.type_p} at {self.address}'
