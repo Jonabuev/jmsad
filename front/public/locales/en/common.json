@@ -182,6 +182,7 @@
   },
   "search": {
     "placeholder": "Search by IIN or username",
+    "address_placeholder": "Enter address",
     "apply_filters": "Apply filters",
     "no_complaints": "No complaints found",
     "tenant": "Tenant",

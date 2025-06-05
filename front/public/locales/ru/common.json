@@ -182,6 +182,7 @@
   },
   "search": {
     "placeholder": "Поиск по ИИН или имени пользователя",
+    "address_placeholder": "Введите адрес",
     "apply_filters": "Применить фильтры",
     "no_complaints": "Жалобы не найдены",
     "tenant": "Арендатор",

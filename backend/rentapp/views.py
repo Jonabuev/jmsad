@@ -496,6 +496,12 @@ class TenantRegistryView1(ListAPIView):
 
         # Фильтрация арендаторов
         queryset = CustomUser.objects.filter(role='tenant')
+        
+        # ✅ Фильтрация по адресу дома (если указан)
+        address = self.request.query_params.get('address')
+        if address:
+            queryset = queryset.filter(rentals__house__address__icontains=address)
+
 
         # Фильтрация по жалобам с статусом "reviewed"
         queryset = queryset.annotate(

@@ -11,6 +11,8 @@ const TenantRegistry: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [addressQuery, setAddressQuery] = useState("");
+
   const router = useRouter();
   const [tenants, setTenants] = useState<ITenant[]>([]);
 
@@ -41,6 +43,9 @@ const TenantRegistry: React.FC = () => {
         params.start_date = startDate;
         params.end_date = endDate;
       }
+      if (addressQuery) {
+        params.address = addressQuery; 
+      }
 
       const res = await axios.get(
         "http://127.0.0.1:8000/api/tenant-registry1/",
@@ -56,7 +61,7 @@ const TenantRegistry: React.FC = () => {
     } catch (error) {
       console.error("Ошибка при загрузке жалоб:", error);
     }
-  }, [router, searchQuery, startDate, endDate]);
+  }, [router, searchQuery, startDate, endDate, addressQuery]);
 
   useEffect(() => {
     fetchComplaints();
@@ -84,6 +89,13 @@ const TenantRegistry: React.FC = () => {
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <input
+          type="text"
+          placeholder={t("search.address_placeholder")} 
+          value={addressQuery}
+          onChange={(e) => setAddressQuery(e.target.value)}
           className="border p-2 rounded"
         />
         <button
