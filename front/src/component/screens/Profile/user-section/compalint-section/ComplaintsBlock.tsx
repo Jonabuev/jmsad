@@ -37,10 +37,10 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
         <p className="text-gray-500">{t("profile.noComplaints")}.</p>
       ) : (
         <div className="space-y-8">
-          {complaint_received?.length > 0 && (
+          {complaint_send?.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {t("profile.receivedComplaints")}
+                {t("profile.sentComplaints")}
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full border text-sm">
@@ -53,6 +53,9 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
                         {t("profile.status")}
                       </th>
                       <th className="border px-4 py-2">{t("profile.date")}</th>
+                      <th className="border px-4 py-2">
+                        {t("profile.details")}
+                      </th>
                       <th className="border px-4 py-2">
                         {t("profile.action")}
                       </th>
@@ -69,11 +72,19 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
                           {formatDate(c.created_at)}
                         </td>
                         <td className="border px-4 py-2">
-                          {c.status === "rejected" && (
+                          <Link
+                            href={`/complaints/${c.uuid}`}
+                            className="text-blue-600 underline hover:text-blue-800"
+                          >
+                            {t("profile.details")}
+                          </Link>
+                        </td>
+                        <td className="border px-4 py-2">
+                          {c.status === "reviewed" && (
                             <button
                               onClick={() => {
                                 const newDesc = prompt(
-                                  "Введите новое описание:",
+                                  "Введите новое описание (необязательно):",
                                   c.description
                                 );
                                 if (newDesc !== null)
@@ -93,10 +104,10 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
             </div>
           )}
 
-          {complaint_send?.length > 0 && (
+          {complaint_received?.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {t("profile.sentComplaints")}
+                {t("profile.receivedComplaints")}
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full border text-sm">
