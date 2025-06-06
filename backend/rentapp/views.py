@@ -488,6 +488,8 @@ from datetime import datetime
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView
+from django.db.models.functions import Cast
+from django.db.models import CharField
 
 class TenantRegistryView1(ListAPIView):
     serializer_class = CustomUserSerializer
@@ -499,24 +501,35 @@ class TenantRegistryView1(ListAPIView):
         if not user.email_confirmed:
             raise PermissionDenied("Требуется подтверждение почты для доступа.")
 
-        # Фильтрация арендаторов
         queryset = CustomUser.objects.filter(role='tenant')
-        
-        # ✅ Фильтрация по адресу дома (если указан)
+
+        # Фильтрация по адресу дома
         address = self.request.query_params.get('address')
         if address:
             queryset = queryset.filter(rentals__house__address__icontains=address)
 
+        # Фильтрация по court_score и причинам — временно сохраняем для фильтрации пользователей
+        court_score_filter = self.request.query_params.get('court_decision_score')
+        reasons_filter = self.request.query_params.get('reasons')
 
-        # Фильтрация по жалобам с статусом "reviewed"
-        queryset = queryset.annotate(
-            complaint_count=Count(
-                'received_rental_complaints',
-                filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
-            )
-        ).filter(complaint_count__gt=0)  # Показывать только тех, у кого есть такие жалобы
+        # Отдельный queryset пользователей, удовлетворяющих фильтрам по жалобам
+        if court_score_filter or reasons_filter:
+            # Пользователи, у которых есть жалобы с заданными court_score или reasons
+            complaint_filter = Q()
 
-        # Фильтры по поиску
+            if court_score_filter:
+                complaint_filter &= Q(received_rental_complaints__court_decision_score__startswith=court_score_filter)
+            if reasons_filter:
+                reason_ids = [int(r) for r in reasons_filter.split(',') if r.isdigit()]
+                if reason_ids:
+                    complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
+
+            # Получаем пользователей с этими жалобами
+            filtered_user_ids = CustomUser.objects.filter(role='tenant').filter(complaint_filter).values_list('id', flat=True).distinct()
+
+            queryset = queryset.filter(id__in=filtered_user_ids)
+
+        # Далее фильтрация по search и дате (если есть)
         search_query = self.request.query_params.get('search')
         if search_query:
             queryset = queryset.filter(
@@ -524,23 +537,24 @@ class TenantRegistryView1(ListAPIView):
                 Q(identifier__icontains=search_query)
             )
 
-        # Фильтрация по датам
         start_date_str = self.request.query_params.get('start_date')
         end_date_str = self.request.query_params.get('end_date')
-
         if start_date_str and end_date_str:
-            # Преобразуем строки в datetime
             start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-
-            # Преобразуем в aware datetime
             start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
             end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
-
             queryset = queryset.filter(r_date__range=[start_date, end_date])
 
-        return queryset
+        # Теперь аннотируем complaint_count по ВСЕМ жалобам с status='reviewed' без учета фильтров по причинам и court_score
+        queryset = queryset.annotate(
+            complaint_count=Count(
+                'received_rental_complaints',
+                filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
+            )
+        ).filter(complaint_count__gt=0)  # Оставляем только с жалобами
 
+        return queryset
 
 
 

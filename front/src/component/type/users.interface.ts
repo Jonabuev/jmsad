@@ -27,6 +27,8 @@ export interface IProfile {
 }
 
 export interface ITenant {
+  complaint_reasons: string;
+  court_scores: string;
   username: string;
   email: string;
   email_confirmed: boolean;

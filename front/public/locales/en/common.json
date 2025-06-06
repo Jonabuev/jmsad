@@ -193,7 +193,18 @@
     "entry_date": "Entry date",
     "rating": "Rating",
     "profile": "Profile",
-    "tenant_registry": "Tenant Registry"
+    "tenant_registry": "Tenant Registry",
+    "court_scores": "Court Scores",
+    "complaint_reasons": "Complaint Reasons",
+    "filter_reasons": "Filter Reasons",
+    "court_score_placeholder": "Court decision number",
+    "reason": {
+      "Жалобы от соседей / нарушение порядка": "Complaints from neighbors / disturbing the order",
+      "Нарушение условий договора": "Breach of contract terms",
+      "Порча имущества": "Property damage",
+      "Просрочка платежей": "Payment delays",
+      "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
+    }
   },
   "forum": {
     "title": "Complaints Forum",

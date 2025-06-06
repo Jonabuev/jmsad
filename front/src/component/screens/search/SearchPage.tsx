@@ -4,17 +4,62 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { MyComponent } from "@/component/star/Star";
 import { ITenant } from "@/component/type/users.interface";
-import { useTranslation } from "next-i18next"; // Импортируем useTranslation
+import { useTranslation } from "next-i18next";
+
+interface IComplaintReason {
+  id: number;
+  reason: string;
+}
 
 const TenantRegistry: React.FC = () => {
-  const { t } = useTranslation("common"); // Используем хук для перевода
+  const { t } = useTranslation("common");
   const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [addressQuery, setAddressQuery] = useState("");
+  const [courtScore, setCourtScore] = useState("");
+  const [reasons, setReasons] = useState<IComplaintReason[]>([]);
+  const [selectedReasons, setSelectedReasons] = useState<number[]>([]);
 
   const router = useRouter();
   const [tenants, setTenants] = useState<ITenant[]>([]);
+
+  // Загрузка причин
+  useEffect(() => {
+    
+    const fetchReasons = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await axios.get("http://127.0.0.1:8000/api/complaint-reasons/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setReasons(res.data);
+      } catch (error) {
+        console.error("Ошибка загрузки причин жалоб:", error);
+      }
+    };
+    fetchReasons();
+  }, []);
+
+  const getTranslatedReasons = (reasonsStr: string) => {
+    if (!reasonsStr) return "-";
+
+    const keys = reasonsStr.split(",").map((s) => s.trim()).filter(Boolean);
+
+    return keys
+      .map((key) => {
+        // Если ключ текстовый (как "nonpayment"), переводим напрямую:
+        return t(`search.reason.${key}`);
+      })
+      .join(", ");
+  };
+  const toggleReason = (id: number) => {
+    setSelectedReasons((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+  };
 
   const fetchComplaints = useCallback(async () => {
     try {
@@ -43,25 +88,33 @@ const TenantRegistry: React.FC = () => {
         params.start_date = startDate;
         params.end_date = endDate;
       }
-      if (addressQuery) {
-        params.address = addressQuery; 
+      if (addressQuery) params.address = addressQuery;
+      if (courtScore) params.court_decision_score = courtScore;
+
+      if (selectedReasons.length > 0) {
+        params.reasons = selectedReasons.join(",");
       }
 
-      const res = await axios.get(
-        "http://127.0.0.1:8000/api/tenant-registry1/",
-        {
-          params,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.get("http://127.0.0.1:8000/api/tenant-registry1/", {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setTenants(res.data);
     } catch (error) {
       console.error("Ошибка при загрузке жалоб:", error);
     }
-  }, [router, searchQuery, startDate, endDate, addressQuery]);
+  }, [
+    router,
+    searchQuery,
+    startDate,
+    endDate,
+    addressQuery,
+    courtScore,
+    selectedReasons,
+  ]);
 
   useEffect(() => {
     fetchComplaints();
@@ -93,18 +146,45 @@ const TenantRegistry: React.FC = () => {
         />
         <input
           type="text"
-          placeholder={t("search.address_placeholder")} 
+          placeholder={t("search.address_placeholder")}
           value={addressQuery}
           onChange={(e) => setAddressQuery(e.target.value)}
           className="border p-2 rounded"
         />
-        <button
-          onClick={fetchComplaints}
-          className="md:col-span-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          {t("search.apply_filters")}
-        </button>
+        <input
+          type="text"
+          placeholder={t("search.court_score_placeholder")}
+          value={courtScore}
+          onChange={(e) => setCourtScore(e.target.value)}
+          className="border p-2 rounded"
+        />
       </div>
+
+      {/* Чекбоксы причин */}
+      <fieldset className="mb-4">
+        <legend className="font-semibold mb-2">{t("search.filter_reasons")}</legend>
+        <div className="flex flex-wrap gap-3">
+          {reasons.map((reason) => (
+            <label key={reason.id} className="inline-flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={selectedReasons.includes(reason.id)}
+                onChange={() => toggleReason(reason.id)}
+                className="form-checkbox"
+              />
+              <span>{t(`search.reason.${reason.reason}`)}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <button
+        onClick={fetchComplaints}
+        className="md:col-span-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+      >
+        {t("search.apply_filters")}
+      </button>
+
       {tenants.length === 0 ? (
         <p className="text-gray-600">{t("search.no_complaints")}</p>
       ) : (
@@ -114,11 +194,11 @@ const TenantRegistry: React.FC = () => {
               <tr className="text-left">
                 <th className="border px-4 py-2">{t("search.tenant")}</th>
                 <th className="border px-4 py-2">{t("search.iin")}</th>
-                <th className="border px-4 py-2">
-                  {t("search.complaints_count")}
-                </th>
+                <th className="border px-4 py-2">{t("search.complaints_count")}</th>
                 <th className="border px-4 py-2">{t("search.entry_date")}</th>
                 <th className="border px-4 py-2">{t("search.rating")}</th>
+                <th className="border px-4 py-2">{t("search.court_scores")}</th> 
+                <th className="border px-4 py-2">{t("search.complaint_reasons")}</th> 
                 <th className="border px-4 py-2">{t("search.profile")}</th>
               </tr>
             </thead>
@@ -127,22 +207,15 @@ const TenantRegistry: React.FC = () => {
                 <tr key={tenant.identifier} className="border text-center">
                   <td className="border px-4 py-2">{tenant.username}</td>
                   <td className="border px-4 py-2">{tenant.identifier}</td>
+                  <td className="border px-4 py-2">{tenant.complaint_count ?? 0}</td>
                   <td className="border px-4 py-2">
-                    {tenant.complaint_count ?? 0}
+                    {tenant.r_date ? new Date(tenant.r_date).toLocaleDateString("ru-RU") : "-"}
                   </td>
                   <td className="border px-4 py-2">
-                    {tenant.r_date
-                      ? new Date(tenant.r_date).toLocaleDateString("ru-RU")
-                      : "-"}
+                    {tenant.rating ? <MyComponent value={tenant.rating} /> : "—"}
                   </td>
-
-                  <td className="border px-4 py-2">
-                    {tenant.rating ? (
-                      <MyComponent value={tenant.rating} />
-                    ) : (
-                      "—"
-                    )}
-                  </td>
+                  <td className="border px-4 py-2">{tenant.court_scores || "-"}</td> 
+                  <td className="border px-4 py-2">{getTranslatedReasons(tenant.complaint_reasons)}</td> 
                   <td className="border px-4 py-2">
                     <Link
                       href={`/user/${tenant.username}`}
