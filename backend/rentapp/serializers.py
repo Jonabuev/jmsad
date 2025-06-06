@@ -84,6 +84,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
     complaint_count = serializers.IntegerField(read_only=True)
+    court_scores = serializers.SerializerMethodField()
+    complaint_reasons = serializers.SerializerMethodField()
+    complaint_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = CustomUser
@@ -105,6 +108,27 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user.set_password(password1)
         user.save()
         return user
+    def get_court_scores(self, obj):
+        # Получаем уникальные court_decision_score по жалобам пользователя с фильтром по accused и статусу, например
+        scores_qs = obj.received_rental_complaints.filter(
+            accused=obj,
+            status='reviewed'
+        ).values_list('court_decision_score', flat=True).distinct()
+
+        # Преобразуем в строки и фильтруем None или пустые
+        scores = [str(score) for score in scores_qs if score]
+        return ", ".join(scores)
+
+    def get_complaint_reasons(self, obj):
+        # Получаем уникальные причины через связь ManyToMany или ForeignKey
+        # Предположим, reasons - ManyToMany в жалобах, нужно получить уникальные reason__reason
+        reasons_qs = obj.received_rental_complaints.filter(
+            accused=obj,
+            status='reviewed'
+        ).values_list('reasons__reason', flat=True).distinct()
+
+        reasons = [reason for reason in reasons_qs if reason]
+        return ", ".join(reasons)
 
 
 # serializers.py
