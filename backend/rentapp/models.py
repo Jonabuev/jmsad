@@ -167,14 +167,16 @@ class House(models.Model):
                 region = city = district = None
 
                 for comp in components:
-                    kind = comp.get("kind")
-                    name = comp.get("name")
-                    if kind == "province":
-                        region = name
-                    elif kind == "locality":
-                        city = name
-                    elif kind == "district":
-                        district = name
+                  kind = comp.get("kind")
+                  name = comp.get("name")
+                  if kind == "province":
+                      region = name
+                  elif kind == "locality":
+                      city = name
+                  elif kind in ("district", "area"):
+                      district = name
+
+
 
                 # Защита от повторов
                 if city == region:
