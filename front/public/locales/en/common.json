@@ -418,5 +418,32 @@
         ]
       }
     }
+  },
+  "password": {
+    "change": {
+      "title": "Change Password",
+      "description": "To change your password, we'll send a verification code to your email.",
+      "send_code": "Send Verification Code",
+      "enter_code_and_password": "Enter Verification Code and New Password",
+      "code_label": "Verification Code",
+      "new_password_label": "New Password",
+      "confirm": "Change Password",
+      "success_title": "Password Changed Successfully",
+      "success_message": "Your password has been changed successfully. You can now use your new password to log in.",
+      "back_to_profile": "Back to Profile"
+    },
+    "reset": {
+      "title": "Reset Password",
+      "description": "Enter your email address and we'll send you a verification code to reset your password.",
+      "email_label": "Email Address",
+      "send_code": "Send Reset Code",
+      "enter_code": "Enter Verification Code",
+      "code_label": "Verification Code",
+      "new_password_label": "New Password",
+      "change_password": "Reset Password",
+      "success_title": "Password Reset Successful",
+      "success_message": "Your password has been reset successfully. You can now log in with your new password.",
+      "go_to_login": "Go to Login"
+    }
   }
 }
