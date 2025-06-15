@@ -209,6 +209,12 @@
   "forum": {
     "title": "Форум жалоб",
     "filter": {
+      "region": "Регион",
+      "city": "Город",
+      "district": "Район",
+      "address": "Адрес",
+      "all": "Все",
+      "addressPlaceholder": "Введите адрес",
       "popular": "Популярные",
       "new": "Новые",
       "old": "Старые"

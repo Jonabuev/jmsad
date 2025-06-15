@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import AvailableHousesView, ChatMessageListCreateView, ChatThreadListCreateView, ConfirmPasswordChangeView, CreateRentalRequest, CustomTokenObtainPairView, FavoriteListCreateView, MyRentalsAPIView, NotificationListView, PublicUserProfileView, RentalDetailView, RentalListCreateView, RentalRequestListView, RequestPasswordChangeView, RequestPasswordResetView, house_locations, profile_view
+from .views import AvailableHousesView, ChatMessageListCreateView, ChatThreadListCreateView, ConfirmPasswordChangeView, CreateRentalRequest, CustomTokenObtainPairView, FavoriteListCreateView, MyRentalsAPIView, NotificationListView, PublicUserProfileView, RentalDetailView, RentalListCreateView, RentalRequestListView, RequestPasswordChangeView, RequestPasswordResetView, get_location_filters, house_locations, profile_view
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -44,6 +44,7 @@ urlpatterns = [
     path('support-complaint/', SupportComplaintAPIView.as_view(), name='support_complaint'),
     path('recommend-tenants/', RecommendTenantsAPIView.as_view(), name='recommend_tenants'),
     path('forum/', ForumView.as_view(), name='forum'),
+    path('forum/filters/', get_location_filters, name='forum-filters'),
     path('analitics/', RecommendTenantsAPIView.as_view(), name='analitics'),
     path('analiticsML/', views.evaluate_reliability, name='analitics'),
     path('forum-add/<int:complaint_id>/', AddCommentAPIView.as_view(), name='forum_add'),

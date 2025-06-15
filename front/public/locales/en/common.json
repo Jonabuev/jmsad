@@ -211,7 +211,13 @@
     "filter": {
       "popular": "Popular",
       "new": "New",
-      "old": "Old"
+      "old": "Old",
+      "region": "Region",
+      "city": "City",
+      "district": "District",
+      "address": "Address",
+      "all": "All",
+      "addressPlaceholder": "Enter address"
     },
     "postedBy": "Posted by",
     "description": "Description",

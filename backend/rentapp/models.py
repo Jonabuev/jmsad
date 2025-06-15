@@ -128,10 +128,12 @@ class House(models.Model):
     district = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.latitude or not self.longitude or not self.region or not self.city:
+        if not all([self.latitude, self.longitude, self.region, self.city]):
+
             lat, lon, region, city, district = self.get_coordinates()
             self.latitude = lat
             self.longitude = lon
+
             self.region = region
             self.city = city
             self.district = district

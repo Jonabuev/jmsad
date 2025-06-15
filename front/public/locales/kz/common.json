@@ -211,7 +211,13 @@
     "filter": {
       "popular": "Популярлы",
       "new": "Жаңа",
-      "old": "Ескі"
+      "old": "Ескі",
+      "region": "Облыс",
+      "city": "Қала",
+      "district": "Аудан",
+      "address": "Мекенжай",
+      "all": "Барлығы",
+      "addressPlaceholder": "Мекенжайды енгізіңіз"
     },
     "postedBy": "Жариялаған",
     "description": "Сипаттама",

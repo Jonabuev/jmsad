@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import ComplaintCard from "./list-complaints/ComplaintCard";
-
+import { AdvancedForumFilter } from "./filter/AdvancedForumFilter";
 import axios from "axios";
 import { useAuthToken } from "@/component/hooks/useAuthToken";
 import { useComplaints } from "@/component/hooks/forum/useForum";
@@ -9,12 +9,18 @@ import { useComplaints } from "@/component/hooks/forum/useForum";
 const Forum: React.FC = () => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("popular");
+  const [locationFilters, setLocationFilters] = useState({
+    region: "",
+    city: "",
+    district: "",
+    address: "",
+  });
   const token = useAuthToken();
-  const { complaints, fetchComplaints } = useComplaints(filter, token);
+  const { complaints, fetchComplaints } = useComplaints(filter, token, locationFilters);
 
   useEffect(() => {
     fetchComplaints();
-  }, [filter, fetchComplaints]);
+  }, [filter, locationFilters, fetchComplaints]);
 
   const supportComplaint = async (complaintId: number) => {
     try {
@@ -57,6 +63,12 @@ const Forum: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">
         {t("forum.title")}
       </h1>
+      
+      <AdvancedForumFilter
+        onFilterChange={setLocationFilters}
+        t={t}
+      />
+
       <div className="flex gap-2 mb-6 justify-center">
         {["popular", "new", "old"].map((type) => (
           <button
@@ -70,6 +82,7 @@ const Forum: React.FC = () => {
           </button>
         ))}
       </div>
+
       {complaints.map((complaint) =>
         complaint.status === "reviewed" ? (
           <ComplaintCard
