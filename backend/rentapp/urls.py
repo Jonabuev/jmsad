@@ -17,9 +17,8 @@ from .views import (
     GoogleAuthView,
     ComplaintDetailByUUIDView,
     OCRCheckView,
-    ROCImageAPIView
-  
-    
+    ROCImageAPIView,
+    NotificationMarkAsReadView
 )
 
 
@@ -70,6 +69,8 @@ urlpatterns = [
     path('chat-messages/<int:thread_id>/', ChatMessageListCreateView.as_view(), name='chat-message-list-create'),
 
     path('notifications/', NotificationListView.as_view(), name='notification-list'),
+    path('notifications/<int:pk>/mark-as-read/', NotificationMarkAsReadView.as_view(), name='notification-mark-as-read'),
+
     path('available-houses/', AvailableHousesView.as_view(), name='available-houses'),
 
     path('request-password-reset/', RequestPasswordResetView.as_view()),
@@ -80,4 +81,6 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('login/', views.login_view, name='login'),
     
+    path('rentals/<int:rental_id>/confirm/', views.confirm_rental, name='confirm-rental'),
+    path('rentals/<int:rental_id>/reject/', views.reject_rental, name='reject-rental'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

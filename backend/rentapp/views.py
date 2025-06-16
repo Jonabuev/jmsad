@@ -15,6 +15,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Avg
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .notifications import (
+    send_complaint_received_notification,
+    send_complaint_status_update_notification,
+    send_complaint_supported_notification,
+    send_complaint_comment_notification,
+    send_rental_confirmation_notification,
+    send_rental_rejection_notification,
+)
 
 
 from rest_framework.decorators import api_view, permission_classes
@@ -112,11 +120,8 @@ def createRentalComplaint(request):
     # Сохраняем изменения
     accused.save()
 
-
-
     if 'evidence' in request.FILES:
         complaint.evidence = request.FILES['evidence']
-
 
     complaint.save()
 
@@ -130,6 +135,8 @@ def createRentalComplaint(request):
     for img in images:
        ComplaintImage.objects.create(complaint=complaint, image=img)
 
+    # Отправляем уведомление о создании жалобы
+    send_complaint_received_notification(complaint)
 
     return Response({'message': 'Жалоба успешно создана.', 'id': complaint.id}, status=status.HTTP_201_CREATED)
 
@@ -354,6 +361,9 @@ def update_complaint_status1(request, pk):
           if tenant.r_date is None:
             tenant.r_date = timezone.now()  
             tenant.save() 
+
+        # Отправляем уведомление об изменении статуса жалобы
+        send_complaint_status_update_notification(complaint)
 
         return Response({'success': True, 'status': complaint.status}, status=200)
 
@@ -838,7 +848,9 @@ class AddCommentAPIView(APIView):
         data['user'] = request.user.id
         serializer = CommentSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            comment = serializer.save()
+            # Отправляем уведомление о новом комментарии
+            send_complaint_comment_notification(complaint, comment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -853,7 +865,12 @@ class SupportComplaintAPIView(APIView):
         complaint = RentalComplaint.objects.get(id=complaint_id)
         complaint.support_count += 1
         complaint.save()
+        
+        # Отправляем уведомление о поддержке жалобы
+        send_complaint_supported_notification(complaint, request.user)
+        
         return Response({'message': 'Complaint supported successfully'}, status=status.HTTP_200_OK)
+
 import pandas as pd
 import pickle
 from rest_framework.views import APIView
@@ -1315,13 +1332,25 @@ class ChatMessageListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 📌 Notification API
-class NotificationListView(APIView):
+class NotificationListView(generics.ListAPIView):
+    serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-        serializer = NotificationSerializer(notifications, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+class NotificationMarkAsReadView(generics.UpdateAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        return Response(self.get_serializer(notification).data)
 
 
 
@@ -1665,6 +1694,68 @@ class ConfirmPasswordChangeView(APIView):
         req_obj.save()
 
         return Response({'success': 'Пароль успешно изменен'}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def confirm_rental(request, rental_id):
+    try:
+        rental = Rental.objects.get(id=rental_id)
+        
+        # Проверяем, является ли пользователь владельцем дома
+        if rental.house.owner != request.user:
+            return Response(
+                {'error': 'У вас нет прав для подтверждения этой аренды'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Проверяем, что аренда в статусе pending
+        if rental.status != 'pending':
+            return Response(
+                {'error': 'Можно подтвердить только ожидающие аренды'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        rental.status = 'active'
+        rental.is_confirmed = True
+        rental.save()
+        
+        # Отправляем уведомление арендатору
+        send_rental_confirmation_notification(rental)
+        
+        return Response({'message': 'Аренда успешно подтверждена'}, status=status.HTTP_200_OK)
+    except Rental.DoesNotExist:
+        return Response({'error': 'Аренда не найдена'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reject_rental(request, rental_id):
+    try:
+        rental = Rental.objects.get(id=rental_id)
+        
+        # Проверяем, является ли пользователь владельцем дома
+        if rental.house.owner != request.user:
+            return Response(
+                {'error': 'У вас нет прав для отклонения этой аренды'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Проверяем, что аренда в статусе pending
+        if rental.status != 'pending':
+            return Response(
+                {'error': 'Можно отклонить только ожидающие аренды'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        rental.status = 'rejected'
+        rental.save()
+        
+        # Отправляем уведомление арендатору
+        send_rental_rejection_notification(rental)
+        
+        return Response({'message': 'Аренда отклонена'}, status=status.HTTP_200_OK)
+    except Rental.DoesNotExist:
+        return Response({'error': 'Аренда не найдена'}, status=status.HTTP_404_NOT_FOUND)
 
 
 

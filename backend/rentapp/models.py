@@ -398,10 +398,28 @@ class ChatMessage(models.Model):
     is_read = models.BooleanField(default=False)
 
 class Notification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('complaint_received', 'Получена жалоба'),
+        ('complaint_status_updated', 'Обновлен статус жалобы'),
+        ('complaint_supported', 'Жалоба поддержана'),
+        ('complaint_commented', 'Новый комментарий к жалобе'),
+        ('rental_confirmed', 'Аренда подтверждена'),
+        ('rental_rejected', 'Аренда отклонена'),
+    )
+
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES, default='complaint_received')
+    title = models.CharField(max_length=255, default='Уведомление')
     message = models.TextField()
+    related_complaint = models.ForeignKey('RentalComplaint', on_delete=models.CASCADE, null=True, blank=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.type} - {self.user.username}'
 
 
 

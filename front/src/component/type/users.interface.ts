@@ -14,9 +14,14 @@ export interface IUser {
 
 export interface IRental {
   id: number;
-  house_id: number;
-  status: "active" | "finished" | "pending";
   house: IHouse;
+  tenant: IUser;
+  status: 'pending' | 'active' | 'ended' | 'rejected';
+  start_date: string;
+  end_date: string;
+  created_at: string;
+  updated_at: string;
+  is_confirmed: boolean;
 }
 
 export interface IProfile {
