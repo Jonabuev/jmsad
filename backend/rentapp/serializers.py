@@ -85,13 +85,16 @@ class CustomUserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
     complaint_count = serializers.IntegerField(read_only=True)
     court_scores = serializers.SerializerMethodField()
+    complaint_dates = serializers.SerializerMethodField()
     complaint_reasons = serializers.SerializerMethodField()
     complaint_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = CustomUser
         fields = '__all__'  # или перечисли поля явно
-
+    def get_complaint_dates(self, obj):
+        complaints = obj.received_rental_complaints.filter(status='reviewed')
+        return [c.created_at.isoformat() for c in complaints]
     def validate(self, attrs):
         password1 = attrs.get('password1')
         password2 = attrs.get('password2')

@@ -13,6 +13,8 @@ interface IComplaintReason {
 
 const TenantRegistry: React.FC = () => {
   const { t } = useTranslation("common");
+  const [activeTab, setActiveTab] = useState<"tenants" | "landlords">("tenants");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -22,46 +24,55 @@ const TenantRegistry: React.FC = () => {
   const [selectedReasons, setSelectedReasons] = useState<number[]>([]);
 
   const router = useRouter();
-  const [tenants, setTenants] = useState<ITenant[]>([]);
+  const [users, setUsers] = useState<ITenant[]>([]);
 
-  // Загрузка причин
   useEffect(() => {
-    
     const fetchReasons = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const res = await axios.get("http://127.0.0.1:8000/api/complaint-reasons/", {
+        if (!token) {
+          console.error("No token found");
+          return;
+        }
+
+        const res = await axios.get("http://127.0.0.1:8000/api/all-complaint-reasons/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setReasons(res.data);
+        let filteredReasons = res.data;
+
+        if (activeTab === "tenants") {
+          filteredReasons = res.data.filter((reason: IComplaintReason) =>
+            ["Просрочка платежей", "Порча имущества", "Нарушение условий договора", "Жалобы от соседей / нарушение порядка", "Самовольное выселение или отказ освободить помещение"].includes(reason.reason)
+          );
+        } else {
+          filteredReasons = res.data.filter((reason: IComplaintReason) =>
+            ["Отсутствие ремонта помещения", "Игнорирование заявок на устранение неисправностей", "Повышение арендной платы без уведомления", "Отказ предоставить документы на жилье", "Нарушение конфиденциальности жильцов"].includes(reason.reason)
+          );
+        }
+
+        setReasons(filteredReasons);
       } catch (error) {
         console.error("Ошибка загрузки причин жалоб:", error);
       }
     };
     fetchReasons();
-  }, []);
+  }, [activeTab]);
 
-  const getTranslatedReasons = (reasonsStr: string) => {
-    if (!reasonsStr) return "-";
-
-    const keys = reasonsStr.split(",").map((s) => s.trim()).filter(Boolean);
-
-    return keys
-      .map((key) => {
-        // Если ключ текстовый (как "nonpayment"), переводим напрямую:
-        return t(`search.reason.${key}`);
-      })
-      .join(", ");
-  };
   const toggleReason = (id: number) => {
     setSelectedReasons((prev) =>
       prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
     );
   };
 
-  const fetchComplaints = useCallback(async () => {
+  const getTranslatedReasons = (reasonsStr: string) => {
+    if (!reasonsStr) return "-";
+    const keys = reasonsStr.split(",").map((s) => s.trim()).filter(Boolean);
+    return keys.map((key) => t(`search.reason.${key}`)).join(", ");
+  };
+
+  const fetchUsers = useCallback(async () => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -70,9 +81,7 @@ const TenantRegistry: React.FC = () => {
       }
 
       const profileRes = await axios.get("http://127.0.0.1:8000/api/profile/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const profile = profileRes.data;
@@ -90,23 +99,26 @@ const TenantRegistry: React.FC = () => {
       }
       if (addressQuery) params.address = addressQuery;
       if (courtScore) params.court_decision_score = courtScore;
-
       if (selectedReasons.length > 0) {
         params.reasons = selectedReasons.join(",");
       }
 
-      const res = await axios.get("http://127.0.0.1:8000/api/tenant-registry1/", {
+      const endpoint =
+        activeTab === "tenants"
+          ? "http://127.0.0.1:8000/api/tenant-registry1/"
+          : "http://127.0.0.1:8000/api/landlords/";
+
+      const res = await axios.get(endpoint, {
         params,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      setTenants(res.data);
+      setUsers(res.data);
     } catch (error) {
-      console.error("Ошибка при загрузке жалоб:", error);
+      console.error("Ошибка при загрузке:", error);
     }
   }, [
+    activeTab,
     router,
     searchQuery,
     startDate,
@@ -117,13 +129,32 @@ const TenantRegistry: React.FC = () => {
   ]);
 
   useEffect(() => {
-    fetchComplaints();
-  }, [fetchComplaints]);
+    fetchUsers();
+  }, [fetchUsers]);
 
   return (
     <div className="max-w-10xl mx-auto p-6 bg-white shadow-md rounded-xl mt-10">
       <h2 className="text-2xl font-bold mb-4">{t("search.tenant_registry")}</h2>
-      {/* Фильтры */}
+
+      <div className="flex space-x-4 mb-6">
+        <button
+          onClick={() => setActiveTab("tenants")}
+          className={`px-4 py-2 rounded ${
+            activeTab === "tenants" ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          {t("search.tenants")}
+        </button>
+        <button
+          onClick={() => setActiveTab("landlords")}
+          className={`px-4 py-2 rounded ${
+            activeTab === "landlords" ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          {t("search.landlords")}
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <input
           type="text"
@@ -160,7 +191,6 @@ const TenantRegistry: React.FC = () => {
         />
       </div>
 
-      {/* Чекбоксы причин */}
       <fieldset className="mb-4">
         <legend className="font-semibold mb-2">{t("search.filter_reasons")}</legend>
         <div className="flex flex-wrap gap-3">
@@ -179,46 +209,56 @@ const TenantRegistry: React.FC = () => {
       </fieldset>
 
       <button
-        onClick={fetchComplaints}
+        onClick={fetchUsers}
         className="md:col-span-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
       >
         {t("search.apply_filters")}
       </button>
 
-      {tenants.length === 0 ? (
+      {users.length === 0 ? (
         <p className="text-gray-600">{t("search.no_complaints")}</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto mt-4">
           <table className="min-w-full text-sm border">
             <thead className="bg-gray-100">
               <tr className="text-left">
                 <th className="border px-4 py-2">{t("search.tenant")}</th>
                 <th className="border px-4 py-2">{t("search.iin")}</th>
                 <th className="border px-4 py-2">{t("search.complaints_count")}</th>
-                <th className="border px-4 py-2">{t("search.entry_date")}</th>
+                {/*<th className="border px-4 py-2">{t("search.entry_date")}</th>*/}
+                <th className="border px-4 py-2">{t("search.complaint_dates")}</th> {/* Новая колонка */}
                 <th className="border px-4 py-2">{t("search.rating")}</th>
-                <th className="border px-4 py-2">{t("search.court_scores")}</th> 
-                <th className="border px-4 py-2">{t("search.complaint_reasons")}</th> 
+                <th className="border px-4 py-2">{t("search.court_scores")}</th>
+                <th className="border px-4 py-2">{t("search.complaint_reasons")}</th>
                 <th className="border px-4 py-2">{t("search.profile")}</th>
               </tr>
             </thead>
             <tbody>
-              {tenants.map((tenant) => (
-                <tr key={tenant.identifier} className="border text-center">
-                  <td className="border px-4 py-2">{tenant.username}</td>
-                  <td className="border px-4 py-2">{tenant.identifier}</td>
-                  <td className="border px-4 py-2">{tenant.complaint_count ?? 0}</td>
+              {users.map((user) => (
+                <tr key={user.identifier} className="border text-center">
+                  <td className="border px-4 py-2">{user.username}</td>
+                  <td className="border px-4 py-2">{user.identifier}</td>
+                  <td className="border px-4 py-2">{user.complaint_count ?? 0}</td>
+                  {/*<td className="border px-4 py-2">
+                    {user.r_date ? new Date(user.r_date).toLocaleDateString("ru-RU") : "-"}
+                  </td>*/}
                   <td className="border px-4 py-2">
-                    {tenant.r_date ? new Date(tenant.r_date).toLocaleDateString("ru-RU") : "-"}
+                    {user.complaint_dates && user.complaint_dates.length > 0
+                      ? user.complaint_dates
+                          .map((date) => new Date(date).toLocaleDateString("ru-RU"))
+                          .join(", ")
+                      : "-"}
                   </td>
                   <td className="border px-4 py-2">
-                    {tenant.rating ? <MyComponent value={tenant.rating} /> : "—"}
+                    {user.rating ? <MyComponent value={user.rating} /> : "—"}
                   </td>
-                  <td className="border px-4 py-2">{tenant.court_scores || "-"}</td> 
-                  <td className="border px-4 py-2">{getTranslatedReasons(tenant.complaint_reasons)}</td> 
+                  <td className="border px-4 py-2">{user.court_scores || "-"}</td>
+                  <td className="border px-4 py-2">
+                    {getTranslatedReasons(user.complaint_reasons)}
+                  </td>
                   <td className="border px-4 py-2">
                     <Link
-                      href={`/user/${tenant.username}`}
+                      href={`/user/${user.username}`}
                       className="text-blue-600 underline hover:text-blue-800"
                     >
                       {t("search.profile")}

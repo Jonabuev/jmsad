@@ -568,6 +568,79 @@ class TenantRegistryView1(ListAPIView):
 
 
 
+class TenantRegistryView2(ListAPIView):
+    serializer_class = CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if not user.email_confirmed:
+            raise PermissionDenied("Требуется подтверждение почты для доступа.")
+
+        queryset = CustomUser.objects.filter(role='landlord')
+
+        address = self.request.query_params.get('address')
+        if address:
+            queryset = queryset.filter(rentals__house__address__icontains=address)
+
+        court_score_filter = self.request.query_params.get('court_decision_score')
+        reasons_filter = self.request.query_params.get('reasons')
+
+        if court_score_filter or reasons_filter:
+            complaint_filter = Q()
+            if court_score_filter:
+                complaint_filter &= Q(received_rental_complaints__court_decision_score__startswith=court_score_filter)
+            if reasons_filter:
+                reason_ids = [int(r) for r in reasons_filter.split(',') if r.isdigit()]
+                if reason_ids:
+                    complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
+
+            filtered_user_ids = CustomUser.objects.filter(role='landlord').filter(complaint_filter).values_list('id', flat=True).distinct()
+            queryset = queryset.filter(id__in=filtered_user_ids)
+
+        search_query = self.request.query_params.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(username__icontains=search_query) |
+                Q(identifier__icontains=search_query)
+            )
+
+        start_date_str = self.request.query_params.get('start_date')
+        end_date_str = self.request.query_params.get('end_date')
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
+            end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
+            queryset = queryset.filter(r_date__range=[start_date, end_date])
+
+        queryset = queryset.annotate(
+            complaint_count=Count(
+                'received_rental_complaints',
+                filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
+            )
+        ).filter(complaint_count__gt=0)
+
+        return queryset
+
+
+from rest_framework import generics, permissions
+from .models import ComplaintReason
+from .serializers import ComplaintReasonSerializer
+
+
+class ComplaintReasonListTenant(generics.ListAPIView):
+    queryset = ComplaintReason.objects.filter(type='tenant')
+    serializer_class = ComplaintReasonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ComplaintReasonListLandlord(generics.ListAPIView):
+    queryset = ComplaintReason.objects.filter(type='landlord')
+    serializer_class = ComplaintReasonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 
 # views.py
@@ -757,8 +830,29 @@ from .models import ComplaintReason
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def complaint_reasons(request):
+    user = request.user  # Получаем аутентифицированного пользователя
+    role = user.role  # Предполагаем, что role — поле модели CustomUser
+
+    if role == "tenant":
+        # Фильтруем причины жалоб на владельца (например, из БД только те, что относятся к landlord)
+        reasons = ComplaintReason.objects.filter(type="landlord")  # Добавьте поле type в модель, если нужно
+    elif role == "landlord":
+        # Фильтруем причины жалоб на арендатора (например, из БД только те, что относятся к tenant)
+        reasons = ComplaintReason.objects.filter(type="tenant")  # Добавьте поле type в модель, если нужно
+    else:
+        return Response({"error": "Invalid role"}, status=400)
+
+    data = [{'id': r.id, 'reason': r.reason} for r in reasons]
+
+    return Response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_complaint_reasons(request):
+    # Возвращаем все причины жалоб без фильтрации
     reasons = ComplaintReason.objects.all()
     data = [{'id': r.id, 'reason': r.reason} for r in reasons]
+
     return Response(data)
 
 from rest_framework import status

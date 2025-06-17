@@ -15,9 +15,7 @@ interface RentalOption {
 
 const SubmitComplaintForm: React.FC = () => {
   const { t } = useTranslation();
-  const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>(
-    []
-  );
+  const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
   const [formData, setFormData] = useState({
     rental: "",
     description: "",
@@ -35,6 +33,7 @@ const SubmitComplaintForm: React.FC = () => {
 
   const router = useRouter();
 
+  // Загрузка аренды
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
@@ -45,22 +44,71 @@ const SubmitComplaintForm: React.FC = () => {
       })
       .then((res) => setRentals(res.data))
       .catch(() => setErrorMessage(t("Scomplaint.loadRentalsError")));
-  }, [t]); // ← добавляем t сюда
+  }, [t]);
 
+  // Загрузка причин для тенанта
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      setErrorMessage(t("Scomplaint.authRequired"));
-      return;
-    }
+    const profile = JSON.parse(localStorage.getItem("profile") || '{}');
+    const role = profile?.user?.role || 'guest';
+    console.log("Role:", role);
+
+    if (!token || role !== "tenant") return;
+
+    const reasonUrl = "http://127.0.0.1:8000/api/complaint-reasons/";
+    console.log("Fetching tenant reasons from:", reasonUrl);
 
     axios
-      .get("http://127.0.0.1:8000/api/complaint-reasons/", {
+      .get(reasonUrl, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setComplaintReasons(res.data))
-      .catch(() => setErrorMessage(t("Scomplaint.loadReasonsError")));
-  }, [t]); // ← добавляем t сюда тоже
+      .then((res) => {
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setComplaintReasons(data);
+          console.log("Fetched tenant reasons:", data);
+        } else {
+          setErrorMessage(t("Scomplaint.invalidDataFormat"));
+          console.error("Expected array, got:", data);
+        }
+      })
+      .catch((error) => {
+        setErrorMessage(t("Scomplaint.loadReasonsError"));
+        console.error("Error fetching tenant reasons:", error);
+      });
+  }, [t]);
+
+  // Загрузка причин для лендлорда
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const profile = JSON.parse(localStorage.getItem("profile") || '{}');
+    const role = profile?.user?.role || 'guest';
+    console.log("Role:", role);
+
+    if (!token || role !== "landlord") return;
+
+    const reasonUrl = "http://127.0.0.1:8000/api/complaint-reasons/";
+    console.log("Fetching landlord reasons from:", reasonUrl);
+
+    axios
+      .get(reasonUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setComplaintReasons(data);
+          console.log("Fetched landlord reasons:", data);
+        } else {
+          setErrorMessage(t("Scomplaint.invalidDataFormat"));
+          console.error("Expected array, got:", data);
+        }
+      })
+      .catch((error) => {
+        setErrorMessage(t("Scomplaint.loadReasonsError"));
+        console.error("Error fetching landlord reasons:", error);
+      });
+  }, [t]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -106,7 +154,7 @@ const SubmitComplaintForm: React.FC = () => {
     formData.reason.forEach((id) => data.append("reason", String(id)));
     if (formData.evidence) data.append("evidence", formData.evidence);
     formData.evidenceImages.forEach((file) => {
-      data.append("evidence_images", file); // ключ должен соответствовать Django view
+      data.append("evidence_images", file);
     });
     data.append("damage_cost", formData.damageCost);
 
