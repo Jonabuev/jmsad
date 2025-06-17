@@ -200,10 +200,19 @@ class House(models.Model):
 
 
 class ComplaintReason(models.Model):
+    TENANT = 'tenant'
+    LANDLORD = 'landlord'
+
+    REASON_TYPE_CHOICES = [
+        (TENANT, 'Tenant'),
+        (LANDLORD, 'Landlord'),
+    ]
+
     reason = models.CharField(max_length=255, unique=True)
+    type = models.CharField(max_length=20, choices=REASON_TYPE_CHOICES, default='')
 
     def __str__(self):
-        return self.reason
+        return f"{self.reason} ({self.type})"
     
 import uuid
 from django.db import models

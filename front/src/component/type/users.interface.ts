@@ -46,6 +46,7 @@ export interface ITenant {
   complaints_rental: IComplaint[];
   complaint_count: number;
   r_date: Date;
+  complaint_dates?: string[];
 }
 
 export interface IHouse {

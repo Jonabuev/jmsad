@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import AvailableHousesView, ChatMessageListCreateView, ChatThreadListCreateView, ConfirmPasswordChangeView, CreateRentalRequest, CustomTokenObtainPairView, FavoriteListCreateView, MyRentalsAPIView, NotificationListView, PublicUserProfileView, RentalDetailView, RentalListCreateView, RentalRequestListView, RequestPasswordChangeView, RequestPasswordResetView, get_location_filters, house_locations, profile_view
+from .views import AvailableHousesView, ChatMessageListCreateView, ChatThreadListCreateView, ComplaintReasonListLandlord, ComplaintReasonListTenant, ConfirmPasswordChangeView, CreateRentalRequest, CustomTokenObtainPairView, FavoriteListCreateView, MyRentalsAPIView, NotificationListView, PublicUserProfileView, RentalDetailView, RentalListCreateView, RentalRequestListView, RequestPasswordChangeView, RequestPasswordResetView, all_complaint_reasons, get_location_filters, house_locations, profile_view
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -18,7 +18,8 @@ from .views import (
     ComplaintDetailByUUIDView,
     OCRCheckView,
     ROCImageAPIView,
-    NotificationMarkAsReadView
+    NotificationMarkAsReadView,
+    TenantRegistryView2
 )
 
 
@@ -62,7 +63,8 @@ urlpatterns = [
     path('rent-house/', CreateRentalRequest.as_view(), name='rental-house'),
     path('roc-curve/', ROCImageAPIView.as_view(), name='roc-image'),
 
-
+    
+    path('landlords/', TenantRegistryView2.as_view(), name='landlords'),
     path('favorites/', FavoriteListCreateView.as_view(), name='favorite-list-create'),
 
     path('chat-threads/', ChatThreadListCreateView.as_view(), name='chat-thread-list-create'),
@@ -72,11 +74,12 @@ urlpatterns = [
     path('notifications/<int:pk>/mark-as-read/', NotificationMarkAsReadView.as_view(), name='notification-mark-as-read'),
 
     path('available-houses/', AvailableHousesView.as_view(), name='available-houses'),
-
+    path('all-complaint-reasons/', all_complaint_reasons, name='all-complaint-reasons'),
     path('request-password-reset/', RequestPasswordResetView.as_view()),
     path('request-password-change/', RequestPasswordChangeView.as_view()),
     path('confirm-password-change/', ConfirmPasswordChangeView.as_view()),
-    
+    path('complaint-reasons/tenant/', ComplaintReasonListTenant.as_view()),
+    path('complaint-reasons/landlord/', ComplaintReasonListLandlord.as_view()),
     # Профиль пользователя
     path('profile/', views.profile, name='profile'),
     path('login/', views.login_view, name='login'),
