@@ -115,85 +115,76 @@ class House(models.Model):
 
     id = models.AutoField(primary_key=True)
     owner = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    
+    # Основное поле адреса (оставляем для обратной совместимости)
     address = models.CharField(max_length=255)
+    
+    # Иерархические поля адреса
+    street = models.CharField(max_length=255, verbose_name="Улица", null=True, blank=True)
+    microdistrict = models.CharField(max_length=255, verbose_name="Микрорайон", null=True, blank=True)
+    district = models.CharField(max_length=255, verbose_name="Район", null=True, blank=True)
+    city = models.CharField(max_length=255, verbose_name="Город", null=True, blank=True)
+    region = models.CharField(max_length=255, verbose_name="Область", null=True, blank=True)
+    
+    # Остальные поля
     type_p = models.CharField(max_length=20, choices=PROPERTY_TYPE_CHOICES)
     num_of_rooms = models.IntegerField(default=1)
     created_at = models.DateTimeField(default=timezone.now)
     comment = models.TextField(blank=True, null=True)
-
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    region = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=255, blank=True, null=True)
-    district = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not all([self.latitude, self.longitude, self.region, self.city]):
-
-            lat, lon, region, city, district = self.get_coordinates()
+        # Если address заполнен, получаем координаты и компоненты адреса
+        if self.address:
+            lat, lon, region, city, district, street, microdistrict = self.get_coordinates(self.address)
             self.latitude = lat
             self.longitude = lon
-
             self.region = region
             self.city = city
             self.district = district
+            self.street = street
+            self.microdistrict = microdistrict
         super().save(*args, **kwargs)
 
-    def get_coordinates(self):
+    def get_coordinates(self, address):
         API_KEY = "c2b5bfe1-4f8f-4d16-baa8-2c2aa6c94384"
-        full_address = f"{self.address}, Казахстан"
-        url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_KEY}&geocode={full_address}&format=json&lang=ru_RU"
-
+        url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_KEY}&geocode={address}&format=json&lang=ru_RU"
         headers = {
             'Accept': 'application/json',
             'User-Agent': 'Mozilla/5.0',
             'Referer': 'http://localhost:8000'
         }
-
-        retries = 3
-        for attempt in range(retries):
-            try:
-                response = requests.get(url, headers=headers, timeout=10)
-                response.raise_for_status()
-                data = response.json()
-
-                features = data['response']['GeoObjectCollection']['featureMember']
-                if not features:
-                    return None, None, None, None, None
-
-                geo_obj = features[0]['GeoObject']
-                pos = geo_obj['Point']['pos']
-                lon, lat = map(float, pos.split())
-
-                components = geo_obj['metaDataProperty']['GeocoderMetaData']['Address']['Components']
-                region = city = district = None
-
-                for comp in components:
-                  kind = comp.get("kind")
-                  name = comp.get("name")
-                  if kind == "province":
-                      region = name
-                  elif kind == "locality":
-                      city = name
-                  elif kind in ("district", "area"):
-                      district = name
-
-
-
-                # Защита от повторов
-                if city == region:
-                    region = None
-
-                return lat, lon, region, city, district
-
-            except Exception as e:
-                print(f"Ошибка: {e}")
-                time.sleep(1)
-                continue
-
-        return None, None, None, None, None
-
-
+        response = requests.get(url, headers=headers, timeout=10)
+        data = response.json()
+        features = data['response']['GeoObjectCollection']['featureMember']
+        if not features:
+            return None, None, None, None, None, None, None
+        geo_obj = features[0]['GeoObject']
+        pos = geo_obj['Point']['pos']
+        lon, lat = map(float, pos.split())
+        components = geo_obj['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+        region = city = district = street = microdistrict = complex_name = None
+        for comp in components:
+            kind = comp.get("kind")
+            name = comp.get("name")
+            if kind == "province":
+                region = name
+            elif kind == "locality":
+                city = name
+            elif kind in ("district", "area"):
+                district = name
+            elif kind == "street":
+                street = name
+            elif kind == "other":
+                if "мкр" in name.lower():
+                    microdistrict = name
+                elif "жк" in name.lower():
+                    complex_name = name
+        # Если микрорайон не найден, но есть ЖК — используем ЖК
+        if not microdistrict and complex_name:
+            microdistrict = complex_name
+        return lat, lon, region, city, district, street, microdistrict
     def __str__(self):
         return f'{self.type_p} at {self.address}'
 

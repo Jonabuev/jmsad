@@ -64,13 +64,25 @@ from .models import House
 class HouseForm(forms.ModelForm):
     class Meta:
         model = House
-        fields = ['address', 'type_p', 'num_of_rooms', 'comment']  # Убираем поле 'owner'
+        fields = ['street', 'microdistrict', 'district', 'city', 'region', 'type_p', 'num_of_rooms', 'comment']
         widgets = {
-            'type_p': forms.Select(choices=House.PROPERTY_TYPE_CHOICES),
-            'num_of_rooms': forms.NumberInput(attrs={'min': 1}),
-            'address': forms.TextInput(attrs={'placeholder': 'Введите адрес'}),
-            'comment': forms.TextInput(attrs={'placeholder': 'Описание'})
+            'street': forms.TextInput(attrs={'placeholder': 'Введите улицу и номер дома', 'class': 'form-control'}),
+            'microdistrict': forms.TextInput(attrs={'placeholder': 'Введите микрорайон', 'class': 'form-control'}),
+            'district': forms.TextInput(attrs={'placeholder': 'Введите район', 'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'placeholder': 'Введите город', 'class': 'form-control'}),
+            'region': forms.TextInput(attrs={'placeholder': 'Введите область', 'class': 'form-control'}),
+            'type_p': forms.Select(choices=House.PROPERTY_TYPE_CHOICES, attrs={'class': 'form-control'}),
+            'num_of_rooms': forms.NumberInput(attrs={'min': 1, 'class': 'form-control'}),
+            'comment': forms.Textarea(attrs={'placeholder': 'Описание', 'class': 'form-control'})
         }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Формируем полный адрес из компонентов
+        instance.address = f"{instance.street}, {instance.microdistrict}, {instance.district}, {instance.city}, {instance.region}"
+        if commit:
+            instance.save()
+        return instance
 
 
 from django import forms
