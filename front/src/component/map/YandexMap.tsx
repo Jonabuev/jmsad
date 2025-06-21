@@ -49,6 +49,9 @@ interface Marker {
   properties: {
     balloonContent: string;
   };
+  options: {
+    iconColor: string;
+  };
 }
 
 interface YandexMapProps {
@@ -84,7 +87,7 @@ const YandexMap: React.FC<YandexMapProps> = ({ center, zoom, markers }) => {
         const placemark = new window.ymaps.Placemark(
           marker.coordinates,
           { balloonContent: marker.properties.balloonContent },
-          { preset: "islands#icon", iconColor: "#ff5733" }
+          { preset: "islands#icon", iconColor: marker.options.iconColor }
         );
         map.geoObjects.add(placemark);
       });

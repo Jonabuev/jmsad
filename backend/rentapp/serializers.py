@@ -14,9 +14,17 @@ from rest_framework import serializers
 from .models import Complaint, House, CustomUser
 
 class HouseSerializer(serializers.ModelSerializer):
+    is_rented = serializers.SerializerMethodField()
+
     class Meta:
         model = House
-        fields = ['id', 'address', 'type_p', 'latitude', 'longitude']
+        fields = ['id', 'address', 'type_p', 'latitude', 'longitude', 'is_rented']
+
+    def get_is_rented(self, obj):
+        from .models import Rental
+        from django.utils import timezone
+        now = timezone.now().date()
+        return Rental.objects.filter(house=obj, start_date__lte=now, end_date__gte=now, status='active').exists()
 
 class UserShortSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
@@ -223,10 +231,18 @@ class IdentityVerificationSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'id_document', 'verified']
 
 class HouseSerializer(serializers.ModelSerializer):
+    is_rented = serializers.SerializerMethodField()
+
     class Meta:
         model = House
         fields = '__all__'
         read_only_fields = ['owner']  # чтобы пользователь не мог сам задать owner
+    
+    def get_is_rented(self, obj):
+        from .models import Rental
+        from django.utils import timezone
+        now = timezone.now().date()
+        return Rental.objects.filter(house=obj, start_date__lte=now, end_date__gte=now, status='active').exists()
 
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user  # ← устанавливаем owner

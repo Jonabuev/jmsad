@@ -19,7 +19,8 @@ from .views import (
     OCRCheckView,
     ROCImageAPIView,
     NotificationMarkAsReadView,
-    TenantRegistryView2
+    TenantRegistryView2,
+    AllHousesView
 )
 
 
@@ -83,6 +84,7 @@ urlpatterns = [
     # Профиль пользователя
     path('profile/', views.profile, name='profile'),
     path('login/', views.login_view, name='login'),
+    path('all-houses/', AllHousesView.as_view(), name='all-houses'),
     
     path('rentals/<int:rental_id>/confirm/', views.confirm_rental, name='confirm-rental'),
     path('rentals/<int:rental_id>/reject/', views.reject_rental, name='reject-rental'),

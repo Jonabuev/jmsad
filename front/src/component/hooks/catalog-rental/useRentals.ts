@@ -1,27 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { IHouse } from "@/component/type/properties.interface";
 
-export interface Rental {
-  id: number;
-  type_p: string;
-  address: string;
-  price: number;
-  rooms: number;
-  description: string;
-  latitude: number;
-  longitude: number;
-}
-
-export function useRentals(startDate: string, endDate: string) {
-  const [rentals, setRentals] = useState<Rental[]>([]);
+export function useRentals(startDate?: string, endDate?: string) {
+  const [rentals, setRentals] = useState<IHouse[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(() => {
-    if (!startDate || !endDate) return;
     setLoading(true);
+    const isFiltered = startDate && endDate;
+    const url = isFiltered
+      ? "http://127.0.0.1:8000/api/available-houses/"
+      : "http://127.0.0.1:8000/api/all-houses/";
+
+    const params = isFiltered
+      ? { start_date: startDate, end_date: endDate }
+      : {};
+
     axios
-      .get("http://127.0.0.1:8000/api/available-houses/", {
-        params: { start_date: startDate, end_date: endDate },
+      .get(url, {
+        params,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },

@@ -1824,32 +1824,21 @@ def confirm_rental(request, rental_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def reject_rental(request, rental_id):
-    try:
-        rental = Rental.objects.get(id=rental_id)
-        
-        # Проверяем, является ли пользователь владельцем дома
-        if rental.house.owner != request.user:
-            return Response(
-                {'error': 'У вас нет прав для отклонения этой аренды'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Проверяем, что аренда в статусе pending
-        if rental.status != 'pending':
-            return Response(
-                {'error': 'Можно отклонить только ожидающие аренды'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        rental.status = 'rejected'
-        rental.save()
-        
-        # Отправляем уведомление арендатору
-        send_rental_rejection_notification(rental)
-        
-        return Response({'message': 'Аренда отклонена'}, status=status.HTTP_200_OK)
-    except Rental.DoesNotExist:
-        return Response({'error': 'Аренда не найдена'}, status=status.HTTP_404_NOT_FOUND)
+    rental = get_object_or_404(Rental, id=rental_id)
+    if request.user != rental.house.owner:
+        return Response({'detail': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
+    rental.status = 'declined'
+    rental.save()
+    # Опционально: отправить уведомление арендатору
+    return Response({'status': 'Rental rejected'})
+
+class AllHousesView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        houses = House.objects.all()
+        serializer = HouseSerializer(houses, many=True)
+        return Response(serializer.data)
 
 
 

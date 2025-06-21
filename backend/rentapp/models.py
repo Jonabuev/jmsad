@@ -129,6 +129,7 @@ class House(models.Model):
     # Остальные поля
     type_p = models.CharField(max_length=20, choices=PROPERTY_TYPE_CHOICES)
     num_of_rooms = models.IntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(default=timezone.now)
     comment = models.TextField(blank=True, null=True)
     latitude = models.FloatField(null=True, blank=True)
