@@ -8,7 +8,7 @@ const VerifyIdentityForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState<IProfile>();
+  const [profile, setProfile] = useState<IProfile | null>(null);
   const { t } = useTranslation("common");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,6 +16,7 @@ const VerifyIdentityForm: React.FC = () => {
       setFile(e.target.files[0]);
     }
   };
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("access_token");
@@ -27,7 +28,7 @@ const VerifyIdentityForm: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setProfile(response.data); // Предполагается, что API возвращает IProfile
+        setProfile(response.data);
       } catch (error) {
         console.error("Ошибка при загрузке профиля:", error);
       }
@@ -35,10 +36,6 @@ const VerifyIdentityForm: React.FC = () => {
 
     fetchProfile();
   }, []);
-
-  useEffect(() => {
-    console.log("User:", profile?.user);
-  }, [profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,17 +56,26 @@ const VerifyIdentityForm: React.FC = () => {
       return;
     }
 
-    if (!profile?.user?.username || !profile?.user?.identifier) {
+    const user = profile?.user;
+    if (!user || !user.username ) {
       setError("Ошибка: данные пользователя не загружены.");
       setLoading(false);
       return;
     }
 
-    const textsToFind = [profile.user.username, profile.user.identifier];
+    const textsToFind = [user.username, user.identifier];
 
     const formData = new FormData();
     formData.append("id_document", file);
     formData.append("texts_to_find", JSON.stringify(textsToFind));
+
+    // Добавим поля, чтобы бэк знал, что проверять
+    formData.append("passport_expiry", user.passport_expiry || "");
+    formData.append("document_type", user.document_type || "");
+
+    if (user.document_type === "visa" && user.visa_number) {
+      formData.append("visa_number", user.visa_number);
+    }
 
     try {
       const response = await axios.post(
@@ -85,6 +91,10 @@ const VerifyIdentityForm: React.FC = () => {
       setMessage(response.data.message || "Успешно отправлено!");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.error ||
+            "Ошибка при верификации документа."
+        );
         console.error("Ошибка сервера:", err.response?.data);
       } else {
         setError("Произошла непредвиденная ошибка.");

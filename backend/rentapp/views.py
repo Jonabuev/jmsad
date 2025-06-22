@@ -1563,11 +1563,9 @@ import pdf2image
 from .serializers import ImageUploadSerializer
 from .models import IdentityVerification
 
-pdf2image.pdf2image.POPPLER_PATH = r"C:\Program Files\poppler-24.08.0\Library\bin"
 
 # Затем импортировать библиотеки
 from pdf2image import convert_from_bytes
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
 def extract_text(image):
@@ -1576,7 +1574,7 @@ def extract_text(image):
         if image.mode in ("RGBA", "P"):
             image = image.convert("RGB")
 
-        extracted_text = pytesseract.image_to_string(image, lang='rus')
+        extracted_text = pytesseract.image_to_string(image, lang='eng+rus+kaz')
         return extracted_text.strip()
     except Exception as e:
         return f"Error during OCR processing: {str(e)}"
@@ -1588,7 +1586,7 @@ def convert_file_to_image(file):
         print(f"📂 Загруженный файл: {file.name}, Расширение: {file_ext}")
 
         if file_ext == "pdf":
-            images = convert_from_bytes(file.read(), poppler_path=r"C:\Program Files\poppler-24.08.0\Library\bin")
+            images = convert_from_bytes(file.read())
             print(f"📸 Количество извлечённых страниц: {len(images)}")
 
             if images:
@@ -1605,6 +1603,9 @@ def convert_file_to_image(file):
         raise ValueError(f"Ошибка при обработке файла: {str(e)}")
 
 
+import re
+from datetime import datetime
+
 class OCRCheckView(APIView):
     def post(self, request, *args, **kwargs):
         print("Request data:", request.data)  
@@ -1614,40 +1615,64 @@ class OCRCheckView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Получение файла и списка слов
         uploaded_file = request.FILES.get('id_document')
-        texts_to_find = json.loads(request.data.get("texts_to_find", "[]"))
-
         if not uploaded_file:
             return Response({"error": "Файл не был загружен."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not texts_to_find:
-            return Response({"error": "Список текстов для поиска пуст."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Конвертация загруженного файла в изображение
         try:
             image = convert_file_to_image(uploaded_file)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         extracted_text = extract_text(image).lower()
-        print("Extracted text:", extracted_text)  
+        print("📄 Extracted text:\n", extracted_text)
 
-        results = {
-            text: all(word.lower() in extracted_text for word in text.split())
-            for text in texts_to_find
-        }
+        # --- Проверка на ФИО ---
+        username_match = request.user.username.lower() in extracted_text
+        print(f"👤 Username match: {username_match}")
 
-        print("Results:", results)  
+        # --- Проверка на ИИН/БИН, только если не виза или виза, но с identifier ---
+        identifier = request.user.identifier
+        skip_identifier_check = request.user.document_type == "visa" and not identifier
 
-        # Проверка данных пользователя
-        username_match = results.get(request.user.username, False)
-        identifier_match = results.get(request.user.identifier, False)
-        print(f"Username: {request.user.username}")
-        print(f"Identifier: {request.user.identifier}")
-        print(f"Results: {results}")
+        if skip_identifier_check:
+            identifier_match = True
+            print("ℹ️ ИИН/БИН не требуется для документа типа 'visa'")
+        else:
+            identifier_match = identifier and identifier in extracted_text
+            print(f"🆔 Identifier match: {identifier_match}")
 
-        if username_match and identifier_match:
+
+        # --- Проверка срока действия паспорта ---
+        expiry_date_str = request.user.passport_expiry.strftime('%d.%m.%Y')
+        expiry_matches = re.findall(r"\d{2}[./-]\d{2}[./-]\d{4}", extracted_text)
+        expiry_match = False
+        expiry_is_valid = False
+
+        for date_str in expiry_matches:
+            try:
+                doc_date = datetime.strptime(date_str.replace("-", ".").replace("/", "."), '%d.%m.%Y').date()
+                if doc_date == request.user.passport_expiry:
+                    expiry_match = True
+                if doc_date >= datetime.today().date():
+                    expiry_is_valid = True
+            except ValueError:
+                continue
+
+        print(f"📅 Expiry match: {expiry_match}, Not expired: {expiry_is_valid}")
+
+        # --- Проверка визы, если используется ---
+        visa_match = True
+        if request.user.document_type == "visa":
+            visa_number = getattr(request.user, "visa_number", "")
+            if visa_number:
+                visa_match = visa_number in extracted_text
+                print(f"🛂 Visa number match: {visa_match}")
+            else:
+                print("⚠️ Виза указана, но visa_number отсутствует")
+
+        # --- Успешная верификация ---
+        if username_match and identifier_match and expiry_match and expiry_is_valid and visa_match:
             try:
                 with transaction.atomic():
                     request.user.email_confirmed = True
@@ -1667,7 +1692,15 @@ class OCRCheckView(APIView):
             except Exception as e:
                 return Response({"error": f"Ошибка при сохранении данных: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response({"error": "Текст в документе не совпадает с учетными данными."}, status=status.HTTP_400_BAD_REQUEST)
+        # Если что-то не совпало:
+        return Response({
+            "error": "Документ не прошёл проверку.",
+            "username_match": username_match,
+            "identifier_match": identifier_match,
+            "expiry_match": expiry_match,
+            "expiry_valid": expiry_is_valid,
+            "visa_match": visa_match,
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

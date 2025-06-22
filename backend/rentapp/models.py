@@ -285,6 +285,7 @@ class CustomUser(AbstractUser):
         null=True,
     )
     passport_expiry = models.DateField(null=True, blank=True)  # для id/pаспорта/визы
+    visa_number = models.CharField(max_length=50, null=True, blank=True)
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPES, blank=True, null=True)
     username = models.CharField(max_length=150, unique=True, validators=[RegexValidator(r'^[\w\s]+$', 'Username can contain letters, numbers, and spaces only.')])
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
