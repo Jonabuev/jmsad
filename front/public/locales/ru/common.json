@@ -135,7 +135,15 @@
     "submit": "Зарегистрироваться",
     "field_required": "Это поле обязательно для заполнения",
     "password_mismatch": "Пароли не совпадают",
-    "successful_registration": "Регистрация прошла успешно"
+    "successful_registration": "Регистрация прошла успешно",
+    "citizenship": "Гражданство",
+    "document_type": "Тип документа",
+    "id_card": "Удостоверение личности",
+    "passport_kz": "Паспорт РК",
+    "visa": "Виза",
+    "passport_expiry": "Дата окончания действия документа",
+    "visa_number": "Номер визы",
+    "doc_expired": "Срок действия документа истёк"
   },
   "Scomplaint": {
     "title": "Подать жалобу",

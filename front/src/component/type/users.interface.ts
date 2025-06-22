@@ -148,11 +148,15 @@ export interface IRegisterData {
   username: string;
   email: string;
   phone_number: string;
-  role: string;
+  role: "tenant" | "landlord";
   type_entity: "individual" | "legal_entity";
   type_identify: "iin" | "bin";
   identifier: string;
-  documents?: string;
+  document_type: "id_card" | "passport_kz" | "visa";
+  passport_expiry: string;
+  visa_number: string;
   password1: string;
   password2: string;
+  citizenship: string;
 }
+

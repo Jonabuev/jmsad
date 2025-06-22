@@ -135,7 +135,15 @@
     "submit": "Register",
     "field_required": "This field is required",
     "password_mismatch": "Passwords do not match",
-    "successful_registration": "Registration successful"
+    "successful_registration": "Registration successful",
+    "citizenship": "Citizenship",
+    "document_type": "Document type",
+    "id_card": "ID Card",
+    "passport_kz": "KZ Passport",
+    "visa": "Visa",
+    "passport_expiry": "Document expiry date",
+    "visa_number": "Visa number",
+    "doc_expired": "Document has expired"
   },
   "Scomplaint": {
     "title": "Submit a Complaint",

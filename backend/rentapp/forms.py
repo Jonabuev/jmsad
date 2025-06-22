@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
@@ -13,14 +14,31 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'role', 'phone_number', 'type_entity', 'type_identify', 'identifier', 'password1', 'password2')
-    
+        fields = (
+            'username', 'email', 'role', 'phone_number',
+            'type_entity', 'type_identify', 'identifier',
+            'document_type', 'passport_expiry', "citizenship",
+            'password1', 'password2'
+        )
+
     role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, label="Role", widget=forms.Select(attrs={'class': 'form-control'}))
     phone_number = forms.CharField(max_length=15, required=False, label="Phone Number", widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
     identifier = forms.CharField(max_length=15, required=False, label="Identifier", widget=forms.TextInput(attrs={'class': 'form-control'}))
     type_entity = forms.ChoiceField(choices=CustomUser.type_chose, label="Entity Type", widget=forms.Select(attrs={'class': 'form-control'}))
     type_identify = forms.ChoiceField(choices=CustomUser.type_chose1, label="Identity Type", widget=forms.Select(attrs={'class': 'form-control'}))
+    
+    passport_expiry = forms.DateField(
+        required=True,
+        label="Срок действия документа",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+
+    document_type = forms.ChoiceField(
+        choices=CustomUser.DOCUMENT_TYPES,
+        label="Document Type",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -41,7 +59,11 @@ class CustomUserCreationForm(UserCreationForm):
 
         if type_entity == 'legal_entity' and not identifier:
             self.add_error('identifier', "Юридическое лицо должно иметь ИИН/БИН.")
-        
+
+        expiry_date = cleaned_data.get("passport_expiry")
+
+        if expiry_date and expiry_date < timezone.now().date():
+            self.add_error("passport_expiry", "Срок действия документа истёк.")    
         return cleaned_data
 
     def save(self, commit=True):

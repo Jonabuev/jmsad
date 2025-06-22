@@ -118,7 +118,7 @@
   },
   "registration": {
     "registration1": "Тіркеу",
-    "user-type": "Пайдаланушы түрі",
+    "user_type": "Пайдаланушы түрі",
     "individual": "Жеке тұлға",
     "legal_entity": "Заңды тұлға",
     "role": "Рөл",
@@ -135,7 +135,15 @@
     "submit": "Тіркелу",
     "field_required": "Бұл өріс міндетті түрде толтырылуы тиіс",
     "password_mismatch": "Құпия сөздер сәйкес келмейді",
-    "successful_registration": "Тіркеу сәтті аяқталды"
+    "successful_registration": "Тіркеу сәтті аяқталды",
+    "citizenship": "Азаматтық",
+    "document_type": "Құжат түрі",
+    "id_card": "Жеке куәлік",
+    "passport_kz": "ҚР төлқұжаты",
+    "visa": "Виза",
+    "passport_expiry": "Құжаттың жарамдылық мерзімі",
+    "visa_number": "Виза нөмірі",
+    "doc_expired": "Құжаттың мерзімі өтіп кеткен"
   },
   "Scomplaint": {
     "title": "Шағым беру",
