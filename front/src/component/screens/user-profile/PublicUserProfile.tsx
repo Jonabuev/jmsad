@@ -1,7 +1,6 @@
 "use client";
 
 import { FC, useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,6 +11,9 @@ import {
   IRental,
 } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "@/component/store/store";
+import { useApi } from "@/component/hooks/useApi";
 
 const tabs = [
   { key: "info", label: "profile.info" },
@@ -20,53 +22,35 @@ const tabs = [
 ];
 
 const PublicUserProfile: FC = () => {
-  const [profileData, setProfileData] = useState<IPublicProfileData | null>(
-    null
-  );
+  const [profileData, setProfileData] = useState<IPublicProfileData | null>(null);
   const [activeTab, setActiveTab] = useState("info");
   const { t } = useTranslation("common");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { username } = router.query;
 
+  const { profile: currentUserProfile, loading: currentUserLoading } = useSelector((state: RootState) => state.auth);
+
+  const isOwnProfile = username === currentUserProfile?.user.username;
+
+  const { data: publicProfileData, loading: publicProfileLoading, error } = useApi<IPublicProfileData>(
+    `/user/profile/${username}/`,
+    {},
+    { skip: !username || isOwnProfile }
+  );
+
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!username) return;
+    if (isOwnProfile) {
+      setProfileData(currentUserProfile as IPublicProfileData);
+    } else if (publicProfileData) {
+      setProfileData(publicProfileData);
+    }
+  }, [username, currentUserProfile, publicProfileData]);
 
-      try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/user/profile/${username}/`
-        );
-        console.log("API Response:", response.data); // Добавим для отладки
-
-        if (response.data) {
-          setProfileData(response.data);
-        } else {
-          setError("Не удалось загрузить данные профиля.");
-        }
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 404) {
-            setError("Профиль не найден.");
-          } else {
-            setError("Ошибка при загрузке профиля.");
-          }
-        } else {
-          setError("Непредвиденная ошибка.");
-        }
-        setLoading(false);
-      }
-    };
-
-    fetchProfileData();
-  }, [username]);
+  const loading = currentUserLoading || publicProfileLoading;
 
   if (loading) return <div>Загрузка...</div>;
   if (error)
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
+    return <div className="text-center mt-10 text-red-500">{error.message || 'Ошибка'}</div>;
   if (!profileData)
     return <div className="text-center mt-10">Профиль не найден.</div>;
 

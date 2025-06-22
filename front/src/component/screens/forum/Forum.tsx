@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import ComplaintCard from "./list-complaints/ComplaintCard";
 import { AdvancedForumFilter } from "./filter/AdvancedForumFilter";
-import axios from "axios";
-import { useAuthToken } from "@/component/hooks/useAuthToken";
 import { useComplaints } from "@/component/hooks/forum/useForum";
+import { useApi } from "@/component/hooks/useApi";
 
 const Forum: React.FC = () => {
   const { t } = useTranslation();
@@ -15,8 +14,20 @@ const Forum: React.FC = () => {
     district: "",
     address: "",
   });
-  const token = useAuthToken();
-  const { complaints, fetchComplaints } = useComplaints(filter, token, locationFilters);
+  
+  const { complaints, loading, fetchComplaints } = useComplaints(filter, locationFilters);
+
+  const { fetchData: supportComplaintApi } = useApi(
+    '/support-complaint/',
+    { method: 'POST' },
+    { manual: true }
+  );
+
+  const { fetchData: addCommentApi } = useApi(
+    '', // URL будет динамическим
+    { method: 'POST' },
+    { manual: true }
+  );
 
   useEffect(() => {
     fetchComplaints();
@@ -24,16 +35,7 @@ const Forum: React.FC = () => {
 
   const supportComplaint = async (complaintId: number) => {
     try {
-      if (!token) return;
-      await axios.post(
-        "http://127.0.0.1:8000/api/support-complaint/",
-        { complaint_id: complaintId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await supportComplaintApi({ data: { complaint_id: complaintId } });
       fetchComplaints();
     } catch (err) {
       console.error("Ошибка при поддержке жалобы:", err);
@@ -42,16 +44,11 @@ const Forum: React.FC = () => {
 
   const addComment = async (complaintId: number, text: string) => {
     try {
-      if (!text || !token) return;
-      await axios.post(
-        `http://127.0.0.1:8000/api/forum-add/${complaintId}/`,
-        { text },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (!text) return;
+      await addCommentApi({
+        url: `/forum-add/${complaintId}/`,
+        data: { text },
+      });
       fetchComplaints();
     } catch (err) {
       console.error("Ошибка при добавлении комментария:", err);
@@ -83,7 +80,8 @@ const Forum: React.FC = () => {
         ))}
       </div>
 
-      {complaints.map((complaint) =>
+      {loading && <p>{t('forum.loading')}</p>}
+      {!loading && complaints.map((complaint) =>
         complaint.status === "reviewed" ? (
           <ComplaintCard
             key={complaint.id}

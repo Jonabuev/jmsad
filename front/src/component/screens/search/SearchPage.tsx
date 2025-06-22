@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { MyComponent } from "@/component/star/Star";
 import { ITenant } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
+import { useApi } from "@/component/hooks/useApi";
+import { useDebounce } from "@/component/hooks/useDebounce";
 
 interface IComplaintReason {
   id: number;
@@ -20,45 +21,61 @@ const TenantRegistry: React.FC = () => {
   const [endDate, setEndDate] = useState("");
   const [addressQuery, setAddressQuery] = useState("");
   const [courtScore, setCourtScore] = useState("");
-  const [reasons, setReasons] = useState<IComplaintReason[]>([]);
   const [selectedReasons, setSelectedReasons] = useState<number[]>([]);
 
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const debouncedAddressQuery = useDebounce(addressQuery, 500);
+
   const router = useRouter();
-  const [users, setUsers] = useState<ITenant[]>([]);
+
+  const { data: reasonsData } = useApi<IComplaintReason[]>('/all-complaint-reasons/');
+  const { data: users, loading: usersLoading, fetchData: fetchUsers } = useApi<ITenant[]>('', {}, { manual: true });
+
+  const reasons = React.useMemo(() => {
+    if (!reasonsData) return [];
+    if (activeTab === "tenants") {
+      return reasonsData.filter((reason) =>
+        ["Просрочка платежей", "Порча имущества", "Нарушение условий договора", "Жалобы от соседей / нарушение порядка", "Самовольное выселение или отказ освободить помещение"].includes(reason.reason)
+      );
+    } else {
+      return reasonsData.filter((reason) =>
+        ["Отсутствие ремонта помещения", "Игнорирование заявок на устранение неисправностей", "Повышение арендной платы без уведомления", "Отказ предоставить документы на жилье", "Нарушение конфиденциальности жильцов"].includes(reason.reason)
+      );
+    }
+  }, [reasonsData, activeTab]);
+
+  const handleFetchUsers = () => {
+    const endpoint =
+      activeTab === "tenants"
+        ? "/tenant-registry1/"
+        : "/landlords/";
+
+    const params: Record<string, string> = {};
+      if (debouncedSearchQuery) params.search = debouncedSearchQuery;
+      if (startDate && endDate) {
+        params.start_date = startDate;
+        params.end_date = endDate;
+      }
+      if (debouncedAddressQuery) params.address = debouncedAddressQuery;
+      if (courtScore) params.court_decision_score = courtScore;
+      if (selectedReasons.length > 0) {
+        params.reasons = selectedReasons.join(",");
+      }
+
+    fetchUsers({ url: endpoint, params });
+  };
 
   useEffect(() => {
-    const fetchReasons = async () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          console.error("No token found");
-          return;
-        }
-
-        const res = await axios.get("http://127.0.0.1:8000/api/all-complaint-reasons/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        let filteredReasons = res.data;
-
-        if (activeTab === "tenants") {
-          filteredReasons = res.data.filter((reason: IComplaintReason) =>
-            ["Просрочка платежей", "Порча имущества", "Нарушение условий договора", "Жалобы от соседей / нарушение порядка", "Самовольное выселение или отказ освободить помещение"].includes(reason.reason)
-          );
-        } else {
-          filteredReasons = res.data.filter((reason: IComplaintReason) =>
-            ["Отсутствие ремонта помещения", "Игнорирование заявок на устранение неисправностей", "Повышение арендной платы без уведомления", "Отказ предоставить документы на жилье", "Нарушение конфиденциальности жильцов"].includes(reason.reason)
-          );
-        }
-
-        setReasons(filteredReasons);
-      } catch (error) {
-        console.error("Ошибка загрузки причин жалоб:", error);
-      }
-    };
-    fetchReasons();
-  }, [activeTab]);
+    handleFetchUsers();
+  }, [
+    activeTab,
+    debouncedSearchQuery,
+    startDate,
+    endDate,
+    debouncedAddressQuery,
+    courtScore,
+    selectedReasons,
+  ]);
 
   const toggleReason = (id: number) => {
     setSelectedReasons((prev) =>
@@ -71,66 +88,6 @@ const TenantRegistry: React.FC = () => {
     const keys = reasonsStr.split(",").map((s) => s.trim()).filter(Boolean);
     return keys.map((key) => t(`search.reason.${key}`)).join(", ");
   };
-
-  const fetchUsers = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      const profileRes = await axios.get("http://127.0.0.1:8000/api/profile/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const profile = profileRes.data;
-
-      if (!profile.user.email_confirmed) {
-        router.push("/profile");
-        return;
-      }
-
-      const params: Record<string, string> = {};
-      if (searchQuery) params.search = searchQuery;
-      if (startDate && endDate) {
-        params.start_date = startDate;
-        params.end_date = endDate;
-      }
-      if (addressQuery) params.address = addressQuery;
-      if (courtScore) params.court_decision_score = courtScore;
-      if (selectedReasons.length > 0) {
-        params.reasons = selectedReasons.join(",");
-      }
-
-      const endpoint =
-        activeTab === "tenants"
-          ? "http://127.0.0.1:8000/api/tenant-registry1/"
-          : "http://127.0.0.1:8000/api/landlords/";
-
-      const res = await axios.get(endpoint, {
-        params,
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setUsers(res.data);
-    } catch (error) {
-      console.error("Ошибка при загрузке:", error);
-    }
-  }, [
-    activeTab,
-    router,
-    searchQuery,
-    startDate,
-    endDate,
-    addressQuery,
-    courtScore,
-    selectedReasons,
-  ]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
 
   return (
     <div className="max-w-10xl mx-auto p-6 bg-white shadow-md rounded-xl mt-10">
@@ -209,13 +166,15 @@ const TenantRegistry: React.FC = () => {
       </fieldset>
 
       <button
-        onClick={fetchUsers}
+        onClick={handleFetchUsers}
         className="md:col-span-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        disabled={usersLoading}
       >
-        {t("search.apply_filters")}
+        {usersLoading ? t("search.loading") : t("search.apply_filters")}
       </button>
 
-      {users.length === 0 ? (
+      {usersLoading && <p>{t("search.loading")}</p>}
+      {!usersLoading && users && users.length === 0 ? (
         <p className="text-gray-600">{t("search.no_complaints")}</p>
       ) : (
         <div className="overflow-x-auto mt-4">
@@ -225,8 +184,7 @@ const TenantRegistry: React.FC = () => {
                 <th className="border px-4 py-2">{t("search.tenant")}</th>
                 <th className="border px-4 py-2">{t("search.iin")}</th>
                 <th className="border px-4 py-2">{t("search.complaints_count")}</th>
-                {/*<th className="border px-4 py-2">{t("search.entry_date")}</th>*/}
-                <th className="border px-4 py-2">{t("search.complaint_dates")}</th> {/* Новая колонка */}
+                <th className="border px-4 py-2">{t("search.complaint_dates")}</th>
                 <th className="border px-4 py-2">{t("search.rating")}</th>
                 <th className="border px-4 py-2">{t("search.court_scores")}</th>
                 <th className="border px-4 py-2">{t("search.complaint_reasons")}</th>
@@ -234,14 +192,11 @@ const TenantRegistry: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {users && users.map((user) => (
                 <tr key={user.identifier} className="border text-center">
                   <td className="border px-4 py-2">{user.username}</td>
                   <td className="border px-4 py-2">{user.identifier}</td>
                   <td className="border px-4 py-2">{user.complaint_count ?? 0}</td>
-                  {/*<td className="border px-4 py-2">
-                    {user.r_date ? new Date(user.r_date).toLocaleDateString("ru-RU") : "-"}
-                  </td>*/}
                   <td className="border px-4 py-2">
                     {user.complaint_dates && user.complaint_dates.length > 0
                       ? user.complaint_dates
@@ -257,11 +212,8 @@ const TenantRegistry: React.FC = () => {
                     {getTranslatedReasons(user.complaint_reasons)}
                   </td>
                   <td className="border px-4 py-2">
-                    <Link
-                      href={`/user/${user.username}`}
-                      className="text-blue-600 underline hover:text-blue-800"
-                    >
-                      {t("search.profile")}
+                    <Link href={`/user/${user.username}`} className="text-blue-600 hover:underline">
+                      {t("search.view_profile")}
                     </Link>
                   </td>
                 </tr>

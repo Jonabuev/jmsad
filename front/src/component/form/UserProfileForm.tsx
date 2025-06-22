@@ -2,141 +2,75 @@
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useApi } from "../hooks/useApi";
+import { IProfileData } from "../type/users.interface";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../store/store";
+import { fetchUserProfile } from "../store/auth/authSlice";
+
+type FormValues = {
+  username: string;
+  phone_number: string;
+  email: string;
+  avatar: FileList | null;
+  clearAvatar: boolean;
+};
 
 const UserProfileForm = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    identifier: "",
-    phone_number: "",
-    email: "",
-    avatar: "",
-    newAvatar: null as File | null,
-    clearAvatar: false,
-  });
+  const { profile: profileData, loading: profileLoading } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const { t } = useTranslation("common");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setFormData((prev) => ({
-        ...prev,
-        newAvatar: e.target.files?.[0] || null,
-      }));
-    }
-  };
-
-  const fetchProfile = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Вы не авторизованы");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/profile/", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        setFormData((prev) => ({
-          ...prev,
-          username: data.full_name || "",
-          identifier: data.identifier || "",
-          phone_number: data.phone || "",
-          email: data.email || "",
-          avatar: data.avatar || "",
-        }));
-      } else {
-        console.error("Ошибка загрузки профиля");
-      }
-    } catch (err) {
-      console.error("Ошибка при получении профиля:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { fetchData: updateProfile, loading: updateLoading } = useApi<IProfileData>('/profile/edit/', {
+    method: 'PATCH',
+  }, { manual: true });
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Вы не авторизованы");
-      return;
+    if (profileData) {
+      reset({
+        username: profileData.username || "",
+        phone_number: profileData.phone_number || "",
+        email: profileData.email || "",
+      });
     }
+  }, [profileData, reset]);
 
-    const form = new FormData();
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    const formPayload = new FormData();
 
-    // Добавляем только если есть значение
-    if (formData.username.trim()) {
-      form.append("username", formData.username);
-    }
-
-    if (formData.phone_number.trim()) {
-      form.append("phone_number", formData.phone_number);
-    }
-
-    if (formData.email.trim()) {
-      form.append("email", formData.email);
-    }
-
-    // Обработка флага очистки аватара
-    form.append("clear_avatar", String(formData.clearAvatar));
-
-    // Добавляем аватар, если выбран новый файл
-    if (formData.newAvatar) {
-      form.append("avatar", formData.newAvatar);
+    if (data.username.trim()) formPayload.append("username", data.username);
+    if (data.phone_number.trim()) formPayload.append("phone_number", data.phone_number);
+    if (data.email.trim()) formPayload.append("email", data.email);
+    formPayload.append("clear_avatar", String(data.clearAvatar));
+    if (data.avatar && data.avatar.length > 0) {
+      formPayload.append("avatar", data.avatar[0]);
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/profile/edit/", {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Профиль обновлён:", data);
-
-        fetchProfile(); // Обновить отображение
-        router.push("/profile"); // Заменить на нужный путь
-      } else {
-        const errorData = await response.json();
-        console.error("Ошибка:", errorData);
-        alert("Ошибка при обновлении профиля");
-      }
+      await updateProfile({ data: formPayload });
+      dispatch(fetchUserProfile());
+      router.push("/profile");
     } catch (err) {
-      console.error("Ошибка при запросе:", err);
+      console.error("Ошибка при обновлении профиля:", err);
+      alert("Ошибка при обновлении профиля");
     }
   };
 
-  if (loading) return <p className="text-center">{t("editProfile.loading")}</p>;
+  if (profileLoading) return <p className="text-center">{t("editProfile.loading")}</p>;
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="max-w-md mx-auto bg-white p-6 rounded shadow"
     >
       <div className="mb-4">
@@ -145,11 +79,10 @@ const UserProfileForm = () => {
         </label>
         <input
           type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
+          {...register("username", { required: "Имя пользователя обязательно" })}
           className="w-full p-2 border border-gray-300 rounded"
         />
+        {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
       </div>
 
       <div className="mb-4">
@@ -158,8 +91,7 @@ const UserProfileForm = () => {
         </label>
         <input
           type="text"
-          name="identifier"
-          value={formData.identifier}
+          value={profileData?.identifier || ''}
           readOnly
           className="w-full p-2 border border-gray-300 rounded bg-gray-100"
         />
@@ -171,9 +103,7 @@ const UserProfileForm = () => {
         </label>
         <input
           type="text"
-          name="phone_number"
-          value={formData.phone_number}
-          onChange={handleChange}
+          {...register("phone_number")}
           className="w-full p-2 border border-gray-300 rounded"
         />
       </div>
@@ -184,25 +114,38 @@ const UserProfileForm = () => {
         </label>
         <input
           type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
+          {...register("email", { 
+            required: "Email обязателен",
+            pattern: {
+              value: /^\S+@\S+$/i,
+              message: "Некорректный формат email"
+            }
+          })}
           className="w-full p-2 border border-gray-300 rounded"
         />
+        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
       </div>
 
       <div className="mb-6">
         <label className="block font-medium mb-1">
           {t("editProfile.uploadNew")}:
         </label>
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+        <input type="file" accept="image/*" {...register("avatar")} />
+      </div>
+      
+      <div className="mb-6">
+        <label className="flex items-center">
+          <input type="checkbox" {...register("clearAvatar")} className="mr-2" />
+          <span>{t("editProfile.clearAvatar")}</span>
+        </label>
       </div>
 
       <button
         type="submit"
         className="bg-[#2094f3] text-white px-6 py-2 rounded hover:bg-blue-600 transition"
+        disabled={updateLoading}
       >
-        {t("editProfile.saveChanges")}
+        {updateLoading ? t("editProfile.saving") : t("editProfile.saveChanges")}
       </button>
     </form>
   );

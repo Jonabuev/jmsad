@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
-import axios from "axios";
 import { IComplaint } from "@/component/type/users.interface";
+import { useApi } from "../useApi";
+import { useMemo } from "react";
 
 interface LocationFilters {
   region: string;
@@ -11,32 +11,17 @@ interface LocationFilters {
 
 export const useComplaints = (
   filter: string,
-  token: string | null,
   locationFilters: LocationFilters
 ) => {
-  const [complaints, setComplaints] = useState<IComplaint[]>([]);
+  const params = useMemo(() => ({
+    filter,
+    ...(locationFilters.region && { region: locationFilters.region }),
+    ...(locationFilters.city && { city: locationFilters.city }),
+    ...(locationFilters.district && { district: locationFilters.district }),
+    ...(locationFilters.address && { address: locationFilters.address }),
+  }), [filter, locationFilters]);
 
-  const fetchComplaints = useCallback(async () => {
-    try {
-      const params = new URLSearchParams({
-        filter,
-        ...(locationFilters.region && { region: locationFilters.region }),
-        ...(locationFilters.city && { city: locationFilters.city }),
-        ...(locationFilters.district && { district: locationFilters.district }),
-        ...(locationFilters.address && { address: locationFilters.address }),
-      });
+  const { data: complaints, loading, error, fetchData } = useApi<IComplaint[]>('/forum/', { params });
 
-      const response = await axios.get(
-        `http://127.0.0.1:8000/api/forum/?${params.toString()}`,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
-      setComplaints(response.data);
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-    }
-  }, [filter, token, locationFilters]);
-
-  return { complaints, fetchComplaints };
+  return { complaints: complaints || [], loading, error, fetchComplaints: fetchData };
 };

@@ -1,51 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import axios from "axios";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-
-interface IUser {
-  user: {
-    username: string;
-    avatar?: string;
-    role: "tenant" | "landlord";
-  };
-}
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/component/store/store";
+import { logout } from "@/component/store/auth/authSlice";
 
 const NavigationBar: React.FC = () => {
-  const [user, setUser] = useState<IUser | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const { profile: user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const languageDropdownRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation("common");
   const router = useRouter();
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem("access_token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      axios
-        .get("http://127.0.0.1:8000/api/profile/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          setUser(res.data);
-        })
-        .catch((err) => {
-          console.error("Ошибка при загрузке данных о пользователе:", err);
-        });
-    }
-  }, [token]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,8 +41,7 @@ const NavigationBar: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    setUser(null);
+    dispatch(logout());
     window.location.href = "/";
   };
 
@@ -81,12 +51,12 @@ const NavigationBar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-1 justify-end gap-8 relative h-14)">
+    <div className="flex flex-1 justify-end gap-8 relative h-14">
       <div className="flex items-center gap-9">
         <Link className="text-[#0d151c] text-sm font-medium" href="/search">
           {t("navigation.registry")}
         </Link>
-        {user?.user.role !== "tenant" && (
+        {isAuthenticated && user?.user.role !== "tenant" && (
           <Link className="text-[#0d151c] text-sm font-medium" href="/forum">
             {t("navigation.forum")}
           </Link>
@@ -137,7 +107,7 @@ const NavigationBar: React.FC = () => {
           )}
         </div>
 
-        {user ? (
+        {isAuthenticated && user ? (
           <div className="relative" ref={dropdownRef}>
             <Image
               src={`http://127.0.0.1:8000${user.user.avatar}`}

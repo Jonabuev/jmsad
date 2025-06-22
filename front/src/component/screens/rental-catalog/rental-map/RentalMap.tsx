@@ -1,8 +1,14 @@
 import { IHouse } from "@/component/type/properties.interface";
-import YandexMap from "@/component/map/YandexMap";
+// import YandexMap from "@/component/map/YandexMap";
+import dynamic from "next/dynamic";
 
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
+
+const YandexMapWithNoSSR = dynamic(() => import("@/component/map/YandexMap"), {
+  ssr: false,
+  loading: () => <p>Загрузка карты...</p>,
+});
 
 declare global {
   interface Window {
@@ -23,7 +29,7 @@ export default function RentalMap({ rentals, onRentClick }: Props) {
   }, [onRentClick]);
 
   return (
-    <YandexMap
+    <YandexMapWithNoSSR
       center={[43.222, 76.8512]}
       zoom={11}
       markers={rentals.map((rental) => ({

@@ -1,51 +1,101 @@
 import axios from "axios";
+import Router from "next/router";
 
-const userData = {
-  username: "john_doe",
-  email: "john@example.com",
-  phone_number: "1234567890",
-  role: "tenant",
-  type_entity: "individual",
-  type_identify: "iin",
-  identifier: "123456789012",
-  password1: "password123",
-  password2: "password123",
-};
+const API_URL = "http://127.0.0.1:8000/api";
 
-export const registerUser = async () => {
-  const response = await axios.post(
-    "http://127.0.0.1:8000/register/",
-    userData,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
-  );
-  localStorage.setItem("access_token", response.data.access);
-  localStorage.setItem("refresh_token", response.data.refresh);
-  console.log("User registered successfully");
-};
 
-export const refreshToken = async () => {
-  const refreshToken = localStorage.getItem("refresh_token");
-  if (!refreshToken) {
-    console.error("No refresh token found");
-    return;
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  const response = await axios.post(
-    "http://127.0.0.1:8000/api/token/refresh/",
-    {
-      refresh: refreshToken,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+let isRefreshing = false;
+let failedQueue: { resolve: (value: unknown) => void; reject: (reason?: any) => void; }[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
     }
-  );
+  });
 
-  localStorage.setItem("access_token", response.data.access);
-  console.log("Access token refreshed");
+  failedQueue = [];
 };
+
+
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise(function(resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          return axios(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        })
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (refreshToken) {
+        try {
+          const response = await axios.post(`${API_URL}/token/refresh/`, {
+            refresh: refreshToken,
+          });
+          const newAccessToken = response.data.access;
+          localStorage.setItem("access_token", newAccessToken);
+          api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          processQueue(null, newAccessToken);
+          return api(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          Router.push("/login");
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      } else {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        Router.push("/login");
+        isRefreshing = false;
+        return Promise.reject(error);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
