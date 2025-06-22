@@ -10,6 +10,10 @@ export interface IUser {
   is_superuser: boolean;
   rating?: number;
   complaints_rental: IComplaint[];
+  document_type: "id_card" | "passport_kz" | "visa";
+  passport_expiry: string;
+  visa_number?: string;
+  citizenship: string;
 }
 
 export interface IRental {
