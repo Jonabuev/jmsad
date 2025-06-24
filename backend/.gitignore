@@ -26,7 +26,6 @@ migrations/
 
 # Static and media files
 /static/
-media/
 
 # Local environment settings
 *.env
