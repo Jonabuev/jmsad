@@ -23,7 +23,7 @@ venv.bak/
 
 # Django migrations
 migrations/
-
+media/
 # Static and media files
 /static/
 
