@@ -19,6 +19,19 @@ from django.utils import timezone
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
 def profile(request):
+    """
+    API endpoint для получения полного профиля пользователя.
+    
+    Возвращает подробную информацию о пользователе, включая:
+    - Данные пользователя
+    - Дома (для арендодателей)
+    - Аренды (для арендаторов)
+    - Жалобы (отправленные и полученные)
+    - Админские жалобы (для администраторов)
+    
+    Permissions:
+        - Требуется аутентификация
+    """
     try:
         user = request.user
         print(f"User: {user.username}, ID: {user.id}")  # Логируем пользователя
@@ -70,12 +83,28 @@ def profile(request):
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
         import traceback
+        print(traceback.format_exc())
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
 def edit_profile(request):
+    """
+    API endpoint для редактирования профиля пользователя.
+    
+    Позволяет обновить данные пользователя, включая аватар.
+    Поддерживает частичное обновление (PATCH).
+    
+    Supported fields:
+        - Все поля модели CustomUser
+        - avatar: Новый аватар
+        - clear_avatar: Удаление аватара (true/false)
+    
+    Permissions:
+        - Требуется аутентификация
+        - Пользователь может редактировать только свой профиль
+    """
     user = request.user
 
     serializer = CustomUserSerializer(user, data=request.data, partial=True)
@@ -113,12 +142,32 @@ def edit_profile(request):
 # Представление для получения профиля
 @api_view(['GET'])
 def profile_view(request):
+    """
+    API endpoint для получения базовой информации о профиле.
+    
+    Возвращает только основные данные пользователя без дополнительной информации.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
     user = request.user
     serializer = CustomUserSerializer(user)
     return Response(serializer.data)
 
 
 class PublicUserProfileView(APIView):
+    """
+    API endpoint для получения публичного профиля пользователя.
+    
+    Возвращает публичную информацию о пользователе по username.
+    Включает дома, аренды и жалобы пользователя.
+    
+    URL Parameters:
+        - username: Имя пользователя для просмотра профиля
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
     def get(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
         
@@ -190,12 +239,28 @@ class PublicUserProfileView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_apartments(request):
+    """
+    API endpoint для получения квартир пользователя.
+    
+    Возвращает список всех домов/квартир, принадлежащих текущему пользователю.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
     houses = House.objects.filter(owner=request.user)
     return Response(HouseSerializer(houses, many=True).data, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def user_info(request):
+    """
+    API endpoint для получения базовой информации о пользователе.
+    
+    Возвращает минимальную информацию: username и статус суперпользователя.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
     user = request.user
     return Response({
         "username": user.username,
@@ -206,6 +271,18 @@ def user_info(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_identity(request):
+    """
+    API endpoint для верификации личности пользователя.
+    
+    Загружает документ для верификации и помечает email как подтвержденный.
+    Отправляет уведомление на email о получении документа.
+    
+    Required fields:
+        - id_document: Файл документа для верификации
+    
+    Permissions:
+        - Требуется аутентификация
+    """
     try:
         id_doc = request.FILES.get('id_document')
         with transaction.atomic():
@@ -225,6 +302,21 @@ def verify_identity(request):
         return Response({"error": "Error occurred during identity verification."}, status=status.HTTP_400_BAD_REQUEST)
 
 class TenantRegistryView(generics.ListAPIView):
+    """
+    API endpoint для реестра арендаторов.
+    
+    Возвращает список жалоб, поданных арендодателями на арендаторов.
+    Поддерживает фильтрацию по поиску и датам.
+    
+    Query Parameters:
+        - search: Поиск по username или identifier
+        - start_date: Начальная дата фильтрации
+        - end_date: Конечная дата фильтрации
+    
+    Permissions:
+        - Требуется аутентификация
+        - Требуется подтверждение email
+    """
     serializer_class = ComplaintRegistrySerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -265,6 +357,28 @@ class TenantRegistryView(generics.ListAPIView):
 
 
 class TenantRegistryView1(ListAPIView):
+    """
+    API endpoint для расширенного реестра арендаторов.
+    
+    Возвращает список арендаторов с фильтрацией по различным критериям:
+    - По адресу дома
+    - По court_decision_score
+    - По причинам жалоб
+    - По датам
+    - Поиск по username/identifier
+    
+    Query Parameters:
+        - address: Фильтр по адресу дома
+        - court_decision_score: Фильтр по court_decision_score
+        - reasons: Фильтр по причинам жалоб (через запятую)
+        - search: Поиск по username или identifier
+        - start_date: Начальная дата
+        - end_date: Конечная дата
+    
+    Permissions:
+        - Требуется аутентификация
+        - Требуется подтверждение email
+    """
     serializer_class = CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -332,6 +446,24 @@ class TenantRegistryView1(ListAPIView):
 
 
 class TenantRegistryView2(ListAPIView):
+    """
+    API endpoint для реестра арендодателей.
+    
+    Аналогичен TenantRegistryView1, но для арендодателей.
+    Возвращает список арендодателей с фильтрацией по различным критериям.
+    
+    Query Parameters:
+        - address: Фильтр по адресу дома
+        - court_decision_score: Фильтр по court_decision_score
+        - reasons: Фильтр по причинам жалоб (через запятую)
+        - search: Поиск по username или identifier
+        - start_date: Начальная дата
+        - end_date: Конечная дата
+    
+    Permissions:
+        - Требуется аутентификация
+        - Требуется подтверждение email
+    """
     serializer_class = CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
