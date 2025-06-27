@@ -20,6 +20,27 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
+    """
+    API endpoint для регистрации нового пользователя.
+    
+    Создает нового пользователя с валидацией данных через форму.
+    Автоматически генерирует JWT токены для аутентификации.
+    
+    Required fields:
+        - username: Имя пользователя
+        - email: Email адрес
+        - password1: Пароль
+        - password2: Подтверждение пароля
+        - role: Роль пользователя (tenant/landlord)
+    
+    Returns:
+        - access_token: JWT токен для доступа
+        - refresh_token: JWT токен для обновления
+        - profile_url: Ссылка на профиль пользователя
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
     print("Полученные данные:", request.data)
 
     form = CustomUserCreationForm(data=request.data)
@@ -47,6 +68,23 @@ def register(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
+    """
+    API endpoint для аутентификации пользователя.
+    
+    Проверяет учетные данные пользователя и возвращает JWT токены.
+    
+    Required fields:
+        - username: Имя пользователя или email
+        - password: Пароль пользователя
+    
+    Returns:
+        - access_token: JWT токен для доступа
+        - refresh_token: JWT токен для обновления
+        - profile_url: Ссылка на профиль пользователя
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
     # Логируем полученные данные для отладки
     print("Попытка логина с данными:", request.data)
 
@@ -82,6 +120,18 @@ def login_view(request):
 User = CustomUser
 
 class RequestPasswordResetView(APIView):
+    """
+    API endpoint для запроса сброса пароля.
+    
+    Отправляет код подтверждения на email пользователя для сброса пароля.
+    
+    Required fields:
+        - email: Email адрес пользователя
+        - или username: Имя пользователя
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
     def post(self, request):
         email_or_username = request.data.get('email') or request.data.get('username')
 
@@ -101,6 +151,14 @@ class RequestPasswordResetView(APIView):
 
 
 class RequestPasswordChangeView(APIView):
+    """
+    API endpoint для запроса смены пароля авторизованным пользователем.
+    
+    Отправляет код подтверждения на email текущего пользователя для смены пароля.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -112,6 +170,20 @@ class RequestPasswordChangeView(APIView):
         return Response({'success': 'Confirmation code sent to your email'}, status=200)
 
 class ConfirmPasswordChangeView(APIView):
+    """
+    API endpoint для подтверждения смены пароля.
+    
+    Подтверждает код и изменяет пароль пользователя.
+    
+    Required fields:
+        - code: Код подтверждения
+        - new_password: Новый пароль
+        - email: Email пользователя (для сброса пароля)
+    
+    Permissions:
+        - Для сброса пароля: доступно всем
+        - Для смены пароля: требуется аутентификация
+    """
     def post(self, request):
         code = request.data.get('code')
         new_password = request.data.get('new_password')
@@ -167,6 +239,23 @@ class ConfirmPasswordChangeView(APIView):
 CustomUser = get_user_model()
 @method_decorator(csrf_exempt, name='dispatch')
 class GoogleAuthView(APIView):
+    """
+    API endpoint для аутентификации через Google OAuth.
+    
+    Проверяет Google ID токен и создает/находит пользователя в системе.
+    Возвращает JWT токены для дальнейшей работы.
+    
+    Required fields:
+        - token: Google ID токен
+    
+    Returns:
+        - access: JWT токен для доступа
+        - refresh: JWT токен для обновления
+        - user: Информация о пользователе
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
     permission_classes = [AllowAny]
     def post(self, request):
         token = request.data.get('token')
@@ -208,5 +297,22 @@ class GoogleAuthView(APIView):
 
 # Представление для обновления токена
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    API endpoint для получения JWT токенов.
+    
+    Стандартный endpoint DRF для получения access и refresh токенов.
+    Расширяет базовый TokenObtainPairView для кастомизации при необходимости.
+    
+    Required fields:
+        - username: Имя пользователя
+        - password: Пароль пользователя
+    
+    Returns:
+        - access: JWT токен для доступа
+        - refresh: JWT токен для обновления
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
     pass
 

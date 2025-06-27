@@ -1,10 +1,10 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status, generics, permissions
+from rest_framework import status, generics, permissions, filters
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rentapp.models import Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
@@ -15,16 +15,21 @@ from rentapp.notifications import (
     send_complaint_received_notification, send_complaint_status_update_notification,
     send_complaint_supported_notification, send_complaint_comment_notification
 )
+from rentapp.services.complaint_service import ComplaintService
+from rentapp.exceptions import RentAppException
+from rentapp.cache import ComplaintCache, HouseCache, invalidate_complaint_cache
+from django_filters.rest_framework import DjangoFilterBackend
+from rentapp.permissions import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
 def createRentalComplaint(request):
     user = request.user
     rental_id = request.data.get('rental_id')
 
     # Проверка аренды
     try:
-        rental = Rental.objects.get(id=rental_id)
+        rental = Rental.objects.select_related('house', 'house__owner', 'tenant').get(id=rental_id)
     except Rental.DoesNotExist:
         return Response({'detail': 'Аренда не найдена.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -78,7 +83,7 @@ def createRentalComplaint(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
 def submit_complaint(request):
     try:
         # Получаем текущего пользователя как отправителя жалобы
@@ -150,10 +155,10 @@ def submit_complaint(request):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
 def dispute_complaint(request, complaint_id):
     try:
-        complaint = RentalComplaint.objects.get(id=complaint_id)
+        complaint = RentalComplaint.objects.select_related('rental', 'complainant', 'accused').get(id=complaint_id)
     except RentalComplaint.DoesNotExist:
         return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -167,10 +172,144 @@ def dispute_complaint(request, complaint_id):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsLandlord])
 def update_complaint_status(request, pk):
     try:
-        complaint = Complaint.objects.get(pk=pk)
+        result = ComplaintService.update_complaint_status(pk, request.data.get('status'), request.user)
+        # Инвалидируем кэш жалоб после обновления статуса
+        invalidate_complaint_cache()
+        return Response(result, status=status.HTTP_200_OK)
+    except RentAppException as e:
+        return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def complaint_reasons(request):
+    user = request.user  # Получаем аутентифицированного пользователя
+    role = user.role  # Предполагаем, что role — поле модели CustomUser
+
+    if role == "tenant":
+        # Используем кэширование для причин жалоб
+        reasons = ComplaintCache.get_complaint_reasons("landlord")
+    elif role == "landlord":
+        # Используем кэширование для причин жалоб
+        reasons = ComplaintCache.get_complaint_reasons("tenant")
+    else:
+        return Response({"error": "Invalid role"}, status=400)
+
+    return Response(reasons)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_complaint_reasons(request):
+    # Возвращаем все причины жалоб без фильтрации
+    reasons = ComplaintReason.objects.all()
+    serializer = ComplaintReasonSerializer(reasons, many=True)
+    return Response(serializer.data)
+
+
+class ComplaintReasonListTenant(generics.ListAPIView):
+    queryset = ComplaintReason.objects.filter(type='tenant')
+    serializer_class = ComplaintReasonSerializer
+    permission_classes = [permissions.IsAuthenticated, IsTenant]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['type']
+    search_fields = ['reason']
+    ordering_fields = ['id', 'reason']
+
+
+class ComplaintReasonListLandlord(generics.ListAPIView):
+    queryset = ComplaintReason.objects.filter(type='landlord')
+    serializer_class = ComplaintReasonSerializer
+    permission_classes = [permissions.IsAuthenticated, IsLandlord]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['type']
+    search_fields = ['reason']
+    ordering_fields = ['id', 'reason']
+
+
+class ComplaintDetailListView(generics.ListAPIView):
+    serializer_class = RentalComplaintSerializer
+    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'complainant', 'accused', 'rental']
+    search_fields = ['description', 'complainant__username', 'accused__username']
+    ordering_fields = ['created_at', 'support_count']
+
+    def get_queryset(self):
+        return RentalComplaint.objects.select_related(
+            'rental', 'rental__house', 'rental__house__owner',
+            'complainant', 'accused'
+        ).prefetch_related(
+            'reasons', 'comments', 'comments__user'
+        )
+
+
+class ComplaintDetailByUUIDView(RetrieveAPIView):
+    serializer_class = RentalComplaintSerializer
+    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    lookup_field = 'uuid'
+
+    def get_queryset(self):
+        return RentalComplaint.objects.select_related(
+            'rental', 'rental__house', 'rental__house__owner',
+            'complainant', 'accused'
+        ).prefetch_related(
+            'reasons', 'comments', 'comments__user'
+        )
+
+
+class AddCommentAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+
+    def post(self, request, complaint_id):
+        try:
+            complaint = RentalComplaint.objects.select_related('rental', 'complainant').get(id=complaint_id)
+        except RentalComplaint.DoesNotExist:
+            return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
+
+        comment_text = request.data.get('text')
+        if not comment_text:
+            return Response({"error": "Текст комментария обязателен"}, status=status.HTTP_400_BAD_REQUEST)
+
+        comment = Comment.objects.create(
+            complaint=complaint,
+            user=request.user,
+            text=comment_text
+        )
+
+        # Отправляем уведомление о новом комментарии
+        send_complaint_comment_notification(complaint, comment)
+
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class SupportComplaintAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+
+    def post(self, request):
+        complaint_id = request.data.get('complaint_id')
+        try:
+            complaint = RentalComplaint.objects.select_related('complainant').get(id=complaint_id)
+        except RentalComplaint.DoesNotExist:
+            return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
+
+        complaint.support_count += 1
+        complaint.save()
+
+        # Отправляем уведомление о поддержке
+        send_complaint_supported_notification(complaint, request.user)
+
+        return Response({"message": "Жалоба поддержана"}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_complaint_status1(request, pk):
+    try:
+        complaint = Complaint.objects.select_related('complainant', 'accused').get(pk=pk)
         new_status = request.data.get('status')
         if new_status not in ['pending', 'reviewed', 'rejected']:
             return Response({'error': 'Недопустимый статус'}, status=400)
@@ -183,134 +322,37 @@ def update_complaint_status(request, pk):
     except Complaint.DoesNotExist:
         return Response({'error': 'Жалоба не найдена'}, status=404)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def complaint_reasons(request):
-    user = request.user  # Получаем аутентифицированного пользователя
-    role = user.role  # Предполагаем, что role — поле модели CustomUser
-
-    if role == "tenant":
-        # Фильтруем причины жалоб на владельца (например, из БД только те, что относятся к landlord)
-        reasons = ComplaintReason.objects.filter(type="landlord")  # Добавьте поле type в модель, если нужно
-    elif role == "landlord":
-        # Фильтруем причины жалоб на арендатора (например, из БД только те, что относятся к tenant)
-        reasons = ComplaintReason.objects.filter(type="tenant")  # Добавьте поле type в модель, если нужно
-    else:
-        return Response({"error": "Invalid role"}, status=400)
-
-    data = [{'id': r.id, 'reason': r.reason} for r in reasons]
-
-    return Response(data)
-
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def all_complaint_reasons(request):
-    # Возвращаем все причины жалоб без фильтрации
-    reasons = ComplaintReason.objects.all()
-    data = [{'id': r.id, 'reason': r.reason} for r in reasons]
-
-    return Response(data)
-
-class ComplaintReasonListTenant(generics.ListAPIView):
-    queryset = ComplaintReason.objects.filter(type='tenant')
-    serializer_class = ComplaintReasonSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-class ComplaintReasonListLandlord(generics.ListAPIView):
-    queryset = ComplaintReason.objects.filter(type='landlord')
-    serializer_class = ComplaintReasonSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class ComplaintDetailByUUIDView(RetrieveAPIView):
-    serializer_class = RentalComplaintSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'uuid'
-
-    def get_queryset(self):
-        user = self.request.user
-        if user:
-            
-            print(f'{RentalComplaint.objects.all()}')
-            return RentalComplaint.objects.all()
-
-
-
-class AddCommentAPIView(APIView):
-    def post(self, request, complaint_id):
-        
-        complaint = RentalComplaint.objects.get(id=complaint_id)
-        data = request.data.copy()
-        data['complaint'] = complaint_id
-        data['user'] = request.user.id
-        serializer = CommentSerializer(data=data)
-        if serializer.is_valid():
-            comment = serializer.save()
-            # Отправляем уведомление о новом комментарии
-            send_complaint_comment_notification(complaint, comment)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-
-class SupportComplaintAPIView(APIView):
-    def post(self, request):
-        complaint_id = request.data.get('complaint_id')
-        complaint = RentalComplaint.objects.get(id=complaint_id)
-        complaint.support_count += 1
-        complaint.save()
-        
-        # Отправляем уведомление о поддержке жалобы
-        send_complaint_supported_notification(complaint, request.user)
-        
-        return Response({'message': 'Complaint supported successfully'}, status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def update_complaint_status1(request, pk):
-    try:
-        complaint = RentalComplaint.objects.get(pk=pk)
-        new_status = request.data.get('status')
-
-        if new_status not in ['pending', 'reviewed', 'rejected']:
-            return Response({'error': 'Недопустимый статус'}, status=400)
-
-        complaint.status = new_status
-        complaint.save()
-
-        if complaint.accused_id:
-          tenant = CustomUser.objects.get(id=complaint.accused_id)  # Получаем пользователя по ID
-          if tenant.r_date is None:
-            tenant.r_date = timezone.now()  
-            tenant.save() 
-
-        # Отправляем уведомление об изменении статуса жалобы
-        send_complaint_status_update_notification(complaint)
-
-        return Response({'success': True, 'status': complaint.status}, status=200)
-
-    except RentalComplaint.DoesNotExist:
-        return Response({'error': 'Жалоба не найдена'}, status=404)
 
 @api_view(['GET'])
 def house_locations(request):
-    houses = House.objects.exclude(latitude=None).exclude(longitude=None)
-    serializer = HouseSerializer(houses, many=True)
-    return Response(serializer.data)
+    # Используем кэширование для локаций домов
+    houses = HouseCache.get_house_locations()
+    return Response(houses)
+
 
 class CreateComplaintAPIView(APIView):
+    """
+    API endpoint для создания жалобы.
+    
+    POST: Создает новую жалобу
+    
+    Required fields:
+        - title: Заголовок жалобы
+        - description: Описание жалобы
+        - house_id: ID дома
+        - priority: Приоритет жалобы (опционально)
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        serializer = ComplaintCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            result = ComplaintService.create_complaint(request.data, request.user)
+            return Response(result, status=status.HTTP_201_CREATED)
+        except RentAppException as e:
+            return Response({"error": e.message}, status=status.HTTP_400_BAD_REQUEST)
     
 
 

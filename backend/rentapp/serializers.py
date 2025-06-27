@@ -15,16 +15,23 @@ from .models import Complaint, House, CustomUser
 
 class HouseSerializer(serializers.ModelSerializer):
     is_rented = serializers.SerializerMethodField()
+    address = serializers.CharField(max_length=255, min_length=5, required=True)
+    type_p = serializers.CharField(max_length=50, required=True)
 
     class Meta:
         model = House
-        fields = ['id', 'address', 'type_p', 'latitude', 'longitude', 'is_rented']
+        fields = '__all__'
+        read_only_fields = ['owner']
 
     def get_is_rented(self, obj):
         from .models import Rental
         from django.utils import timezone
         now = timezone.now().date()
         return Rental.objects.filter(house=obj, start_date__lte=now, end_date__gte=now, status='active').exists()
+
+    def create(self, validated_data):
+        validated_data['owner'] = self.context['request'].user
+        return super().create(validated_data)
 
 class UserShortSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
@@ -43,12 +50,7 @@ class ComplaintRegistrySerializer(serializers.ModelSerializer):
     class Meta:
         model = RentalComplaint
         fields = [
-            'id',
-            'uuid',
-            'created_at',
-            'rating',
-            'accused',
-            'property',
+            'id', 'uuid', 'created_at', 'rating', 'accused', 'property'
         ]
 
     def get_property(self, obj):
@@ -149,16 +151,32 @@ from .models import Complaint, CustomUser, ComplaintImage
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
+    is_current_user = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
+        # Только публичные поля по умолчанию
         fields = [
-            'id', 'username', 'email', 'email_confirmed', 'identifier', 
-            'role', 'phone_number', 'avatar', 'is_superuser', 'rating'
+            'id', 'username', 'role', 'avatar', 'rating', 'is_current_user'
         ]
 
     def get_avatar(self, obj):
         return obj.get_avatar_url()
+
+    def get_is_current_user(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            return obj.id == request.user.id
+        return False
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Если это текущий пользователь — добавить приватные поля
+        if data.get('is_current_user'):
+            data['email'] = instance.email
+            data['phone_number'] = instance.phone_number
+            data['is_superuser'] = instance.is_superuser
+        return data
 
 class CommentSerializer(serializers.ModelSerializer):
     user_data = serializers.SerializerMethodField()  # Отдельное поле с данными пользователя
@@ -185,31 +203,21 @@ class ComplaintImageSerializer(serializers.ModelSerializer):
 class RentalComplaintSerializer(serializers.ModelSerializer):
     complainant = UserSerializer(read_only=True)
     accused = UserSerializer(read_only=True)
-    comments = CommentSerializer(many=True, read_only=True)  # если есть связь с комментариями
+    comments = CommentSerializer(many=True, read_only=True)
     reasons = ComplaintReasonSerializer(many=True, read_only=True)
     property = serializers.SerializerMethodField()
     evidence = serializers.FileField(read_only=True)
-    user=CustomUserSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = RentalComplaint
         fields = [
-            'id',
-            'uuid',
-            'description',
-            'support_count',
-            'status',
-            'rating',
-            'complainant',
-            'accused',
-            'property',
-            'reasons',
-            'evidence',
-            'comments',
-            'created_at',
-            'user',
-            'court_decision_score', 
-            'images'
+            'id', 'uuid', 'description', 'support_count', 'status', 'rating',
+            'complainant', 'accused', 'property', 'reasons', 'evidence',
+            'comments', 'created_at', 'user', 'court_decision_score', 'images'
+        ]
+        read_only_fields = [
+            'complainant', 'accused', 'created_at', 'user', 'support_count', 'images'
         ]
 
     def get_property(self, obj):
@@ -230,24 +238,6 @@ class IdentityVerificationSerializer(serializers.ModelSerializer):
         model = IdentityVerification
         fields = ['id', 'user', 'id_document', 'verified']
 
-class HouseSerializer(serializers.ModelSerializer):
-    is_rented = serializers.SerializerMethodField()
-
-    class Meta:
-        model = House
-        fields = '__all__'
-        read_only_fields = ['owner']  # чтобы пользователь не мог сам задать owner
-    
-    def get_is_rented(self, obj):
-        from .models import Rental
-        from django.utils import timezone
-        now = timezone.now().date()
-        return Rental.objects.filter(house=obj, start_date__lte=now, end_date__gte=now, status='active').exists()
-
-    def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user  # ← устанавливаем owner
-        return super().create(validated_data)
-
 from rest_framework import serializers
 from .models import Rental
 
@@ -265,18 +255,20 @@ from .models import RentalComplaint
 
 
 class ComplaintCreateSerializer(serializers.Serializer):
-    tenant_identity_iin = serializers.CharField()
-    landlord_identity_iin = serializers.CharField()
-    address = serializers.CharField()
-    description = serializers.CharField()
-    rating = serializers.IntegerField(min_value=1, max_value=5)
-    reason = serializers.ListField(child=serializers.IntegerField())
+    tenant_identity_iin = serializers.CharField(max_length=12, min_length=12, required=True)
+    landlord_identity_iin = serializers.CharField(max_length=12, min_length=12, required=True)
+    address = serializers.CharField(max_length=255, min_length=5, required=True)
+    description = serializers.CharField(max_length=1000, min_length=10, required=True)
+    rating = serializers.IntegerField(min_value=1, max_value=5, required=True)
+    reason = serializers.ListField(child=serializers.IntegerField(), min_length=1, required=True)
     evidence = serializers.FileField(required=False)
 
 class ReputationSerializer(serializers.ModelSerializer):
+    comment = serializers.CharField(max_length=500, required=False)
     class Meta:
         model = Reputation
         fields = ['id', 'tenant_identifier', 'author_identifier', 'rating', 'comment', 'status', 'created_at']
+        read_only_fields = ['created_at']
 
 from rest_framework import serializers
 from .models import Rental, Favorite, ChatThread, ChatMessage, Notification
@@ -287,9 +279,14 @@ class RentalSerializer(serializers.ModelSerializer):
     tenant_name = serializers.CharField(source="tenant.username", read_only=True)
     house_address = serializers.CharField(source="house.address", read_only=True)
     house = HouseSerializer(read_only=True)
+
     class Meta:
         model = Rental
-        fields = '__all__'
+        fields = [
+            'id', 'house', 'house_address', 'tenant', 'tenant_name',
+            'status', 'start_date', 'end_date'
+        ]
+        read_only_fields = ['tenant', 'updated_at']
 
 from rest_framework import serializers
 from .models import Rental
@@ -301,24 +298,30 @@ class RentalRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rental
-        fields = ['id', 'tenant_name', 'house_address', 'status', 'start_date', 'end_date']
+        fields = [
+            'id', 'tenant_name', 'house_address', 'status', 'start_date', 'end_date'
+        ]
+        read_only_fields = ['tenant_name', 'house_address']
 
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
-        fields = '__all__'
+        fields = ['id', 'user', 'house', 'created_at']
+        read_only_fields = ['user', 'created_at']
 
 class ChatThreadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatThread
-        fields = '__all__'
+        fields = ['id', 'user1', 'user2', 'created_at']
+        read_only_fields = ['created_at']
 
 class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatMessage
-        fields = '__all__'
+        fields = ['id', 'thread', 'sender', 'message', 'created_at']
+        read_only_fields = ['created_at']
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -330,9 +333,9 @@ class NotificationSerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 
 class ImageUploadSerializer(serializers.Serializer):
-    id_document = serializers.FileField(required=True)  # Изменено с "image" на "id_document"
+    id_document = serializers.FileField(required=True)
     texts_to_find = serializers.ListField(
-        child=serializers.CharField(max_length=255), required=True
+        child=serializers.CharField(max_length=255), required=True, min_length=1
     )
 
 
@@ -341,48 +344,21 @@ from .models import CustomUser as User
 from .models import PasswordChangeRequest
 
 class RequestPasswordChangeSerializer(serializers.Serializer):
-    email_or_username = serializers.CharField(required=False)
+    email_or_username = serializers.CharField(required=True, max_length=255)
 
     def validate_email_or_username(self, value):
-        request = self.context.get("request")
-        if request and request.user:
-            # Если пользователь находится в аккаунте, используем его email
-            return request.user
-        try:
-            if "@" in value:
-                user = User.objects.get(email=value)
-            else:
-                user = User.objects.get(username=value)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Пользователь не найден.")
-        return user
-
+        if not value:
+            raise serializers.ValidationError("Поле обязательно для заполнения.")
+        return value
 
 class ConfirmPasswordChangeSerializer(serializers.Serializer):
-    email_or_username = serializers.CharField(required=False)
-    code = serializers.CharField(max_length=6)
-    new_password = serializers.CharField(min_length=8)
+    email_or_username = serializers.CharField(required=True, max_length=255)
+    code = serializers.CharField(max_length=6, min_length=6, required=True)
+    new_password = serializers.CharField(min_length=8, max_length=128, required=True)
 
     def validate(self, data):
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            user = request.user
-        else:
-            try:
-                if "@" in data['email_or_username']:
-                    user = User.objects.get(email=data['email_or_username'])
-                else:
-                    user = User.objects.get(username=data['email_or_username'])
-            except User.DoesNotExist:
-                raise serializers.ValidationError("Пользователь не найден.")
-
-        try:
-            code_entry = PasswordChangeRequest.objects.get(user=user, code=data['code'], is_used=False)
-        except PasswordChangeRequest.DoesNotExist:
-            raise serializers.ValidationError("Неверный или использованный код.")
-
-        data['user'] = user
-        data['code_entry'] = code_entry
+        if not data.get('email_or_username') or not data.get('code') or not data.get('new_password'):
+            raise serializers.ValidationError("Все поля обязательны для заполнения.")
         return data
 
 
