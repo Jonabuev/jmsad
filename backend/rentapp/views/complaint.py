@@ -7,15 +7,15 @@ from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from rentapp.models import Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
+from rentapp.models import House, Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
 from rentapp.serializers import (
-    RentalComplaintSerializer, ComplaintReasonSerializer, CommentSerializer
+    ComplaintCreateSerializer, HouseSerializer, RentalComplaintSerializer, ComplaintReasonSerializer, CommentSerializer
 )
 from rentapp.notifications import (
     send_complaint_received_notification, send_complaint_status_update_notification,
     send_complaint_supported_notification, send_complaint_comment_notification
 )
-
+from django.utils import timezone
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createRentalComplaint(request):

@@ -122,6 +122,8 @@ export interface IProfileData {
   rentals_all: IRental[];
   complaint_send: IComplaint[];
   admin_complaints: IComplaint[];
+  document_type: string;
+  passport_expiry: string;
 }
 
 export interface IPublicProfileData {

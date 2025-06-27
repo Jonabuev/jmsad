@@ -81,6 +81,7 @@ def login_view(request):
 
 User = CustomUser
 
+@permission_classes([AllowAny])
 class RequestPasswordResetView(APIView):
     def post(self, request):
         email_or_username = request.data.get('email') or request.data.get('username')
@@ -100,6 +101,7 @@ class RequestPasswordResetView(APIView):
         return Response({'success': 'Confirmation code sent to your email'}, status=200)
 
 
+@permission_classes([AllowAny])
 class RequestPasswordChangeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -111,6 +113,7 @@ class RequestPasswordChangeView(APIView):
 
         return Response({'success': 'Confirmation code sent to your email'}, status=200)
 
+@permission_classes([AllowAny])
 class ConfirmPasswordChangeView(APIView):
     def post(self, request):
         code = request.data.get('code')

@@ -155,6 +155,28 @@ const Profile: FC = () => {
           </div>
         </div>
         {!profileData.user.is_superuser && (
+        <>
+          {/* === Документ: тип + дата === */}
+          <div className="p-4 mt-4 border border-yellow-400 bg-yellow-100 text-yellow-800 rounded-lg">
+            <p>
+              {t("profile.documentType")}:{" "}
+              <strong>{t(`editProfile.docType.${profileData.user.document_type || "unknown"}`)}</strong>
+            </p>
+            <p>
+              {t("profile.passportExpiry")}:{" "}
+              <strong>
+                {profileData.user.passport_expiry
+                  ? new Date(profileData.user.passport_expiry).toLocaleDateString()
+                  : t("profile.noExpiryDate")}
+              </strong>
+            </p>
+            {new Date(profileData.user.passport_expiry) < new Date() && (
+              <p className="mt-2 text-red-600 font-semibold">
+                {t("profile.documentExpired")}
+              </p>
+            )}
+          </div>
+
           <UserSection
             profileData={profileData}
             activeTab={activeTab}
@@ -163,7 +185,9 @@ const Profile: FC = () => {
             handleDispute={handleDispute}
             tabs={tabs}
           />
+        </>
         )}
+
 
         {profileData?.user.is_superuser && (
           <AdminComplaintsTable complaints={profileData.admin_complaints} />

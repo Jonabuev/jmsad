@@ -20,11 +20,13 @@ const formatDate = (dateString?: string) => {
 };
 
 const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
-  const { complaint_received, complaint_send } = profileData;
+  const { complaint_received, complaint_send, email_confirmed } = profileData;
 
   return (
     <div className="mt-5 p-4 rounded-lg shadow bg-white">
-      <div className="flex justify-between">
+      {!email_confirmed ? (
+        <p className="text-gray-500"></p>
+      ) : (<div className="flex justify-between">
         <h2 className="font-semibold mb-2 text-gray-700">
           {t("profile.complaints")}
         </h2>
@@ -32,6 +34,7 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
           {t("profile.addComplaint")}
         </Link>
       </div>
+      )}
 
       {!complaint_received?.length && !complaint_send?.length ? (
         <p className="text-gray-500">{t("profile.noComplaints")}.</p>

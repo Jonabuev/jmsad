@@ -1,3 +1,8 @@
+import io
+from PIL import Image
+from pdf2image import convert_from_bytes
+import pytesseract
+
 def extract_text(image):
     """Извлекает текст с изображения с помощью Tesseract"""
     try:

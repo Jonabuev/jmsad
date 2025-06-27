@@ -14,6 +14,7 @@ interface Props {
 
 const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
   const isLandlord = profileData.user.role === "landlord";
+  const email_confirmed = profileData.user.email_confirmed;
   const [loading, setLoading] = useState<{ [key: number]: boolean }>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -103,14 +104,17 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
       
       {isLandlord ? (
         <>
-          <div className="flex justify-between">
-            <h2 className="font-semibold mb-2 text-gray-700">
-              {t("profile.myApartments")}
-            </h2>
-            <Link href="/profile/add-aport" className="text-blue-600">
-              {t("profile.addProperty")}
-            </Link>
-          </div>
+          {!email_confirmed ? (
+            <p className="text-gray-500"></p>
+          ) : (<div className="flex justify-between">
+                <h2 className="font-semibold mb-2 text-gray-700">
+                  {t("profile.myApartments")}
+                </h2>
+                <Link href="/profile/add-aport" className="text-blue-600">
+                  {t("profile.addProperty")}
+                </Link>
+              </div>
+          )}
 
           {profileData.houses?.length ? (
             <ul className="space-y-2">

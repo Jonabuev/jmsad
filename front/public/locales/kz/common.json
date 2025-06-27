@@ -59,7 +59,13 @@
     "pending": "Тексерілуде",
     "reviewed": "Тексерілді",
     "rejected": "Қабылданбады",
-    "adminComplaints": "Әкімші тексеретін шағымдар"
+    "adminComplaints": "Әкімші тексеретін шағымдар",
+    "confirm": "Қабылдау",
+    "reject": "Қабылдамау",
+    "tenant": "Жалға алушы",
+    "documentType": "Құжат түрі",
+    "passportExpiry": "Құжаттың жарамдылық мерзімі",
+    "documentExpired": "Құжатыңыздың мерзімі өтіп кеткен. Ақпаратыңызды жаңартыңыз."
   },
   "verify": {
     "identityVerification": "Жеке басын растау"
@@ -179,13 +185,26 @@
     "damageCost": "Сот шешімі"
   },
   "editProfile": {
-    "loading": "Жүктелуде...",
-    "fullName": "Аты-жөні",
+    "fullName": "Толық аты-жөні",
     "iin": "ЖСН",
-    "phone": "Телефон нөмірі",
+    "phone": "Телефон",
     "email": "Электрондық пошта",
-    "uploadNew": "Жаңасын жүктеу",
-    "saveChanges": "Өзгерістерді сақтау"
+    "documentType": "Құжат түрі",
+    "selectDocumentType": "Құжат түрін таңдаңыз",
+    "docType": {
+      "id": "Куәлік",
+      "passport": "Паспорт",
+      "visa": "Виза"
+    },
+    "passportExpiry": "Құжаттың жарамдылық мерзімі",
+    "visaNumber": "Виза нөмірі",
+    "visaNumberHint": "Тек виза таңдалғанда қол жетімді",
+    "uploadNew": "Жаңа фотосуретті жүктеу",
+    "clearAvatar": "Ағымдағы фотосуретті өшіру",
+    "saving": "Сақталуда...",
+    "saveChanges": "Өзгерістерді сақтау",
+    "loading": "Профиль жүктелуде...",
+    "doc_expired": "Құжаттың мерзімі өтіп кеткен"
   },
   "rentalCatalog": {
     "title": "Тұрғын үй каталогы",

@@ -59,7 +59,13 @@
     "pending": "Under review",
     "reviewed": "Reviewed",
     "rejected": "Rejected",
-    "adminComplaints": "Complaints for administrator review"
+    "adminComplaints": "Complaints for administrator review",
+    "tenant": "Tenant",
+    "confirm": "Confirm",
+    "reject": "Reject",
+    "documentType": "Document Type",
+    "passportExpiry": "Document Expiry Date",
+    "documentExpired": "Your document has expired. Please update your information."
   },
   "verify": {
     "identityVerification": "Identity verification"
@@ -179,13 +185,26 @@
     "damageCost": "Court Decision"
   },
   "editProfile": {
-    "loading": "Loading...",
     "fullName": "Full Name",
     "iin": "IIN",
-    "phone": "Phone Number",
+    "phone": "Phone",
     "email": "Email",
-    "uploadNew": "Upload New",
-    "saveChanges": "Save Changes"
+    "documentType": "Document Type",
+    "selectDocumentType": "Select document type",
+    "docType": {
+      "id": "ID Card",
+      "passport": "Passport",
+      "visa": "Visa"
+    },
+    "passportExpiry": "Document Expiry Date",
+    "visaNumber": "Visa Number",
+    "visaNumberHint": "Only available for Visa",
+    "uploadNew": "Upload new photo",
+    "clearAvatar": "Clear current photo",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "loading": "Loading profile...",
+    "doc_expired": "Document has expired"
   },
   "rentalCatalog": {
     "title": "Housing Catalog",

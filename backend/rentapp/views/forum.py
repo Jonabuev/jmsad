@@ -1,7 +1,9 @@
 from rest_framework import generics, permissions
-from rentapp.models import RentalComplaint
+from rentapp.models import House, RentalComplaint
 from rentapp.serializers import RentalComplaintSerializer
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
 
 class ForumView(generics.ListAPIView):
     serializer_class = RentalComplaintSerializer

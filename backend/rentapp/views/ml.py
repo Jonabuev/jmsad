@@ -17,6 +17,8 @@ import re
 from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
 import pandas as pd
+from PIL import Image
+
 
 
 class ROCImageAPIView(APIView):

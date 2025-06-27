@@ -740,3 +740,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.user.username} on {self.complaint}'
+
+
+class BlacklistEntry(models.Model):
+    REASON_CHOICES = (
+        ("violation", "Violation of rules"),
+        ("expired_document", "Expired document"),
+    )
+
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="blacklist")
+    reason = models.CharField(max_length=32, choices=REASON_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    manual_block = models.BooleanField(default=False)  # true если забанен админом
+
+    def __str__(self):
+        return f"{self.user.username} - {self.reason}"

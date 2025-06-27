@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404
 from datetime import datetime, date
 import calendar
 from django.db.models import Q
-from rentapp.models import Rental, House
-from rentapp.serializers import RentalSerializer, MyRentalSerializer, RentalRequestSerializer, HouseSerializer
+from rentapp.models import Favorite, Rental, House
+from rentapp.serializers import FavoriteSerializer, RentalSerializer, MyRentalSerializer, RentalRequestSerializer, HouseSerializer
 from rentapp.notifications import send_rental_confirmation_notification
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny

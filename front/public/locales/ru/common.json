@@ -59,7 +59,13 @@
     "pending": "Ожидает рассмотрения",
     "reviewed": "Проверено",
     "rejected": "Отклонено",
-    "adminComplaints": "Жалобы для проверки администратором"
+    "adminComplaints": "Жалобы для проверки администратором",
+    "tenant": "Арендатор",
+    "confirm": "Принять",
+    "reject": "Отклонить",
+    "documentType": "Тип документа",
+    "passportExpiry": "Срок действия документа",
+    "documentExpired": "Срок действия вашего документа истёк. Пожалуйста, обновите данные."
   },
   "verify": {
     "identityVerification": "Верификация личности"
@@ -179,14 +185,28 @@
     "damageCost": "Решение суда"
   },
   "editProfile": {
-    "loading": "Загрузка...",
     "fullName": "ФИО",
     "iin": "ИИН",
-    "phone": "Номер телефона",
-    "email": "Электронная почта",
-    "uploadNew": "Загрузить новый",
-    "saveChanges": "Сохранить изменения"
+    "phone": "Телефон",
+    "email": "Email",
+    "documentType": "Тип документа",
+    "selectDocumentType": "Выберите тип документа",
+    "docType": {
+      "id": "Удостоверение",
+      "passport": "Паспорт",
+      "visa": "Виза"
+    },
+    "passportExpiry": "Срок действия документа",
+    "visaNumber": "Номер визы",
+    "visaNumberHint": "Доступно только при выборе визы",
+    "uploadNew": "Загрузить новое фото",
+    "clearAvatar": "Удалить текущее фото",
+    "saving": "Сохранение...",
+    "saveChanges": "Сохранить изменения",
+    "loading": "Загрузка профиля...",
+    "doc_expired": "Срок действия документа истёк"
   },
+
   "rentalCatalog": {
     "title": "Каталог жилья",
     "find": "Найти",

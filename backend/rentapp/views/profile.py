@@ -1,9 +1,10 @@
+from rentapp.permissions.document_valid import NotBlacklistedOrProfileEdit
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from django.shortcuts import get_object_or_404
-from rentapp.models import CustomUser, House, Rental, RentalComplaint, IdentityVerification
+from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification
 from rentapp.serializers import CustomUserSerializer, HouseSerializer, RentalSerializer, RentalComplaintSerializer, ComplaintRegistrySerializer
 from rest_framework.views import APIView
 from django.db import transaction, IntegrityError
@@ -16,7 +17,7 @@ from datetime import datetime
 from django.utils import timezone
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
 def profile(request):
     try:
         user = request.user
@@ -73,7 +74,7 @@ def profile(request):
 
 
 @api_view(['PATCH'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
 def edit_profile(request):
     user = request.user
 
@@ -81,21 +82,33 @@ def edit_profile(request):
     if serializer.is_valid():
         # Обработка удаления аватара
         if request.data.get('clear_avatar') == 'true':
-            user.avatar.delete(save=False)
-            user.avatar = None
+            user.avatar = "avatars/def.jpg"
 
         # Обработка нового аватара
         if 'avatar' in request.FILES:
             user.avatar = request.FILES['avatar']
-        serializer.save()
-        data = {
-            'user': CustomUserSerializer(user).data,            
-        }
 
+        serializer.save()
+
+        # 🔍 Проверка обновлённой даты документа
+        passport_expiry = serializer.validated_data.get("passport_expiry")
+        if passport_expiry and passport_expiry >= timezone.now().date():
+            try:
+                # Удалим из blacklist, если причина expired_document
+                entry = user.blacklist
+                if entry.reason == "expired_document" and not entry.manual_block:
+                    entry.delete()
+            except BlacklistEntry.DoesNotExist:
+                pass
+
+        data = {
+            'user': CustomUserSerializer(user).data,
+        }
         return Response(data, status=status.HTTP_200_OK)
+
     print(serializer.errors)
-    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Представление для получения профиля
 @api_view(['GET'])
@@ -373,3 +386,4 @@ class TenantRegistryView2(ListAPIView):
         ).filter(complaint_count__gt=0)
 
         return queryset
+    
