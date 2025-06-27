@@ -104,9 +104,7 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
       
       {isLandlord ? (
         <>
-          {!email_confirmed ? (
-            <p className="text-gray-500"></p>
-          ) : (<div className="flex justify-between">
+          {profileData.user.email_confirmed ? (<div className="flex justify-between">
                 <h2 className="font-semibold mb-2 text-gray-700">
                   {t("profile.myApartments")}
                 </h2>
@@ -114,6 +112,8 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
                   {t("profile.addProperty")}
                 </Link>
               </div>
+          ) : (
+            <p className="text-gray-500"></p>
           )}
 
           {profileData.houses?.length ? (

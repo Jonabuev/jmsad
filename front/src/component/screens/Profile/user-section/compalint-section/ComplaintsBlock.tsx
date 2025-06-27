@@ -24,9 +24,7 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
 
   return (
     <div className="mt-5 p-4 rounded-lg shadow bg-white">
-      {!email_confirmed ? (
-        <p className="text-gray-500"></p>
-      ) : (<div className="flex justify-between">
+      {profileData.user.email_confirmed ? (<div className="flex justify-between">
         <h2 className="font-semibold mb-2 text-gray-700">
           {t("profile.complaints")}
         </h2>
@@ -34,6 +32,8 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
           {t("profile.addComplaint")}
         </Link>
       </div>
+      ) : (
+        <p className="text-gray-500"></p>
       )}
 
       {!complaint_received?.length && !complaint_send?.length ? (

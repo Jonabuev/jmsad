@@ -26,7 +26,7 @@ from rentapp.exceptions import RentAppException
 from rentapp.cache import HouseCache, invalidate_house_cache
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rentapp.permissions import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
+from rentapp.permissions1 import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
 
 class MyRentalsAPIView(generics.ListAPIView):
     """

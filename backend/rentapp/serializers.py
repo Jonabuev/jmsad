@@ -142,6 +142,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         reasons = [reason for reason in reasons_qs if reason]
         return ", ".join(reasons)
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Приводим к bool вручную (если нужно)
+        data['email_confirmed'] = bool(instance.email_confirmed)
+        return data
 
 
 # serializers.py

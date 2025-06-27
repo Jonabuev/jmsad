@@ -1,4 +1,4 @@
-from backend.rentapp.permissions import IsLandlord, IsTenant
+from rentapp.permissions1 import IsLandlord, IsTenant
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -16,6 +16,7 @@ from rentapp.notifications import (
     send_complaint_received_notification, send_complaint_status_update_notification,
     send_complaint_supported_notification, send_complaint_comment_notification
 )
+from django_filters.rest_framework import DjangoFilterBackend
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsTenant | IsLandlord])

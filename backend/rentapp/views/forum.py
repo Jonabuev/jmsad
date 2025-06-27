@@ -12,7 +12,7 @@ from rentapp.serializers import RentalComplaintSerializer
 from rentapp.services.forum_service import ForumService
 from rentapp.exceptions import RentAppException
 from rentapp.cache import ForumCache, HouseCache
-from rentapp.permissions import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
+from rentapp.permissions1 import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
 
 
 class ForumView(generics.ListAPIView):
