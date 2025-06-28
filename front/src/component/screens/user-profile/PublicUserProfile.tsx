@@ -69,9 +69,16 @@ const PublicUserProfile: FC = () => {
                 className="object-cover"
               />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              {profileData.username}
-            </h1>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                {profileData.anonymous_name || profileData.username}
+              </h1>
+              {profileData.anonymous_name && (
+                <p className="text-sm text-gray-500 mt-1">
+                  @{profileData.username}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 

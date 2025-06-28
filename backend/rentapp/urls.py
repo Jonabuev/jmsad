@@ -6,7 +6,7 @@ from .views.auth import (
 )
 from .views.profile import (
     profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
-    TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info
+    TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, regenerate_anonymous_name, get_anonymous_name
 )
 from .views.rental import (
     MyRentalsAPIView, RentalListCreateView, RentalDetailView, RentalRequestListView,
@@ -17,8 +17,7 @@ from .views.complaint import (
     createRentalComplaint, submit_complaint, dispute_complaint, update_complaint_status,
     update_complaint_status1, complaint_reasons, all_complaint_reasons, ComplaintReasonListTenant,
     ComplaintReasonListLandlord, ComplaintDetailByUUIDView, AddCommentAPIView, SupportComplaintAPIView,
-    house_locations, CreateComplaintAPIView
-)
+    house_locations, CreateComplaintAPIView)
 from .views.forum import ForumView, get_location_filters
 from .views.chat import ChatThreadListCreateView, ChatMessageListCreateView
 from .views.notification import NotificationListView, NotificationMarkAsReadView
@@ -86,4 +85,7 @@ urlpatterns = [
     path('all-houses/', AllHousesView.as_view(), name='all-houses'),
     path('rentals/<int:rental_id>/confirm/', confirm_rental, name='confirm-rental'),
     path('rentals/<int:rental_id>/reject/', reject_rental, name='reject-rental'),
+    # Анонимные имена
+    path('anonymous-name/regenerate/', regenerate_anonymous_name, name='regenerate-anonymous-name'),
+    path('anonymous-name/', get_anonymous_name, name='get-anonymous-name'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

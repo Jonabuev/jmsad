@@ -38,10 +38,10 @@ class UserShortSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['identifier', 'username', 'display_name']
+        fields = ['identifier', 'username', 'display_name', 'anonymous_name']
 
     def get_display_name(self, obj):
-        return obj.username or f"Пользователь {obj.identifier}"
+        return obj.anonymous_name or obj.username or f"Пользователь {obj.identifier}"
 
 class ComplaintRegistrySerializer(serializers.ModelSerializer):
     accused = UserShortSerializer(read_only=True)
@@ -70,6 +70,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'username',
+            'anonymous_name',
             'role',
             'thirdname',
             'phone_number',
@@ -157,12 +158,13 @@ from .models import Complaint, CustomUser, ComplaintImage
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
     is_current_user = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         # Только публичные поля по умолчанию
         fields = [
-            'id', 'username', 'role', 'avatar', 'rating', 'is_current_user'
+            'id', 'username', 'anonymous_name', 'display_name', 'role', 'avatar', 'rating', 'is_current_user'
         ]
 
     def get_avatar(self, obj):
@@ -173,6 +175,9 @@ class UserSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'user'):
             return obj.id == request.user.id
         return False
+
+    def get_display_name(self, obj):
+        return obj.anonymous_name or obj.username
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

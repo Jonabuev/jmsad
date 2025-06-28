@@ -1,5 +1,7 @@
 export interface IUser {
+  id: number;
   username: string;
+  anonymous_name?: string;
   email: string;
   email_confirmed: boolean;
   identifier: string;
@@ -39,6 +41,7 @@ export interface ITenant {
   complaint_reasons: string;
   court_scores: string;
   username: string;
+  anonymous_name?: string;
   email: string;
   email_confirmed: boolean;
   identifier: string;
@@ -147,11 +150,14 @@ export interface IPublicProfileData {
 export interface IUserShort {
   id: number;
   username: string;
+  anonymous_name?: string;
+  display_name?: string;
   email: string;
 }
 
 export interface IRegisterData {
   username: string;
+  anonymous_name?: string;
   email: string;
   phone_number: string;
   role: "tenant" | "landlord";

@@ -7,6 +7,7 @@ from django.core.validators import RegexValidator
 from django.dispatch import receiver
 import random
 from PIL import Image
+
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('landlord', 'Landlord'),
@@ -278,6 +279,36 @@ class CustomUser(AbstractUser):
         ("ZW", "Zimbabwe"),
     ]
 
+    # Списки для генерации анонимных имен
+    ANONYMOUS_ADJECTIVES = [
+        'Тихий', 'Веселый', 'Серьезный', 'Дружелюбный', 'Спокойный', 'Активный', 
+        'Умный', 'Творческий', 'Надежный', 'Ответственный', 'Вежливый', 'Оптимистичный',
+        'Скромный', 'Энергичный', 'Терпеливый', 'Добрый', 'Честный', 'Смелый',
+        'Заботливый', 'Трудолюбивый', 'Любознательный', 'Справедливый', 'Щедрый',
+        'Скромный', 'Смешной', 'Мудрый', 'Быстрый', 'Сильный', 'Гибкий', 'Устойчивый'
+    ]
+    
+    ANONYMOUS_NOUNS = [
+        'Сосед', 'Житель', 'Арендатор', 'Арендодатель', 'Пользователь', 'Клиент',
+        'Гость', 'Хозяин', 'Квартирант', 'Владелец', 'Постоялец', 'Резидент',
+        'Обитатель', 'Насельник', 'Квартиросъемщик', 'Домовладелец', 'Арендатор',
+        'Постоялец', 'Жилец', 'Квартирант', 'Съемщик', 'Хозяин', 'Владелец',
+        'Арендодатель', 'Квартиросъемщик', 'Постоялец', 'Житель', 'Сосед'
+    ]
+    
+    ANONYMOUS_COLORS = [
+        'Красный', 'Синий', 'Зеленый', 'Желтый', 'Оранжевый', 'Фиолетовый', 
+        'Розовый', 'Коричневый', 'Серый', 'Черный', 'Белый', 'Голубой',
+        'Бирюзовый', 'Малиновый', 'Золотой', 'Серебряный', 'Бронзовый', 'Медный',
+        'Изумрудный', 'Сапфировый', 'Рубиновый', 'Аметистовый', 'Топазовый'
+    ]
+    
+    ANONYMOUS_ANIMALS = [
+        'Кот', 'Пес', 'Лев', 'Тигр', 'Медведь', 'Волк', 'Лиса', 'Заяц', 'Еж',
+        'Белка', 'Олень', 'Лось', 'Кабан', 'Косуля', 'Кролик', 'Хомяк', 'Мышь',
+        'Крыса', 'Морская свинка', 'Хорек', 'Норка', 'Выдра', 'Бобр', 'Ондатра'
+    ]
+
     citizenship = models.CharField(
         max_length=2,  # Длина кода страны (2 символа для ISO 3166-1 alpha-2)
         choices=COUNTRY_CHOICES,
@@ -301,16 +332,57 @@ class CustomUser(AbstractUser):
     rating = models.PositiveSmallIntegerField(default=5)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default='avatars/def.jpg')
     r_date = models.DateTimeField(null=True)
+    anonymous_name = models.CharField(max_length=100, blank=True, null=True, unique=True)
 
     def generate_confirmation_code(self):
         self.confirmation_code = str(random.randint(100000, 999999))
         self.save()
+    
+    def generate_anonymous_name(self):
+        """Генерирует случайное анонимное имя для пользователя"""
+        # Выбираем случайные элементы из списков
+        adjective = random.choice(self.ANONYMOUS_ADJECTIVES)
+        noun = random.choice(self.ANONYMOUS_NOUNS)
+        color = random.choice(self.ANONYMOUS_COLORS)
+        animal = random.choice(self.ANONYMOUS_ANIMALS)
+        
+        # Создаем несколько вариантов анонимных имен
+        name_variants = [
+            f"{adjective} {noun}",
+            f"{color} {animal}",
+            f"{adjective} {color} {noun}",
+            f"{noun} {animal}",
+            f"{adjective} {animal}",
+            f"{color} {noun}",
+            f"{adjective} {noun} {animal}",
+            f"{color} {adjective} {noun}"
+        ]
+        
+        # Выбираем случайный вариант
+        anonymous_name = random.choice(name_variants)
+        
+        # Проверяем, что такое имя еще не используется
+        counter = 1
+        original_name = anonymous_name
+        while CustomUser.objects.filter(anonymous_name=anonymous_name).exists():
+            anonymous_name = f"{original_name} {counter}"
+            counter += 1
+            if counter > 100:  # Защита от бесконечного цикла
+                break
+        
+        return anonymous_name
+    
     def save(self, *args, **kwargs):
         if self.type_entity != 'legal_entity':
             self.documents = {}
             self.type_identify = 'iin'
         elif self.type_entity == 'legal_entity':
             self.type_identify = 'bin'
+        
+        # Генерируем анонимное имя, если его нет
+        if not self.anonymous_name:
+            self.anonymous_name = self.generate_anonymous_name()
+        
         super().save(*args, **kwargs)    
     
     def get_avatar_url(self):

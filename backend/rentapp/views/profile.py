@@ -15,6 +15,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView
 from datetime import datetime
 from django.utils import timezone
+from ..utils import generate_anonymous_name
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
@@ -518,4 +519,43 @@ class TenantRegistryView2(ListAPIView):
         ).filter(complaint_count__gt=0)
 
         return queryset
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def regenerate_anonymous_name(request):
+    """Генерирует новое анонимное имя для текущего пользователя"""
+    try:
+        user = request.user
+        old_name = user.anonymous_name
+        user.anonymous_name = generate_anonymous_name()
+        user.save()
+        
+        return Response({
+            'success': True,
+            'anonymous_name': user.anonymous_name,
+            'old_anonymous_name': old_name,
+            'message': 'Анонимное имя успешно обновлено'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_anonymous_name(request):
+    """Получает текущее анонимное имя пользователя"""
+    try:
+        user = request.user
+        return Response({
+            'anonymous_name': user.anonymous_name,
+            'username': user.username,
+            'has_anonymous_name': bool(user.anonymous_name)
+        })
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
