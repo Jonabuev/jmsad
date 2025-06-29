@@ -24,7 +24,7 @@ const Forum: React.FC = () => {
   );
 
   const { fetchData: addCommentApi } = useApi(
-    '', // URL будет динамическим
+    null, // URL будет динамическим
     { method: 'POST' },
     { manual: true }
   );
@@ -45,10 +45,19 @@ const Forum: React.FC = () => {
   const addComment = async (complaintId: number, text: string) => {
     try {
       if (!text) return;
+      
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        console.error('Токен аутентификации не найден');
+        return;
+      }
+      
+      console.log('Отправка комментария:', { complaintId, text });
       await addCommentApi({
         url: `/forum-add/${complaintId}/`,
         data: { text },
       });
+      console.log('Комментарий успешно добавлен');
       fetchComplaints();
     } catch (err) {
       console.error("Ошибка при добавлении комментария:", err);

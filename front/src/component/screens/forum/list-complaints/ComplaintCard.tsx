@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { IComplaint } from "@/component/type/users.interface";
@@ -17,6 +17,12 @@ const ComplaintCard: React.FC<ComplaintCardProps> = ({
   const { t } = useTranslation();
   const [visibleComments, setVisibleComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+
+  useEffect(() => {
+    if (visibleComments) {
+      console.log('Отображение комментариев:', complaint.comments);
+    }
+  }, [visibleComments, complaint.comments]);
 
   return (
     <div className="border rounded p-4 mb-4 shadow-sm bg-gray-50">
@@ -52,28 +58,32 @@ const ComplaintCard: React.FC<ComplaintCardProps> = ({
 
       {visibleComments && (
         <div className="mt-4 space-y-3">
-          {complaint.comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="flex items-start gap-2 border p-2 rounded"
-            >
-              <Image
-                src={
-                  comment.user_data.avatar
-                    ? `http://127.0.0.1:8000${comment.user_data.avatar}`
-                    : "http://127.0.0.1:8000/media/avatars/def.jpg"
-                }
-                alt="Avatar"
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <strong>{comment.user_data.username}</strong>
-                <p>{comment.text}</p>
+          {complaint.comments?.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">Комментариев пока нет</p>
+          ) : (
+            complaint.comments?.map((comment) => (
+              <div
+                key={comment.id}
+                className="flex items-start gap-2 border p-2 rounded"
+              >
+                <Image
+                  src={
+                    comment.user_data?.avatar
+                      ? `http://127.0.0.1:8000${comment.user_data.avatar}`
+                      : "http://127.0.0.1:8000/media/avatars/def.jpg"
+                  }
+                  alt="Avatar"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                <div>
+                  <strong>{comment.user_data?.anonymous_name || 'Неизвестный пользователь'}</strong>
+                  <p>{comment.text}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
 
           <div className="mt-2">
             <textarea
@@ -85,6 +95,11 @@ const ComplaintCard: React.FC<ComplaintCardProps> = ({
             />
             <button
               onClick={() => {
+                if (!newComment.trim()) {
+                  console.log('Комментарий пустой, отправка отменена');
+                  return;
+                }
+                console.log('Клик по кнопке отправки комментария:', { complaintId: complaint.id, newComment });
                 onAddComment(complaint.id, newComment);
                 setNewComment("");
               }}

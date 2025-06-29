@@ -21,7 +21,11 @@ export const useComplaints = (
     ...(locationFilters.address && { address: locationFilters.address }),
   }), [filter, locationFilters]);
 
+  console.log('useComplaints params:', params);
+
   const { data: complaints, loading, error, fetchData } = useApi<IComplaint[]>('/forum/', { params });
+
+  console.log('useComplaints data:', complaints);
 
   return { complaints: complaints || [], loading, error, fetchComplaints: fetchData };
 };
