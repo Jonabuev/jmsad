@@ -827,3 +827,16 @@ class BlacklistEntry(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.reason}"
+    
+
+
+class ComplaintSupport(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name='supports')
+    supported_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'complaint')  # гарантирует, что пользователь может поддержать жалобу только один раз
+
+    def __str__(self):
+        return f"{self.user} поддержал жалобу {self.complaint.id}"

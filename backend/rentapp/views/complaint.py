@@ -1,3 +1,6 @@
+from rentapp.cache import ComplaintCache, HouseCache, invalidate_complaint_cache
+from rentapp.exceptions import RentAppException
+from rentapp.services.complaint_service import ComplaintService
 from rentapp.permissions1 import IsLandlord, IsTenant
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -8,7 +11,7 @@ from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q, Prefetch
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from rentapp.models import House, Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
+from rentapp.models import ComplaintSupport, House, Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
 from rentapp.serializers import (
     ComplaintCreateSerializer, HouseSerializer, RentalComplaintSerializer, ComplaintReasonSerializer, CommentSerializer
 )
@@ -266,6 +269,11 @@ class AddCommentAPIView(APIView):
         except RentalComplaint.DoesNotExist:
             return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
+        # Проверка лимита: максимум 2 комментария от пользователя на жалобу
+        existing_comments = Comment.objects.filter(complaint=complaint, user=request.user).count()
+        if existing_comments >= 2:
+            return Response({"error": "Вы можете оставить не более 2 комментариев к одной жалобе"}, status=status.HTTP_403_FORBIDDEN)
+
         comment_text = request.data.get('text')
         if not comment_text:
             return Response({"error": "Текст комментария обязателен"}, status=status.HTTP_400_BAD_REQUEST)
@@ -276,11 +284,13 @@ class AddCommentAPIView(APIView):
             text=comment_text
         )
 
-        # Отправляем уведомление о новом комментарии
         send_complaint_comment_notification(complaint, comment)
 
         serializer = CommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
 
 
 class SupportComplaintAPIView(APIView):
@@ -289,17 +299,28 @@ class SupportComplaintAPIView(APIView):
     def post(self, request):
         complaint_id = request.data.get('complaint_id')
         try:
-            complaint = RentalComplaint.objects.select_related('complainant').get(id=complaint_id)
+            complaint = RentalComplaint.objects.get(id=complaint_id)
         except RentalComplaint.DoesNotExist:
             return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
-        complaint.support_count += 1
-        complaint.save()
+        user = request.user
+        support = ComplaintSupport.objects.filter(user=user, complaint=complaint).first()
 
-        # Отправляем уведомление о поддержке
-        send_complaint_supported_notification(complaint, request.user)
+        if support:
+            # Пользователь уже поддержал — отменяем
+            support.delete()
+            complaint.support_count = max(0, complaint.support_count - 1)
+            complaint.save()
+            return Response({"message": "Поддержка жалобы отменена"}, status=status.HTTP_200_OK)
+        else:
+            # Пользователь не поддерживал — поддерживаем
+            ComplaintSupport.objects.create(user=user, complaint=complaint)
+            complaint.support_count += 1
+            complaint.save()
+            send_complaint_supported_notification(complaint, user)
+            return Response({"message": "Жалоба поддержана"}, status=status.HTTP_200_OK)
 
-        return Response({"message": "Жалоба поддержана"}, status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])

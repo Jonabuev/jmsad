@@ -248,6 +248,7 @@
   },
   "forum": {
     "title": "Complaints Forum",
+    "commentLimitReached": "You have already posted 2 comments for this complaint.",
     "filter": {
       "popular": "Popular",
       "new": "New",

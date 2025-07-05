@@ -8,6 +8,18 @@ interface ComplaintCardProps {
   onSupport: (id: number) => void;
   onAddComment: (id: number, text: string) => void;
 }
+const getCurrentUserId = () => {
+  try {
+    const profile = localStorage.getItem("profile");
+    if (!profile) return null;
+
+    const parsed = JSON.parse(profile);
+    return parsed?.user?.id ?? null;
+  } catch (e) {
+    console.error("Ошибка при получении user.id из localStorage:", e);
+    return null;
+  }
+};
 
 const ComplaintCard: React.FC<ComplaintCardProps> = ({
   complaint,
@@ -17,6 +29,14 @@ const ComplaintCard: React.FC<ComplaintCardProps> = ({
   const { t } = useTranslation();
   const [visibleComments, setVisibleComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+
+  const currentUserId = getCurrentUserId();
+  const userComments = complaint.comments?.filter(
+    (c) => c.user_data?.id === currentUserId
+  ) ?? [];
+  const hasReachedCommentLimit = userComments.length >= 2;
+
+
 
   useEffect(() => {
     if (visibleComments) {
@@ -66,12 +86,9 @@ const ComplaintCard: React.FC<ComplaintCardProps> = ({
                 key={comment.id}
                 className="flex items-start gap-2 border p-2 rounded"
               >
+                
                 <Image
-                  src={
-                    comment.user_data?.avatar
-                      ? `http://127.0.0.1:8000${comment.user_data.avatar}`
-                      : "http://127.0.0.1:8000/media/avatars/def.jpg"
-                  }
+                  src={"http://127.0.0.1:8000/media/avatars/def.jpg"}
                   alt="Avatar"
                   width={48}
                   height={48}
@@ -86,28 +103,35 @@ const ComplaintCard: React.FC<ComplaintCardProps> = ({
           )}
 
           <div className="mt-2">
-            <textarea
-              rows={3}
-              className="w-full border p-2 rounded"
-              placeholder={t("forum.addComment")}
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
-            <button
-              onClick={() => {
-                if (!newComment.trim()) {
-                  console.log('Комментарий пустой, отправка отменена');
-                  return;
-                }
-                console.log('Клик по кнопке отправки комментария:', { complaintId: complaint.id, newComment });
-                onAddComment(complaint.id, newComment);
-                setNewComment("");
-              }}
-              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              {t("forum.send")}
-            </button>
-          </div>
+          {hasReachedCommentLimit ? (
+            <p className="text-red-600 font-semibold">
+              {t("forum.commentLimitReached") || "Вы уже оставили 2 комментария к этой жалобе."}
+            </p>
+          ) : (
+            <>
+              <textarea
+                rows={3}
+                className="w-full border p-2 rounded"
+                placeholder={t("forum.addComment")}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+              <button
+                onClick={() => {
+                  if (!newComment.trim()) return;
+
+                  onAddComment(complaint.id, newComment);
+                  setNewComment("");
+                }}
+                className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                {t("forum.send")}
+              </button>
+            </>
+          )}
+        </div>
+
+
         </div>
       )}
     </div>
