@@ -127,9 +127,12 @@ export interface IProfileData {
   admin_complaints: IComplaint[];
   document_type: string;
   passport_expiry: string;
+  anonymous_name : string;
+  is_banned: boolean;
 }
 
 export interface IPublicProfileData {
+  anonymous_name: string;
   id: number;
   username: string;
   email: string;
@@ -139,6 +142,7 @@ export interface IPublicProfileData {
   role: "tenant" | "landlord";
   avatar: string | null;
   rating: number;
+  is_banned: boolean;
 
   houses?: IHouse[]; // если landlord
   rentals?: IRental[]; // если tenant

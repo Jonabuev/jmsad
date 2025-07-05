@@ -338,6 +338,19 @@ class CustomUser(AbstractUser):
         self.confirmation_code = str(random.randint(100000, 999999))
         self.save()
     
+    def check_violation_block_status(self):
+        from rentapp.models import BlacklistEntry
+
+        active_violations = self.violations.filter(active=True).count()
+        is_blocked = hasattr(self, 'blacklist')
+
+        if active_violations >= 3:
+            if not is_blocked:
+                BlacklistEntry.objects.create(user=self, reason="violation")
+        else:
+            if is_blocked and self.blacklist.reason == "violation":
+                self.blacklist.delete()
+
     def generate_anonymous_name(self):
         """Генерирует случайное анонимное имя для пользователя"""
         # Выбираем случайные элементы из списков
@@ -840,3 +853,19 @@ class ComplaintSupport(models.Model):
 
     def __str__(self):
         return f"{self.user} поддержал жалобу {self.complaint.id}"
+    
+# models.py
+
+class UserViolation(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="violations")
+    issued_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="issued_violations")
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)  # можно снять нарушение, если нужно
+
+    def __str__(self):
+        return f"Violation for {self.user.username} (active={self.active})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.user.check_violation_block_status()  # автоматическая проверка на блокировку при сохранении

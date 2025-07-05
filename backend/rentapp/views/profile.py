@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from django.shortcuts import get_object_or_404
-from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification
+from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification, UserViolation
 from rentapp.serializers import CustomUserSerializer, HouseSerializer, RentalSerializer, RentalComplaintSerializer, ComplaintRegistrySerializer
 from rest_framework.views import APIView
 from django.db import transaction, IntegrityError
@@ -16,6 +16,7 @@ from rest_framework.generics import ListAPIView
 from datetime import datetime
 from django.utils import timezone
 from ..utils import generate_anonymous_name
+from rentapp.permissions1 import IsAdmin
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
@@ -185,12 +186,14 @@ class PublicUserProfileView(APIView):
         complaints_rental = RentalComplaint.objects.filter(complainant=user)
 
         data = {
+            "id": user.id, 
             "username": user.username,
             "identifier": user.identifier,
             "role": user.role,
             "rating": user.rating,
             "phone_number": user.phone_number,
             "email": user.email,
+            "is_banned": hasattr(user, "blacklist"),
             "email_confirmed": user.email_confirmed,
             "avatar": user.avatar.url if user.avatar else None,
             "houses": [
@@ -236,6 +239,54 @@ class PublicUserProfileView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+
+class IssueViolationAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request):
+        print("USER:", request.user)
+        print("IS AUTH:", request.user.is_authenticated)
+        print("IS SUPERUSER:", request.user.is_superuser)
+        print("DATA:", request.data)
+
+        user_id = request.data.get("user_id")
+        reason = request.data.get("reason", "")
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            print("FULL BODY:", request.data)
+            return Response({"error": "Пользователь не найден"}, status=404)
+
+        UserViolation.objects.create(
+            user=user,
+            issued_by=request.user,
+            reason=reason
+        )
+
+        return Response({"message": "Нарушение назначено"}, status=201)
+
+
+class RemoveBanAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        if not user_id:
+            return Response({"error": "user_id обязателен"}, status=400)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Пользователь не найден"}, status=404)
+
+        # Удаляем из черного списка
+        removed = BlacklistEntry.objects.filter(user=user).delete()
+
+        # Если хочешь, можно также снять все нарушения
+        UserViolation.objects.filter(user=user, active=True).update(active=False)
+
+        return Response({"message": "Блокировка снята"}, status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

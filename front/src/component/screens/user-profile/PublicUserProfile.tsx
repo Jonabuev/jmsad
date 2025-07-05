@@ -21,12 +21,16 @@ const tabs = [
   { key: "complaints", label: "profile.complaints" },
 ];
 
+
 const PublicUserProfile: FC = () => {
   const [profileData, setProfileData] = useState<IPublicProfileData | null>(null);
   const [activeTab, setActiveTab] = useState("info");
   const { t } = useTranslation("common");
   const router = useRouter();
   const { username } = router.query;
+  const [showViolationForm, setShowViolationForm] = useState(false);
+  const [violationReasons, setViolationReasons] = useState<string[]>([]);
+  const [violationMessage, setViolationMessage] = useState("");
 
   const { profile: currentUserProfile, loading: currentUserLoading } = useSelector((state: RootState) => state.auth);
 
@@ -98,6 +102,127 @@ const PublicUserProfile: FC = () => {
               </button>
             ))}
           </div>
+            {!isOwnProfile && currentUserProfile?.user?.is_superuser && (
+              <div className="mt-6">
+                {profileData.is_banned ? (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("http://127.0.0.1:8000/api/remove-ban/", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                          },
+                          body: JSON.stringify({ user_id: profileData.id }),
+                        });
+
+                        const result = await res.json();
+                        if (res.ok) {
+                          setViolationMessage("Блокировка снята");
+                          setProfileData({ ...profileData, is_banned: false });
+                        } else {
+                          setViolationMessage(result.error || "Ошибка при снятии блокировки");
+                        }
+                      } catch {
+                        setViolationMessage("Ошибка при отправке запроса");
+                      }
+                    }}
+                    className="px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700"
+                  >
+                    Снять блокировку
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowViolationForm(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700"
+                  >
+                    Назначить нарушение
+                  </button>
+                )}
+              </div>
+            )}
+
+          {showViolationForm && (
+            <div className="mt-4 bg-white border p-4 rounded shadow max-w-lg w-full">
+              <h3 className="text-lg font-semibold mb-3">Выберите причины нарушения:</h3>
+              <div className="space-y-2">
+                {[
+                  "Нарушение договора",
+                  "Оскорбительное поведение",
+                  "Фейковый аккаунт",
+                  "Жалобы от арендаторов",
+                  "Мошенничество",
+                ].map((reason) => (
+                  <label key={reason} className="block">
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      checked={violationReasons.includes(reason)}
+                      onChange={() => {
+                        setViolationReasons((prev) =>
+                          prev.includes(reason)
+                            ? prev.filter((r) => r !== reason)
+                            : [...prev, reason]
+                        );
+                      }}
+                    />
+                    {reason}
+                  </label>
+                ))}
+              </div>
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={async () => {
+                    if (violationReasons.length === 0) {
+                      setViolationMessage("Выберите хотя бы одну причину");
+                      return;
+                    }
+
+                    try {
+                      const res = await fetch("http://127.0.0.1:8000/api/issue-violation/", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                        },
+                        body: JSON.stringify({
+                          user_id: profileData.id,
+                          reason: violationReasons.join("; "),
+                        }),
+                      });
+                      console.log("Отправка:", {
+                        user_id: profileData.id,
+                        reason: violationReasons.join("; "),
+                      });
+                      if (res.ok) {
+                        setViolationMessage("Нарушение успешно назначено");
+                        setViolationReasons([]);
+                      } else {
+                        const data = await res.json();
+                        setViolationMessage(data.error || "Ошибка при отправке");
+                      }
+                    } catch (e) {
+                      setViolationMessage("Ошибка при отправке запроса");
+                    }
+                  }}
+                  className="bg-red-600 text-white px-4 py-2 rounded"
+                >
+                  Подтвердить
+                </button>
+                <button
+                  onClick={() => setShowViolationForm(false)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Отмена
+                </button>
+              </div>
+              {violationMessage && (
+                <p className="mt-2 text-sm text-gray-700">{violationMessage}</p>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-5 mt-5">
             {/* Общая информация */}
             {activeTab === "info" && (

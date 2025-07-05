@@ -5,7 +5,7 @@ from .views.auth import (
     RequestPasswordChangeView, ConfirmPasswordChangeView, GoogleAuthView
 )
 from .views.profile import (
-    profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
+    IssueViolationAPIView, RemoveBanAPIView, profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
     TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, regenerate_anonymous_name, get_anonymous_name
 )
 from .views.rental import (
@@ -88,4 +88,8 @@ urlpatterns = [
     # Анонимные имена
     path('anonymous-name/regenerate/', regenerate_anonymous_name, name='regenerate-anonymous-name'),
     path('anonymous-name/', get_anonymous_name, name='get-anonymous-name'),
+    #нарушения
+    path("issue-violation/", IssueViolationAPIView.as_view(), name="issue-violation"),
+    path("remove-ban/", RemoveBanAPIView.as_view(), name="remove-ban"),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

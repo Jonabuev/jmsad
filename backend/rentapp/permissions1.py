@@ -29,3 +29,14 @@ class IsOwnerOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
         return hasattr(obj, 'owner') and obj.owner == request.user 
+    
+class IsAdmin(BasePermission):
+    """
+    Разрешение только для  'admin'
+    """
+    def has_permission(self, request, view):
+            return (
+                request.user and 
+                request.user.is_authenticated and 
+                getattr(request.user, "is_superuser", False) is True
+            )
