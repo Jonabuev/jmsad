@@ -78,6 +78,7 @@ export interface Reason {
 }
 
 export interface IComplaint {
+  images: string[];
   id: number;
   description: string;
   status: "pending" | "reviewed" | "rejected" | "resolved";
@@ -92,6 +93,8 @@ export interface IComplaint {
   evidence: string;
   comments: Comment[];
   is_superuser: boolean;
+  disputes: IDispute[];
+  court_decision_score: number;
 }
 
 export interface Comment {
@@ -176,3 +179,10 @@ export interface IRegisterData {
   citizenship: string;
 }
 
+export interface IDispute {
+  id: number;
+  user: IUserShort;
+  explanation: string;
+  evidence: string | null;
+  created_at: string;
+}

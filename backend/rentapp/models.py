@@ -869,3 +869,14 @@ class UserViolation(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.user.check_violation_block_status()  # автоматическая проверка на блокировку при сохранении
+
+class ComplaintDispute(models.Model):
+    complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name="disputes")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    explanation = models.TextField()
+    evidence = models.FileField(upload_to='dispute_evidence/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+   
+    def __str__(self):
+        return f"Dispute by {self.user.username} on Complaint {self.complaint.id}"

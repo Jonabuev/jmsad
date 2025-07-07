@@ -1,8 +1,8 @@
 from rentapp.cache import ComplaintCache, HouseCache, invalidate_complaint_cache
 from rentapp.exceptions import RentAppException
 from rentapp.services.complaint_service import ComplaintService
-from rentapp.permissions1 import IsLandlord, IsTenant
-from rest_framework.decorators import api_view, permission_classes
+from rentapp.permissions1 import IsAdmin, IsLandlord, IsTenant, IsTenantOrLandlordOrAdmin
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions, filters
@@ -11,7 +11,7 @@ from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q, Prefetch
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from rentapp.models import ComplaintSupport, House, Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
+from rentapp.models import ComplaintDispute, ComplaintSupport, House, Rental, RentalComplaint, Complaint, ComplaintReason, ComplaintImage, CustomUser, Comment
 from rentapp.serializers import (
     ComplaintCreateSerializer, HouseSerializer, RentalComplaintSerializer, ComplaintReasonSerializer, CommentSerializer
 )
@@ -20,7 +20,7 @@ from rentapp.notifications import (
     send_complaint_supported_notification, send_complaint_comment_notification
 )
 from django_filters.rest_framework import DjangoFilterBackend
-
+from rest_framework.parsers import MultiPartParser, FormParser
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsTenant | IsLandlord])
 def createRentalComplaint(request):
@@ -171,6 +171,135 @@ def dispute_complaint(request, complaint_id):
     return Response({"success": "Жалоба оспорена и отправлена на повторную проверку."})
 
 
+
+
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
+@parser_classes([MultiPartParser, FormParser])
+def update_complaint(request, uuid):
+    try:
+        complaint = RentalComplaint.objects.get(uuid=uuid)
+    except RentalComplaint.DoesNotExist:
+        return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
+
+    
+
+    # Обновление текста
+    new_description = request.data.get("description")
+    if new_description is not None:
+        complaint.description = new_description
+
+    # Обновление рейтинга
+    new_rating = request.data.get("rating")
+    if new_rating is not None:
+        try:
+            complaint.rating = int(new_rating)
+        except ValueError:
+            return Response({"error": "Некорректное значение рейтинга."}, status=400)
+
+    # Обновление стоимости ущерба
+    damage_cost = request.data.get("damage_cost")
+    if damage_cost is not None:
+        try:
+            complaint.court_decision_score = int(damage_cost)
+        except ValueError:
+            return Response({"error": "Некорректная сумма ущерба."}, status=400)
+
+    # Обновление причин
+    reason_ids = request.data.getlist("reason")
+    if not reason_ids:
+        reason_ids = request.data.get("reason", [])
+        if isinstance(reason_ids, str):
+            # если передано как строка вида "1,2,3"
+            reason_ids = reason_ids.split(",")
+
+    if reason_ids:
+        try:
+            reasons = ComplaintReason.objects.filter(id__in=reason_ids)
+            complaint.reasons.set(reasons)
+        except Exception as e:
+            return Response({"error": "Некорректные причины."}, status=400)
+
+
+
+    # Обновление основного файла (доказательства)
+    if "evidence" in request.FILES:
+        if complaint.evidence:
+            complaint.evidence.delete(save=False)
+        complaint.evidence = request.FILES["evidence"]
+
+    # Обновление дополнительных фото (если у тебя есть модель)
+    # Например, если у тебя:
+    # evidence_images = models.ManyToManyField('ComplaintImage')
+
+    # Удаление старых изображений
+    for img in complaint.images.all():
+        img.image.delete(save=False)
+        img.delete()
+
+    # Добавление новых
+    for img_file in request.FILES.getlist("evidence_images"):
+        ComplaintImage.objects.create(complaint=complaint, image=img_file)
+
+
+
+    # Обновить статус
+    complaint.status = "pending"
+    complaint.save()
+
+    return Response({"success": "Жалоба обновлена и отправлена на повторную проверку."})
+
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_complaint_by_uuid(request, uuid):
+    try:
+        complaint = RentalComplaint.objects.get(uuid=uuid)
+    except RentalComplaint.DoesNotExist:
+        return Response({"error": "Жалоба не найдена"}, status=404)
+
+    serializer = RentalComplaintSerializer(complaint)
+    return Response(serializer.data)
+
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def dispute_complaintFinal(request, uuid):
+    try:
+        complaint = RentalComplaint.objects.get(uuid=uuid)
+    except RentalComplaint.DoesNotExist:
+        return Response({"error": "Жалоба не найдена"}, status=404)
+
+    if request.user != complaint.accused:
+        return Response({"error": "Вы не можете оспаривать чужую жалобу."}, status=403)
+
+    if complaint.status != "reviewed":
+        return Response({"error": "Жалобу можно оспорить только после рассмотрения."}, status=400)
+
+    if complaint.disputes.filter(user=request.user).count() >= 2:
+        return Response({"error": "Вы уже оспаривали эту жалобу 2 раза."}, status=400)
+
+    explanation = request.data.get("explanation")
+    evidence = request.FILES.get("evidence")
+
+    if not explanation:
+        return Response({"error": "Нужно указать объяснение."}, status=400)
+
+    ComplaintDispute.objects.create(
+        complaint=complaint,
+        user=request.user,
+        explanation=explanation,
+        evidence=evidence,
+    )
+    complaint.status = "pending"
+    complaint.save()
+    return Response({"success": "Оспаривание отправлено на рассмотрение."})
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsLandlord])
 def update_complaint_status(request, pk):
@@ -248,7 +377,7 @@ class ComplaintDetailListView(generics.ListAPIView):
 
 class ComplaintDetailByUUIDView(RetrieveAPIView):
     serializer_class = RentalComplaintSerializer
-    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    permission_classes = [IsTenantOrLandlordOrAdmin]
     lookup_field = 'uuid'
 
     def get_queryset(self):
@@ -324,10 +453,10 @@ class SupportComplaintAPIView(APIView):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsTenantOrLandlordOrAdmin])
 def update_complaint_status1(request, pk):
     try:
-        complaint = Complaint.objects.select_related('complainant', 'accused').get(pk=pk)
+        complaint = RentalComplaint.objects.select_related('complainant', 'accused').get(pk=pk)
         new_status = request.data.get('status')
         if new_status not in ['pending', 'reviewed', 'rejected']:
             return Response({'error': 'Недопустимый статус'}, status=400)
@@ -337,7 +466,7 @@ def update_complaint_status1(request, pk):
 
         return Response({'success': True, 'status': complaint.status}, status=200)
 
-    except Complaint.DoesNotExist:
+    except RentalComplaint.DoesNotExist:
         return Response({'error': 'Жалоба не найдена'}, status=404)
 
 

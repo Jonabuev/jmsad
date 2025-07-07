@@ -14,7 +14,7 @@ from .views.rental import (
     FavoriteListCreateView
 )
 from .views.complaint import (
-    createRentalComplaint, submit_complaint, dispute_complaint, update_complaint_status,
+    createRentalComplaint, dispute_complaintFinal, get_complaint_by_uuid, submit_complaint, dispute_complaint, update_complaint, update_complaint_status,
     update_complaint_status1, complaint_reasons, all_complaint_reasons, ComplaintReasonListTenant,
     ComplaintReasonListLandlord, ComplaintDetailByUUIDView, AddCommentAPIView, SupportComplaintAPIView,
     house_locations, CreateComplaintAPIView)
@@ -91,5 +91,9 @@ urlpatterns = [
     #нарушения
     path("issue-violation/", IssueViolationAPIView.as_view(), name="issue-violation"),
     path("remove-ban/", RemoveBanAPIView.as_view(), name="remove-ban"),
+    #жалобы
+    path("rental-complaints/<uuid:uuid>/update/", update_complaint),
+    path("rental-complaints/<uuid:uuid>/", get_complaint_by_uuid),
+    path("complaints/<uuid:uuid>/dispute/", dispute_complaintFinal, name='dispute-complaint'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

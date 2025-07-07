@@ -40,3 +40,13 @@ class IsAdmin(BasePermission):
                 request.user.is_authenticated and 
                 getattr(request.user, "is_superuser", False) is True
             )
+
+
+class IsTenantOrLandlordOrAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user and request.user.is_authenticated and (
+                request.user.role in ["tenant", "landlord"] or
+                getattr(request.user, "is_superuser", False)
+            )
+        )

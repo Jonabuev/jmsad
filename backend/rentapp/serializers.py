@@ -7,6 +7,21 @@ from rest_framework import serializers
 from .models import CustomUser, RentalComplaint
 
 
+from rest_framework import serializers
+from .models import ComplaintDispute
+from .models import CustomUser  # если CustomUser не в том же приложении
+
+class UserShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username']
+
+class ComplaintDisputeSerializer(serializers.ModelSerializer):
+    user = UserShortSerializer(read_only=True)
+
+    class Meta:
+        model = ComplaintDispute
+        fields = ['id', 'user', 'explanation', 'evidence', 'created_at']
 
 # serializers.py
 
@@ -218,20 +233,25 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     evidence = serializers.FileField(read_only=True)
     user = UserSerializer(read_only=True)
+    disputes = ComplaintDisputeSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = RentalComplaint
         fields = [
             'id', 'uuid', 'description', 'support_count', 'status', 'rating',
             'complainant', 'accused', 'property', 'reasons', 'evidence',
-            'comments', 'created_at', 'user', 'court_decision_score', 'images'
+            'comments', 'created_at', 'user', 'court_decision_score', 'images', 'disputes'
         ]
         read_only_fields = [
             'complainant', 'accused', 'created_at', 'user', 'support_count', 'images'
         ]
 
+    def get_images(self, obj):
+        return [image.image.url for image in obj.images.all()]
     def get_property(self, obj):
         return HouseSerializer(obj.rental.house).data if obj.rental and obj.rental.house else None
+    
 
     
 
@@ -372,4 +392,6 @@ class ConfirmPasswordChangeSerializer(serializers.Serializer):
         return data
 
 
+
+# rentapp/serializers.py
 

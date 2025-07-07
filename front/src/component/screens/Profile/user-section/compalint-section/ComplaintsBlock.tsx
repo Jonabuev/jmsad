@@ -83,20 +83,13 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
                           </Link>
                         </td>
                         <td className="border px-4 py-2">
-                          {c.status === "reviewed" && (
-                            <button
-                              onClick={() => {
-                                const newDesc = prompt(
-                                  "Введите новое описание (необязательно):",
-                                  c.description
-                                );
-                                if (newDesc !== null)
-                                  handleDispute(c.id, newDesc);
-                              }}
+                        {c.status === "rejected" && (
+                            <Link
+                              href={`/complaints/${c.uuid}/edit`}
                               className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
                             >
                               {t("profile.dispute")}
-                            </button>
+                            </Link>
                           )}
                         </td>
                       </tr>
@@ -150,21 +143,14 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
                           </Link>
                         </td>
                         <td className="border px-4 py-2">
-                          {c.status === "reviewed" && (
-                            <button
-                              onClick={() => {
-                                const newDesc = prompt(
-                                  "Введите новое описание (необязательно):",
-                                  c.description
-                                );
-                                if (newDesc !== null)
-                                  handleDispute(c.id, newDesc);
-                              }}
-                              className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
-                            >
-                              {t("profile.dispute")}
-                            </button>
-                          )}
+                            {c.status === "reviewed" && (
+                              <Link
+                                href={`/complaints/${c.uuid}/dispute`}
+                                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                              >
+                                {t("profile.dispute")}
+                              </Link>
+                            )}
                         </td>
                       </tr>
                     ))}

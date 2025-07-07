@@ -87,6 +87,18 @@
       "cancelled": "Cancelled"
     }
   },
+  "dispute":{
+    "disputeTitle": "Dispute the Complaint",
+    "disputeExplanation": "Explanation",
+    "disputeEvidence": "Document / Image (optional)",
+    "disputeSubmit": "Submit",
+    "disputeSuccess": "Dispute submitted successfully!",
+    "disputeFailed": "Failed to submit dispute.",
+    "disputeWrongStatus": "The complaint can only be disputed after it has been reviewed.",
+    "disputeLimit": "You have already disputed this complaint 2 times.",
+    "loading": "Loading...",
+    "desc": "A complaint has been filed against you. To dispute it, briefly describe the situation you disagree with and attach evidence."
+  },
   "complaint": {
     "title": "Complaint",
     "description": "Description",
@@ -103,7 +115,17 @@
     "viewFile": "View file",
     "approve": "Approve",
     "reject": "Reject",
+    "courtDecision": "Court Decision",
+    "attachedImages": "Attached Images",
+    "viewEvidence": "View Evidence",
+    "disputeHistory": "Dispute History",
+    "notFound": "Complaint not found",
     "reason": {
+      "Отсутствие ремонта помещения": "Lack of premises repair",
+      "Игнорирование заявок на устранение неисправностей": "Ignoring requests for troubleshooting",
+      "Повышение арендной платы без уведомления": "Rent increase without notice",
+      "Отказ предоставить документы на жилье": "Refusal to provide housing documents",
+      "Нарушение конфиденциальности жильцов": "Violation of tenants' confidentiality",
       "Жалобы от соседей / нарушение порядка": "Complaints from neighbors / disturbing the order",
       "Нарушение условий договора": "Breach of contract terms",
       "Порча имущества": "Property damage",
@@ -159,7 +181,7 @@
     "describeComplaint": "Describe the nature of the complaint",
     "reasons": "Reasons for the complaint:",
     "rating": "Rating:",
-    "evidence": "Evidence (optional):",
+    "evidence": "Evidence:",
     "submit": "Submit Complaint",
     "submitting": "Submitting...",
     "success": "Complaint submitted successfully",
@@ -182,7 +204,10 @@
       "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
     },
     "additionalPhotos": "Photos",
-    "damageCost": "Court Decision"
+    "damageCost": "Court Decision",
+    "submitedit": "Submit Changes",
+    "editTitle": "Edit Complaint",
+    "descriptionedit": "To dispute the complaint, you need to modify its content"
   },
   "editProfile": {
     "fullName": "Full Name",
