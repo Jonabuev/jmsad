@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import (
     ConfirmPasswordChangeSerializer, CustomUserSerializer, IdentityVerificationSerializer, HouseSerializer, 
-    ComplaintCreateSerializer, ReputationSerializer, RentalSerializer
+    HouseCreateSerializer, ComplaintCreateSerializer, ReputationSerializer, RentalSerializer
 )
 from .models import CustomUser, IdentityVerification, House, Complaint, Reputation, Rental
 from django.core.mail import send_mail
@@ -381,7 +381,7 @@ def create_apartment(request):
             {"detail": "Подтвердите свою почту перед добавлением недвижимости."},
             status=status.HTTP_403_FORBIDDEN
         )
-    serializer = HouseSerializer(data=request.data, context={'request': request})
+    serializer = HouseCreateSerializer(data=request.data, context={'request': request})
     print("Полученные данные:", request.data)
     if serializer.is_valid():
         house = serializer.save()

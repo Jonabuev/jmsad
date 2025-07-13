@@ -32,6 +32,7 @@ class HouseSerializer(serializers.ModelSerializer):
     is_rented = serializers.SerializerMethodField()
     address = serializers.CharField(max_length=255, min_length=5, required=True)
     type_p = serializers.CharField(max_length=50, required=True)
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = House
@@ -44,9 +45,60 @@ class HouseSerializer(serializers.ModelSerializer):
         now = timezone.now().date()
         return Rental.objects.filter(house=obj, start_date__lte=now, end_date__gte=now, status='active').exists()
 
+    def get_images(self, obj):
+        """Возвращает список URL изображений для дома"""
+        return [image.image.url for image in obj.images.all()]
+
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
         return super().create(validated_data)
+
+class HouseCreateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для создания новой квартиры/дома.
+    Использует только определенные поля для создания.
+    """
+    address = serializers.CharField(max_length=255, min_length=5, required=True)
+    type_p = serializers.CharField(max_length=20, required=True)
+    num_of_rooms = serializers.IntegerField(min_value=1, required=True)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.00, required=True)
+    description = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    area = serializers.FloatField(min_value=0, required=False)
+    floor = serializers.IntegerField(min_value=0, required=False)
+    total_floors = serializers.IntegerField(min_value=1, required=False)
+    year_built = serializers.IntegerField(min_value=1900, required=False)
+    is_furnished = serializers.BooleanField(required=False, default=False)
+    has_balcony = serializers.BooleanField(required=False, default=False)
+    comment = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    images = serializers.ListField(
+        child=serializers.ImageField(),
+        required=False,
+        write_only=True
+    )
+
+    class Meta:
+        model = House
+        fields = [
+            'address', 'type_p', 'num_of_rooms', 'price', 'description',
+            'area', 'floor', 'total_floors', 'year_built', 'is_furnished',
+            'has_balcony', 'comment', 'images'
+        ]
+        read_only_fields = ['owner']
+
+    def create(self, validated_data):
+        # Извлекаем изображения из validated_data
+        images = validated_data.pop('images', [])
+        
+        # Создаем дом
+        validated_data['owner'] = self.context['request'].user
+        house = super().create(validated_data)
+        
+        # Создаем изображения для дома
+        for image in images:
+            from .models import HouseImage
+            HouseImage.objects.create(house=house, image=image)
+        
+        return house
 
 class UserShortSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()

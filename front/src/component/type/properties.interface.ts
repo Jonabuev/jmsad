@@ -18,12 +18,20 @@ export interface IHouse {
     district: string;
     city: string;
     region: string;
+    description: string;
+    area: number;
+    floor: number;
+    total_floors: number;
+    year_built: number;
+    is_furnished: boolean;
+    has_balcony: boolean;
     type_p: string;
     num_of_rooms: number;
+    price: string;
     created_at: string;
     comment: string;
     latitude: number;
     longitude: number;
-    price: string;
     is_rented: boolean;
+    images: string[];
 }

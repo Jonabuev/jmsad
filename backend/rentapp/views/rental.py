@@ -16,6 +16,7 @@ from rentapp.serializers import (
     MyRentalSerializer,
     RentalRequestSerializer,
     HouseSerializer,
+    HouseCreateSerializer,
 )
 from rentapp.notifications import send_rental_confirmation_notification
 from django.views.decorators.csrf import csrf_exempt
@@ -209,10 +210,30 @@ def create_apartment(request):
     API endpoint для создания новой квартиры/дома.
     
     Создает новый объект недвижимости для текущего пользователя.
+    Использует HouseCreateSerializer для валидации только необходимых полей.
+    Поддерживает загрузку изображений через FormData.
     Требует подтверждения email перед созданием.
+    
+    Required fields:
+        - address: Адрес недвижимости (минимум 5 символов)
+        - type_p: Тип недвижимости (apartment/house/room)
+        - num_of_rooms: Количество комнат (минимум 1)
+        - price: Цена аренды (минимум 0)
+    
+    Optional fields:
+        - description: Описание недвижимости
+        - area: Площадь в м²
+        - floor: Этаж
+        - total_floors: Этажность дома
+        - year_built: Год постройки
+        - is_furnished: Меблировка
+        - has_balcony: Наличие балкона
+        - comment: Комментарий
+        - images: Фотографии апартамента (множественная загрузка)
     
     Permissions:
         - Требуется аутентификация
+        - Требуется роль арендодателя
         - Требуется подтверждение email
     """
     if not request.user.email_confirmed:
@@ -220,10 +241,28 @@ def create_apartment(request):
             {"detail": "Подтвердите свою почту перед добавлением недвижимости."},
             status=status.HTTP_403_FORBIDDEN
         )
-    serializer = HouseSerializer(data=request.data, context={'request': request})
-    print("Полученные данные:", request.data)
+    
+    # Обрабатываем данные из FormData
+    data = request.data.copy()
+    
+    # Обрабатываем boolean поля
+    for field in ['is_furnished', 'has_balcony']:
+        if field in data:
+            data[field] = data[field].lower() in ['true', '1', 'on']
+    
+    serializer = HouseCreateSerializer(data=data, context={'request': request})
+    print("Полученные данные:", data)
+    print("Файлы:", request.FILES)
+    
     if serializer.is_valid():
         house = serializer.save()
+        
+        # Сохраняем изображения
+        images = request.FILES.getlist('images')
+        for image in images:
+            from rentapp.models import HouseImage
+            HouseImage.objects.create(house=house, image=image)
+        
         # Инвалидируем кэш домов после создания нового
         invalidate_house_cache()
         return Response({

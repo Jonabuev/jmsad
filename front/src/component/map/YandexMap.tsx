@@ -114,7 +114,7 @@ const YandexMap: React.FC<YandexMapProps> = ({ center, zoom, markers }) => {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
-  return <div id="map" style={{ width: "100%", height: "500px" }} />;
+  return <div id="map" style={{ width: "100%", height: "100%" }} />;
 };
 
 export default YandexMap;

@@ -477,6 +477,15 @@ class House(models.Model):
     district = models.CharField(max_length=255, verbose_name="Район", null=True, blank=True)
     city = models.CharField(max_length=255, verbose_name="Город", null=True, blank=True)
     region = models.CharField(max_length=255, verbose_name="Область", null=True, blank=True)
+
+    description = models.TextField(verbose_name="Описание", blank=True, null=True)
+    area = models.FloatField(verbose_name="Площадь (м²)", blank=True, null=True)
+    floor = models.IntegerField(verbose_name="Этаж", blank=True, null=True)
+    total_floors = models.IntegerField(verbose_name="Этажность дома", blank=True, null=True)
+    year_built = models.IntegerField(verbose_name="Год постройки", blank=True, null=True)
+    is_furnished = models.BooleanField(verbose_name="Меблировка", default=False)
+    has_balcony = models.BooleanField(verbose_name="Балкон", default=False)
+    
     
     # Остальные поля
     type_p = models.CharField(max_length=20, choices=PROPERTY_TYPE_CHOICES)
@@ -541,7 +550,13 @@ class House(models.Model):
     def __str__(self):
         return f'{self.type_p} at {self.address}'
 
+class HouseImage(models.Model):
+    house = models.ForeignKey('House', on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='house_images/')
+    description = models.CharField(max_length=255, blank=True, null=True)  # опционально
 
+    def __str__(self):
+        return f"Image for {self.house.address}"
 
 class ComplaintReason(models.Model):
     TENANT = 'tenant'

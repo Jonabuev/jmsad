@@ -84,9 +84,11 @@ from django import forms
 from .models import House
 
 class HouseForm(forms.ModelForm):
+    images = forms.ImageField(label="Фотографии", widget=forms.FileInput(), required=False)
     class Meta:
         model = House
-        fields = ['street', 'microdistrict', 'district', 'city', 'region', 'type_p', 'num_of_rooms', 'comment']
+        fields = ['street', 'microdistrict', 'district', 'city', 'region', 'type_p', 'num_of_rooms', 'comment',
+                  'description', 'area', 'floor', 'total_floors', 'year_built', 'is_furnished', 'has_balcony']
         widgets = {
             'street': forms.TextInput(attrs={'placeholder': 'Введите улицу и номер дома', 'class': 'form-control'}),
             'microdistrict': forms.TextInput(attrs={'placeholder': 'Введите микрорайон', 'class': 'form-control'}),
@@ -95,7 +97,14 @@ class HouseForm(forms.ModelForm):
             'region': forms.TextInput(attrs={'placeholder': 'Введите область', 'class': 'form-control'}),
             'type_p': forms.Select(choices=House.PROPERTY_TYPE_CHOICES, attrs={'class': 'form-control'}),
             'num_of_rooms': forms.NumberInput(attrs={'min': 1, 'class': 'form-control'}),
-            'comment': forms.Textarea(attrs={'placeholder': 'Описание', 'class': 'form-control'})
+            'comment': forms.Textarea(attrs={'placeholder': 'Комментарий', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Описание', 'class': 'form-control'}),
+            'area': forms.NumberInput(attrs={'placeholder': 'Площадь (м²)', 'class': 'form-control', 'min': 0}),
+            'floor': forms.NumberInput(attrs={'placeholder': 'Этаж', 'class': 'form-control', 'min': 0}),
+            'total_floors': forms.NumberInput(attrs={'placeholder': 'Этажность дома', 'class': 'form-control', 'min': 0}),
+            'year_built': forms.NumberInput(attrs={'placeholder': 'Год постройки', 'class': 'form-control', 'min': 1800, 'max': 2100}),
+            'is_furnished': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'has_balcony': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
     def save(self, commit=True):

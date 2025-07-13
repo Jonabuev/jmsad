@@ -10,7 +10,16 @@ interface PropertyFormInputs {
   address: string;
   type_p: string;
   num_of_rooms: number;
-  region?: string;
+  price: number;
+  description?: string;
+  area?: number;
+  floor?: number;
+  total_floors?: number;
+  year_built?: number;
+  is_furnished?: boolean;
+  has_balcony?: boolean;
+  comment?: string;
+  images?: FileList;
 }
 
 const PropertyForm: FC = () => {
@@ -24,6 +33,7 @@ const PropertyForm: FC = () => {
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   useEffect(() => {
     const loadYMaps = () => {
@@ -63,6 +73,14 @@ const PropertyForm: FC = () => {
     setSuggestions([]);
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setSelectedFiles(fileArray);
+    }
+  };
+
   const onSubmit = async (data: PropertyFormInputs) => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -71,15 +89,32 @@ const PropertyForm: FC = () => {
     }
 
     try {
+      // Создаем FormData для отправки файлов
+      const formData = new FormData();
+      
+      // Добавляем все текстовые поля
+      Object.keys(data).forEach(key => {
+        if (key !== 'images' && data[key as keyof PropertyFormInputs] !== undefined) {
+          formData.append(key, String(data[key as keyof PropertyFormInputs]));
+        }
+      });
+
+      // Добавляем файлы
+      if (selectedFiles.length > 0) {
+        selectedFiles.forEach((file, index) => {
+          formData.append('images', file);
+        });
+      }
+
       const response = await fetch(
         "http://127.0.0.1:8000/api/apartments/create/",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            // Не устанавливаем Content-Type, браузер сам установит с boundary для FormData
           },
-          body: JSON.stringify(data),
+          body: formData,
         }
       );
 
@@ -163,6 +198,128 @@ const PropertyForm: FC = () => {
               {...register("num_of_rooms", { required: true })}
               className="w-full p-2 border rounded"
             />
+          </div>
+
+          {/* Цена */}
+          <div>
+            <label className="block font-medium">Цена</label>
+            <input
+              type="number"
+              min={0}
+              step={0.01}
+              {...register("price", { required: true })}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Описание */}
+          <div>
+            <label className="block font-medium">Описание</label>
+            <textarea
+              {...register("description")}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Площадь */}
+          <div>
+            <label className="block font-medium">Площадь (м²)</label>
+            <input
+              type="number"
+              min={0}
+              step={0.1}
+              {...register("area")}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Этаж */}
+          <div>
+            <label className="block font-medium">Этаж</label>
+            <input
+              type="number"
+              min={0}
+              {...register("floor")}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Этажность дома */}
+          <div>
+            <label className="block font-medium">Этажность дома</label>
+            <input
+              type="number"
+              min={1}
+              {...register("total_floors")}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Год постройки */}
+          <div>
+            <label className="block font-medium">Год постройки</label>
+            <input
+              type="number"
+              min={1900}
+              max={2100}
+              {...register("year_built")}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Меблировка */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              {...register("is_furnished")}
+              className="mr-2"
+            />
+            <label className="block font-medium">Меблировка</label>
+          </div>
+
+          {/* Балкон */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              {...register("has_balcony")}
+              className="mr-2"
+            />
+            <label className="block font-medium">Балкон</label>
+          </div>
+
+          {/* Комментарий */}
+          <div>
+            <label className="block font-medium">Комментарий</label>
+            <textarea
+              {...register("comment")}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Загрузка изображений */}
+          <div>
+            <label className="block font-medium">Фотографии апартамента</label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full p-2 border rounded"
+            />
+            {selectedFiles.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600 mb-2">
+                  Выбрано файлов: {selectedFiles.length}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="text-xs text-gray-500">
+                      {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <button
