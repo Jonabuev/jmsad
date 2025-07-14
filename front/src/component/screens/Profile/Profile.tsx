@@ -25,6 +25,8 @@ const Profile: FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     router.push("/login");
@@ -61,6 +63,21 @@ const Profile: FC = () => {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    if (router && typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("success") === "1") {
+        setShowSuccess(true);
+        // Удаляем параметр из URL, чтобы уведомление не появлялось снова при обновлении
+        params.delete("success");
+        const newUrl =
+          window.location.pathname +
+          (params.toString() ? "?" + params.toString() : "");
+        window.history.replaceState({}, "", newUrl);
+      }
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -154,6 +171,11 @@ const Profile: FC = () => {
             </button>
           </div>
         </div>
+        {showSuccess && (
+          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded text-center">
+            Апартамент успешно добавлен!
+          </div>
+        )}
         {!profileData.user.is_superuser && (
         <>
           {/* === Документ: тип + дата === */}

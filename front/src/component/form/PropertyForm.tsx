@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/router";
+
 import { FC, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Script from "next/script";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/navigation";
 
 interface PropertyFormInputs {
   address: string;
@@ -23,7 +24,7 @@ interface PropertyFormInputs {
 }
 
 const PropertyForm: FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { register, handleSubmit, setValue, watch } =
     useForm<PropertyFormInputs>();
   const router = useRouter();
@@ -34,6 +35,7 @@ const PropertyForm: FC = () => {
     null
   );
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadYMaps = () => {
@@ -82,9 +84,10 @@ const PropertyForm: FC = () => {
   };
 
   const onSubmit = async (data: PropertyFormInputs) => {
+    setErrorMessage(null); // Сброс ошибки при новом сабмите
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("Вы не авторизованы");
+      setErrorMessage("Вы не авторизованы");
       return;
     }
 
@@ -119,16 +122,23 @@ const PropertyForm: FC = () => {
       );
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Недвижимость добавлена:", result);
-        router.push("/profile");
-        alert("Недвижимость успешно добавлена");
+        // const result = await response.json();
+        // console.log("Недвижимость добавлена:", result);
+        router.push(`/${i18n.language}/profile?success=1`);
       } else {
-        const error = await response.json();
-        console.error("Ошибка при создании:", error);
-        alert("Ошибка при добавлении недвижимости");
+        let errorText = "Ошибка при добавлении недвижимости";
+        try {
+          const error = await response.json();
+          if (error && error.detail) {
+            errorText = error.detail;
+          } else if (typeof error === 'string') {
+            errorText = error;
+          }
+        } catch (e) {}
+        setErrorMessage(errorText);
       }
     } catch (err: unknown) {
+      setErrorMessage("Ошибка при запросе. Попробуйте позже.");
       console.error("Ошибка при запросе:", err);
     }
   };
@@ -147,6 +157,11 @@ const PropertyForm: FC = () => {
         <h2 className="text-2xl text-center font-bold text-blue-500 mb-6">
           {t("form.title")}
         </h2>
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {errorMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Адрес */}
           <div className="relative">
