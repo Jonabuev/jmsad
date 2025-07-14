@@ -61,20 +61,6 @@ export default function ComplaintDetailPage() {
 
       <ComplaintInfo complaint={complaint} t={t} />
 
-      {complaint.evidence && (
-        <div className="mb-4">
-          <strong>{t("complaint.evidence")}:</strong>
-          <br />
-          <a
-            href={complaint.evidence}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 underline"
-          >
-            {t("complaint.viewFile")}
-          </a>
-        </div>
-      )}
 
       {profile?.user.is_superuser && complaint.status === "pending" && (
         <ComplaintActionsButtons
