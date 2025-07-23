@@ -1,7 +1,7 @@
-import axios, { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { login, fetchProfileWithToken } from "@/api/authApi";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -20,38 +20,22 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       // 1. Авторизация
-      const loginResponse = await axios.post(
-        "http://127.0.0.1:8000/api/login/",
-        {
-          username: formData.username,
-          password: formData.password,
-        }
-      );
-
+      const loginResponse = await login(formData.username, formData.password);
       const token = loginResponse.data.access_token;
       localStorage.setItem("access_token", token);
 
       // 2. Получаем профиль пользователя
-      const profileResponse = await axios.get(
-        "http://127.0.0.1:8000/api/profile/",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const profileResponse = await fetchProfileWithToken(token);
       const profileData = profileResponse.data;
       localStorage.setItem("profile", JSON.stringify(profileData));
 
       // 3. Переход на страницу профиля
       router.push("/profile");
-    } catch (err) {
-      const axiosError = err as AxiosError;
+    } catch (err: any) {
       setError("Неверное имя пользователя или пароль.");
       console.error(
         "Login error:",
-        axiosError.response ? axiosError.response.data : axiosError
+        err.response ? err.response.data : err
       );
     }
   };
@@ -106,7 +90,7 @@ const LoginForm = () => {
           </Link>
         </p>
         <p className="mt-4 text-sm">
-          Другой способ входа:{" "}
+          Другой способ входа: {" "}
           <Link href="/google" className="text-blue-500 hover:underline">
             Gmail
           </Link>

@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import Link from "next/link";
-import axios from "axios";
+import { confirmRental, rejectRental } from "@/api/rentalApi";
 import {
   IProfileData,
   IHouse,
@@ -22,35 +22,15 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
     try {
       setLoading(prev => ({ ...prev, [rentalId]: true }));
       setError(null);
-      
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
-
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/rentals/${rentalId}/confirm/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.data) {
-        // Обновляем страницу для отображения изменений
-        window.location.reload();
-      }
-    } catch (error) {
+      await confirmRental(rentalId, token);
+      window.location.reload();
+    } catch (error: any) {
       console.error("Error confirming rental:", error);
-      if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.error || t("profile.confirmationError"));
-      } else {
-        setError(t("profile.confirmationError"));
-      }
+      setError(error.response?.data?.error || t("profile.confirmationError"));
     } finally {
       setLoading(prev => ({ ...prev, [rentalId]: false }));
     }
@@ -60,35 +40,15 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
     try {
       setLoading(prev => ({ ...prev, [rentalId]: true }));
       setError(null);
-
       const token = localStorage.getItem("access_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
-
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/rentals/${rentalId}/reject/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.data) {
-        // Обновляем страницу для отображения изменений
-        window.location.reload();
-      }
-    } catch (error) {
+      await rejectRental(rentalId, token);
+      window.location.reload();
+    } catch (error: any) {
       console.error("Error rejecting rental:", error);
-      if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.error || t("profile.rejectionError"));
-      } else {
-        setError(t("profile.rejectionError"));
-      }
+      setError(error.response?.data?.error || t("profile.rejectionError"));
     } finally {
       setLoading(prev => ({ ...prev, [rentalId]: false }));
     }

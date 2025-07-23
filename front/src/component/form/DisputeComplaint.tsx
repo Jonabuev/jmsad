@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
 import { useTranslation } from "next-i18next";
+import { fetchRentalComplaintByUuid, disputeRentalComplaint } from "@/api/complaintsApi";
 
 export default function DisputeComplaintPage() {
   const { t } = useTranslation("common");
@@ -31,12 +31,7 @@ export default function DisputeComplaintPage() {
             setMessage(t("dispute.disputeFailed") || "Ошибка авторизации.");
         }
 
-
-        const response = await axios.get(`http://127.0.0.1:8000/api/rental-complaints/${uuid}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-        });
-
-        console.log("Complaint response:", response.data); // 👀
+        const response = await fetchRentalComplaintByUuid(uuid as string, token);
         setComplaintData(response.data);
     };
 
@@ -71,13 +66,7 @@ export default function DisputeComplaintPage() {
 
     try {
       const token = localStorage.getItem("access_token");
-      await axios.post(`http://127.0.0.1:8000/api/complaints/${uuid}/dispute/`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
+      await disputeRentalComplaint(uuid as string, formData, token!);
       setMessage(t("dispute.disputeSuccess") || "Успешно отправлено!");
       setTimeout(() => {
         router.push("/profile");

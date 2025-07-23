@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { MyComponent } from "@/component/star/Star";
 import { ITenant } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
+import { fetchComplaintReasons, fetchTenants, fetchLandlords } from "@/api/searchApi";
 
 interface IComplaintReason {
   id: number;
@@ -32,17 +32,27 @@ const TenantRegistry: React.FC = () => {
           console.error("No token found");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/all-complaint-reasons/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchComplaintReasons();
         let filteredReasons = res.data;
         if (activeTab === "tenants") {
           filteredReasons = res.data.filter((reason: IComplaintReason) =>
-            ["Просрочка платежей", "Порча имущества", "Нарушение условий договора", "Жалобы от соседей / нарушение порядка", "Самовольное выселение или отказ освободить помещение"].includes(reason.reason)
+            [
+              "Просрочка платежей",
+              "Порча имущества",
+              "Нарушение условий договора",
+              "Жалобы от соседей / нарушение порядка",
+              "Самовольное выселение или отказ освободить помещение",
+            ].includes(reason.reason)
           );
         } else {
           filteredReasons = res.data.filter((reason: IComplaintReason) =>
-            ["Отсутствие ремонта помещения", "Игнорирование заявок на устранение неисправностей", "Повышение арендной платы без уведомления", "Отказ предоставить документы на жилье", "Нарушение конфиденциальности жильцов"].includes(reason.reason)
+            [
+              "Отсутствие ремонта помещения",
+              "Игнорирование заявок на устранение неисправностей",
+              "Повышение арендной платы без уведомления",
+              "Отказ предоставить документы на жилье",
+              "Нарушение конфиденциальности жильцов",
+            ].includes(reason.reason)
           );
         }
         setReasons(filteredReasons);
@@ -83,14 +93,12 @@ const TenantRegistry: React.FC = () => {
       if (selectedReasons.length > 0) {
         params.reasons = selectedReasons.join(",");
       }
-      const endpoint =
-        activeTab === "tenants"
-          ? "http://127.0.0.1:8000/api/tenant-registry1/"
-          : "http://127.0.0.1:8000/api/landlords/";
-      const res = await axios.get(endpoint, {
-        params,
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      let res;
+      if (activeTab === "tenants") {
+        res = await fetchTenants(params, token);
+      } else {
+        res = await fetchLandlords(params, token);
+      }
       setUsers(res.data);
     } catch (error) {
       console.error("Ошибка при загрузке:", error);

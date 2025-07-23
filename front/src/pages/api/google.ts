@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { verifyGoogleToken } from "@/api/googleApi";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,10 +12,7 @@ export default async function handler(
   const { token } = req.body;
 
   // Проверка токена через Google API
-  const response = await fetch(
-    `https://oauth2.googleapis.com/tokeninfo?id_token=${token}`
-  );
-  const data = await response.json();
+  const data = await verifyGoogleToken(token);
 
   if (data.error_description) {
     return res.status(400).json({ message: "Invalid Token" });

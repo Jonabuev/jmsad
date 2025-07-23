@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useTranslation } from "next-i18next";
+import { fetchRentalRequests, updateRentalStatus } from "@/api/rentalApi";
 
 interface RentalRequest {
   id: number;
@@ -21,12 +21,7 @@ const RentalRequestsTable: React.FC = () => {
     if (!token) return setError("Нет токена авторизации");
 
     try {
-      const { data } = await axios.get<RentalRequest[]>(
-        "http://127.0.0.1:8000/api/rental-requests/",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const { data } = await fetchRentalRequests(token);
       setRequests(data);
     } catch (err) {
       console.error("Ошибка загрузки заявок:", err);
@@ -44,14 +39,7 @@ const RentalRequestsTable: React.FC = () => {
     if (!token) return;
 
     try {
-      await axios.put(
-        `http://127.0.0.1:8000/api/rentals/${id}/`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
+      await updateRentalStatus(id, newStatus, token);
       setRequests((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       );

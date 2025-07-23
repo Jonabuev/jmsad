@@ -1,7 +1,7 @@
 // components/ViolationForm.tsx
 
 import { useState } from "react";
-import axios from "axios";
+import { issueViolation } from "@/api/userApi";
 
 const reasonsList = [
   "Нарушение договора",
@@ -30,18 +30,7 @@ export default function ViolationForm({ targetUserId }: { targetUserId: number }
     }
 
     try {
-      await axios.post(
-        "http://127.0.0.1:8000/api/issue-violation/",
-        {
-          user_id: targetUserId,
-          reason: selectedReasons.join("; "),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`, // если используется JWT
-          },
-        }
-      );
+      await issueViolation(targetUserId, selectedReasons.join("; "));
       setMessage("Нарушение успешно назначено");
       setSelectedReasons([]);
     } catch (err) {

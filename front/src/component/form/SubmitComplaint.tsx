@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import { fetchMyRentals, fetchComplaintReasons, submitRentalComplaint } from "@/api/complaintsApi";
 
 interface ComplaintReason {
   id: number;
@@ -38,10 +38,7 @@ const SubmitComplaintForm: React.FC = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
-    axios
-      .get("http://127.0.0.1:8000/api/my-rentals/", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    fetchMyRentals(token)
       .then((res) => setRentals(res.data))
       .catch(() => setErrorMessage(t("Scomplaint.loadRentalsError")));
   }, [t]);
@@ -51,30 +48,18 @@ const SubmitComplaintForm: React.FC = () => {
     const token = localStorage.getItem("access_token");
     const profile = JSON.parse(localStorage.getItem("profile") || '{}');
     const role = profile?.user?.role || 'guest';
-    console.log("Role:", role);
-
     if (!token || role !== "tenant") return;
-
-    const reasonUrl = "http://127.0.0.1:8000/api/complaint-reasons/";
-    console.log("Fetching tenant reasons from:", reasonUrl);
-
-    axios
-      .get(reasonUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    fetchComplaintReasons(token)
       .then((res) => {
         const data = res.data;
         if (Array.isArray(data)) {
           setComplaintReasons(data);
-          console.log("Fetched tenant reasons:", data);
         } else {
           setErrorMessage(t("Scomplaint.invalidDataFormat"));
-          console.error("Expected array, got:", data);
         }
       })
       .catch((error) => {
         setErrorMessage(t("Scomplaint.loadReasonsError"));
-        console.error("Error fetching tenant reasons:", error);
       });
   }, [t]);
 
@@ -83,30 +68,18 @@ const SubmitComplaintForm: React.FC = () => {
     const token = localStorage.getItem("access_token");
     const profile = JSON.parse(localStorage.getItem("profile") || '{}');
     const role = profile?.user?.role || 'guest';
-    console.log("Role:", role);
-
     if (!token || role !== "landlord") return;
-
-    const reasonUrl = "http://127.0.0.1:8000/api/complaint-reasons/";
-    console.log("Fetching landlord reasons from:", reasonUrl);
-
-    axios
-      .get(reasonUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    fetchComplaintReasons(token)
       .then((res) => {
         const data = res.data;
         if (Array.isArray(data)) {
           setComplaintReasons(data);
-          console.log("Fetched landlord reasons:", data);
         } else {
           setErrorMessage(t("Scomplaint.invalidDataFormat"));
-          console.error("Expected array, got:", data);
         }
       })
       .catch((error) => {
         setErrorMessage(t("Scomplaint.loadReasonsError"));
-        console.error("Error fetching landlord reasons:", error);
       });
   }, [t]);
 
@@ -159,32 +132,17 @@ const SubmitComplaintForm: React.FC = () => {
     data.append("damage_cost", formData.damageCost);
 
     try {
-      await axios.post(
-        "http://127.0.0.1:8000/api/rental-complaints/create/",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
+      await submitRentalComplaint(data, token);
       setSuccessMessage(t("Scomplaint.success"));
       router.push("/profile");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.detail ||
-          error.response?.data?.message ||
-          t("Scomplaint.submitError");
-        setErrorMessage(errorMessage);
-
-        if (error.response?.status === 403) {
-          setErrorMessage(t("Scomplaint.noActiveRental"));
-        }
-      } else {
-        setErrorMessage(t("Scomplaint.unexpectedError"));
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        t("Scomplaint.submitError");
+      setErrorMessage(errorMessage);
+      if (error.response?.status === 403) {
+        setErrorMessage(t("Scomplaint.noActiveRental"));
       }
     } finally {
       setIsSubmitting(false);

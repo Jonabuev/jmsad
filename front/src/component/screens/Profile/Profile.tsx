@@ -1,6 +1,5 @@
 "use client";
 import { FC, useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import Image from "next/image";
 
@@ -9,6 +8,7 @@ import { useTranslation } from "next-i18next";
 
 import AdminComplaintsTable from "./admin-section/AdminSection";
 import UserSection from "./user-section/UserSection";
+import { fetchUserProfile, disputeComplaint } from "@/api/userApi";
 
 const tabs = [
   { key: "info", label: "profile.info" },
@@ -35,15 +35,7 @@ const Profile: FC = () => {
   const handleDispute = async (complaintId: number, newDescription = "") => {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.post(
-        `http://127.0.0.1:8000/api/complaints/${complaintId}/dispute/`,
-        { new_description: newDescription },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await disputeComplaint(complaintId, newDescription, token!);
 
       // Обновить статус локально
       setProfileData((prev) => {
@@ -89,11 +81,7 @@ const Profile: FC = () => {
         }
 
         console.log("Fetching profile data...");
-        const response = await axios.get("http://127.0.0.1:8000/api/profile/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetchUserProfile();
 
         console.log("Profile response:", response.data);
 
@@ -105,23 +93,13 @@ const Profile: FC = () => {
           setError("Не удалось загрузить данные профиля.");
         }
         setLoading(false);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Profile fetch error:", err);
-        if (axios.isAxiosError(err)) {
-          console.error("Axios error details:", {
-            status: err.response?.status,
-            data: err.response?.data,
-            headers: err.response?.headers,
-          });
-
-          if (err.response?.status === 403) {
-            setError("У вас нет доступа к этой странице.");
-            router.push("/login");
-          } else {
-            setError("Ошибка при загрузке профиля.");
-          }
+        if (err.response?.status === 403) {
+          setError("У вас нет доступа к этой странице.");
+          router.push("/login");
         } else {
-          setError("Непредвиденная ошибка.");
+          setError("Ошибка при загрузке профиля.");
         }
         setLoading(false);
       }

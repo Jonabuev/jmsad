@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import Script from "next/script";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
+import { createProperty } from "@/api/propertyApi";
 
 interface PropertyFormInputs {
   address: string;
@@ -108,27 +109,13 @@ const PropertyForm: FC = () => {
           formData.append('images', file);
         });
       }
-
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/apartments/create/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Не устанавливаем Content-Type, браузер сам установит с boundary для FormData
-          },
-          body: formData,
-        }
-      );
-
-      if (response.ok) {
-        // const result = await response.json();
-        // console.log("Недвижимость добавлена:", result);
+      const response = await createProperty(formData, token);
+      if (response.status === 200 || response.status === 201) {
         router.push(`/${i18n.language}/profile?success=1`);
       } else {
         let errorText = "Ошибка при добавлении недвижимости";
         try {
-          const error = await response.json();
+          const error = response.data;
           if (error && error.detail) {
             errorText = error.detail;
           } else if (typeof error === 'string') {
@@ -137,7 +124,7 @@ const PropertyForm: FC = () => {
         } catch (e) {}
         setErrorMessage(errorText);
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       setErrorMessage("Ошибка при запросе. Попробуйте позже.");
       console.error("Ошибка при запросе:", err);
     }

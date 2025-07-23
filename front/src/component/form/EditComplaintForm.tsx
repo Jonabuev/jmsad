@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint } from "@/api/complaintsApi";
 
 interface ComplaintReason {
   id: number;
@@ -36,25 +36,20 @@ const EditComplaintForm: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token || typeof uuid !== "string") return;
-    axios.get(`http://127.0.0.1:8000/api/rental-complaints/${uuid}/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then((res) => {
-      const data = res.data;
-      setFormData({
-        description: data.description || "",
-        rating: data.rating || "3",
-        reason: (data.reason || []).map(Number),
-        evidence: null,
-        evidenceImages: [],
-        damageCost: data.damage_cost || "",
-      });
-      
-      
-    })
-    .catch(() => setLoadError(true)) // только set флага
-    .finally(() => setIsLoading(false));
-    
+    fetchRentalComplaintByUuid(uuid, token)
+      .then((res) => {
+        const data = res.data;
+        setFormData({
+          description: data.description || "",
+          rating: data.rating || "3",
+          reason: (data.reason || []).map(Number),
+          evidence: null,
+          evidenceImages: [],
+          damageCost: data.damage_cost || "",
+        });
+      })
+      .catch(() => setLoadError(true))
+      .finally(() => setIsLoading(false));
   }, [uuid]);
 
   // локальный вывод с переводом
@@ -69,14 +64,10 @@ const EditComplaintForm: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
-
-    axios
-      .get("http://127.0.0.1:8000/api/complaint-reasons/", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    fetchComplaintReasons(token)
       .then((res) => setComplaintReasons(res.data))
-      .catch(() => setLoadError(true)); // снова set флага
-  }, []); // ПУСТОЙ массив зависимостей!
+      .catch(() => setLoadError(true));
+  }, []);
 
 
   // Обработчики
@@ -126,16 +117,7 @@ const EditComplaintForm: React.FC = () => {
     data.append("damage_cost", formData.damageCost);
 
     try {
-      await axios.patch(
-        `http://127.0.0.1:8000/api/rental-complaints/${uuid}/update/`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await updateRentalComplaint(uuid as string, data, token);
       setSuccessMessage(t("Scomplaint.success"));
       router.push("/profile");
     } catch (err) {

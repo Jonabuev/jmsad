@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
-import axios from "axios";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
+import { requestPasswordChange, confirmPasswordChange, changePassword } from "@/api/passwordApi";
 
 type Step = "requestCode" | "verifyCode" | "newPassword" | "success";
 
@@ -17,15 +17,7 @@ const PasswordChangeFlow: FC = () => {
     setError("");
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/request-password-change/",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await requestPasswordChange(token!);
       setMessage(response.data.success);
       setStep("verifyCode");
     } catch (error: any) {
@@ -38,15 +30,7 @@ const PasswordChangeFlow: FC = () => {
     setError("");
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/confirm-password-change/",
-        { code, new_password: newPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await confirmPasswordChange(code, newPassword, token!);
       setMessage(response.data.success);
       setStep("success");
     } catch (error: any) {
@@ -58,10 +42,7 @@ const PasswordChangeFlow: FC = () => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/change-password/",
-        { code, new_password: newPassword }
-      );
+      const response = await changePassword(code, newPassword);
       setMessage(response.data.message);
       setStep("success");
     } catch (error: any) {

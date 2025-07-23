@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { fetchForumFilters } from '@/api/forumApi';
 
 interface LocationFilters {
   regions: string[];
@@ -31,7 +31,7 @@ export const AdvancedForumFilter: React.FC<Props> = ({ onFilterChange, t }) => {
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/forum/filters/');
+        const response = await fetchForumFilters();
         setFilters(response.data);
       } catch (error) {
         console.error('Error fetching filters:', error);

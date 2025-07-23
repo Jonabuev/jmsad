@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
-import axios from "axios";
 import { useTranslation } from "next-i18next";
+import { requestPasswordReset, confirmPasswordReset } from "@/api/passwordApi";
 
 type Step = "email" | "code" | "newPassword" | "success";
 
@@ -17,10 +17,7 @@ const PasswordResetFlow: FC = () => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/request-password-reset/",
-        { email }
-      );
+      const response = await requestPasswordReset(email);
       setMessage(response.data.success);
       setStep("code");
     } catch (error: any) {
@@ -32,10 +29,7 @@ const PasswordResetFlow: FC = () => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/confirm-password-change/",
-        { email, code, new_password: newPassword }
-      );
+      const response = await confirmPasswordReset(email, code, newPassword);
       setMessage(response.data.success);
       setStep("success");
     } catch (error: any) {

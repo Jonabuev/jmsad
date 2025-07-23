@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import axios from "axios";
+import { register } from "@/api/authApi";
 import { IRegisterData } from "../type/users.interface";
 import { useTranslation } from "react-i18next";
 import { COUNTRY_OPTIONS } from "../constants/countries";
@@ -104,19 +104,15 @@ const RegisterForm: FC = () => {
     if (Object.keys(validationErrors).length > 0) return;
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/register/",
-        formData
-      );
-
+      const response = await register(formData);
       if (response.status === 200 || response.status === 201) {
         localStorage.setItem("access_token", response.data.access_token);
         localStorage.setItem("refresh_token", response.data.refresh_token);
         window.location.href = response.data.profile_url;
         alert(t("registration.successful_registration"));
       }
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.data) {
+    } catch (error: any) {
+      if (error.response?.data) {
         const djangoErrors = error.response.data;
         const newErrors: IRegisterErrors = {};
         for (const key in djangoErrors) {

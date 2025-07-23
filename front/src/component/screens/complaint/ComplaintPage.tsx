@@ -6,6 +6,7 @@ import ComplaintInfo from "./complaint-info/ComplaintInfo";
 import ComplaintActionsButtons from "./complaint-action/ComplaintsActions";
 import { useAuthProfile } from "@/component/hooks/complaint/useAuthProfile";
 import { useComplaint } from "@/component/hooks/complaint/useComplaint";
+import { updateComplaintStatus } from "@/api/complaintsApi";
 
 export default function ComplaintDetailPage() {
   const router = useRouter();
@@ -20,21 +21,7 @@ export default function ComplaintDetailPage() {
     status: "reviewed" | "rejected"
   ) => {
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      await axios.post(
-        `http://127.0.0.1:8000/api/complaints1/${complaintId}/status/`,
-        { status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await updateComplaintStatus(complaintId, status);
 
       setProfile((prev) => {
         if (!prev) return prev;

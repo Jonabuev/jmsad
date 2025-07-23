@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { IProfile } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
+import { fetchUserProfile, verifyIdentity } from "@/api/userApi";
 
 const VerifyIdentityForm: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -18,23 +18,17 @@ const VerifyIdentityForm: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileData = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) return;
-
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/profile/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetchUserProfile();
         setProfile(response.data);
       } catch (error) {
         console.error("Ошибка при загрузке профиля:", error);
       }
     };
-
-    fetchProfile();
+    fetchProfileData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,37 +62,21 @@ const VerifyIdentityForm: React.FC = () => {
     const formData = new FormData();
     formData.append("id_document", file);
     formData.append("texts_to_find", JSON.stringify(textsToFind));
-
-    // Добавим поля, чтобы бэк знал, что проверять
     formData.append("passport_expiry", user.passport_expiry || "");
     formData.append("document_type", user.document_type || "");
-
     if (user.document_type === "visa" && user.visa_number) {
       formData.append("visa_number", user.visa_number);
     }
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/verify-identity1/",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await verifyIdentity(formData, token);
       setMessage(response.data.message || "Успешно отправлено!");
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.error ||
-            "Ошибка при верификации документа."
-        );
-        console.error("Ошибка сервера:", err.response?.data);
-      } else {
-        setError("Произошла непредвиденная ошибка.");
-      }
+    } catch (err: any) {
+      setError(
+        err.response?.data?.error ||
+          "Ошибка при верификации документа."
+      );
+      console.error("Ошибка сервера:", err.response?.data);
     } finally {
       setLoading(false);
     }

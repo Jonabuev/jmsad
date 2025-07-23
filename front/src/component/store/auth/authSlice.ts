@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import api from '@/service/api';
+import { fetchUserProfile as fetchUserProfileApi } from '@/api/userApi';
 import { IProfileData } from '@/component/type/users.interface';
 
 export const fetchUserProfile = createAsyncThunk(
   'auth/fetchUserProfile',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get<IProfileData>('/profile/');
+      const response = await fetchUserProfileApi();
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Failed to fetch user profile');

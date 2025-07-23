@@ -6,9 +6,10 @@ import {
 } from "@react-oauth/google";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { googleAuth } from "@/api/authApi";
 
 const GoogleLoginPage: React.FC = () => {
-  const handleLoginSuccess = (response: CredentialResponse) => {
+  const handleLoginSuccess = async (response: CredentialResponse) => {
     console.log("Login Success:", response);
 
     if (!response.credential) {
@@ -16,22 +17,18 @@ const GoogleLoginPage: React.FC = () => {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/api/auth/google/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: response.credential }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Backend response:", data);
+    try {
+      const { data } = await googleAuth(response.credential);
+      console.log("Backend response:", data);
 
-        localStorage.setItem("access_token", data.access);
-        localStorage.setItem("refresh_token", data.refresh);
-        localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-        window.location.href = "/profile";
-      })
-      .catch((err) => console.error("Error sending token:", err));
+      window.location.href = "/profile";
+    } catch (err) {
+      console.error("Error sending token:", err);
+    }
   };
 
   const handleLoginError = () => {

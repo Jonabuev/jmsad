@@ -14,6 +14,7 @@ import { useTranslation } from "next-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "@/component/store/store";
 import { useApi } from "@/component/hooks/useApi";
+import { removeBan, issueViolation } from "@/api/userApi";
 
 const tabs = [
   { key: "info", label: "profile.info" },
@@ -108,22 +109,9 @@ const PublicUserProfile: FC = () => {
                   <button
                     onClick={async () => {
                       try {
-                        const res = await fetch("http://127.0.0.1:8000/api/remove-ban/", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                          },
-                          body: JSON.stringify({ user_id: profileData.id }),
-                        });
-
-                        const result = await res.json();
-                        if (res.ok) {
-                          setViolationMessage("Блокировка снята");
-                          setProfileData({ ...profileData, is_banned: false });
-                        } else {
-                          setViolationMessage(result.error || "Ошибка при снятии блокировки");
-                        }
+                        await removeBan(profileData.id);
+                        setViolationMessage("Блокировка снята");
+                        setProfileData({ ...profileData, is_banned: false });
                       } catch {
                         setViolationMessage("Ошибка при отправке запроса");
                       }
@@ -180,28 +168,9 @@ const PublicUserProfile: FC = () => {
                     }
 
                     try {
-                      const res = await fetch("http://127.0.0.1:8000/api/issue-violation/", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                        },
-                        body: JSON.stringify({
-                          user_id: profileData.id,
-                          reason: violationReasons.join("; "),
-                        }),
-                      });
-                      console.log("Отправка:", {
-                        user_id: profileData.id,
-                        reason: violationReasons.join("; "),
-                      });
-                      if (res.ok) {
-                        setViolationMessage("Нарушение успешно назначено");
-                        setViolationReasons([]);
-                      } else {
-                        const data = await res.json();
-                        setViolationMessage(data.error || "Ошибка при отправке");
-                      }
+                      await issueViolation(profileData.id, violationReasons.join("; "));
+                      setViolationMessage("Нарушение успешно назначено");
+                      setViolationReasons([]);
                     } catch (e) {
                       setViolationMessage("Ошибка при отправке запроса");
                     }

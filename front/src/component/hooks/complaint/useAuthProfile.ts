@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
 import { IProfile } from "@/component/type/users.interface";
+import { fetchUserProfile, refreshAccessToken } from "@/api/userApi";
 
 export function useAuthProfile() {
   const [profile, setProfile] = useState<IProfile | null>(null);
@@ -19,37 +19,23 @@ export function useAuthProfile() {
       }
 
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/profile/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetchUserProfile();
         setProfile(response.data);
-      } catch (error) {
+      } catch (error: any) {
         if (
-          axios.isAxiosError(error) &&
           error.response?.status === 401 &&
           refreshToken
         ) {
           // Попробуем обновить токен
           try {
-            const refreshRes = await axios.post(
-              "http://127.0.0.1:8000/api/token/refresh/",
-              {
-                refresh: refreshToken,
-              }
-            );
+            const refreshRes = await refreshAccessToken(refreshToken);
             const newAccessToken = refreshRes.data.access;
             localStorage.setItem("access_token", newAccessToken);
 
             // Повторно пробуем получить профиль
-            const retryRes = await axios.get(
-              "http://127.0.0.1:8000/api/profile/",
-              {
-                headers: { Authorization: `Bearer ${newAccessToken}` },
-              }
-            );
+            const retryRes = await fetchUserProfile();
             setProfile(retryRes.data);
             return;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (refreshErr) {
             console.warn("Refresh token истёк");
           }

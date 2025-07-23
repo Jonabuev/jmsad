@@ -1,3 +1,5 @@
+import { addForumComment } from "@/api/forumApi";
+
 interface Props {
   complaintId: number;
   token: string | null;
@@ -17,14 +19,7 @@ export const AddComment = ({
 }: Props) => {
   const submitComment = async () => {
     if (!token || !value) return;
-    await fetch(`http://127.0.0.1:8000/api/forum-add/${complaintId}/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ text: value }),
-    });
+    await addForumComment(complaintId, value, token);
     onChange("");
     onSuccess();
   };
