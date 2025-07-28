@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { login, fetchProfileWithToken } from "@/api/authApi";
+import { saveTokens } from "@/utils/tokenUtils";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -21,11 +22,14 @@ const LoginForm = () => {
     try {
       // 1. Авторизация
       const loginResponse = await login(formData.username, formData.password);
-      const token = loginResponse.data.access_token;
-      localStorage.setItem("access_token", token);
+      const accessToken = loginResponse.data.access_token;
+      const refreshToken = loginResponse.data.refresh_token;
+      
+      // Сохраняем токены с проверкой валидности
+      saveTokens(accessToken, refreshToken);
 
       // 2. Получаем профиль пользователя
-      const profileResponse = await fetchProfileWithToken(token);
+      const profileResponse = await fetchProfileWithToken(accessToken);
       const profileData = profileResponse.data;
       localStorage.setItem("profile", JSON.stringify(profileData));
 

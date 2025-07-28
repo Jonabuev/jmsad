@@ -8,12 +8,28 @@ import { fetchUserProfile } from "@/component/store/auth/authSlice";
 import { AppDispatch } from "@/component/store/store";
 import Header from "@/component/header/Header";
 import Footer from "@/component/footer/Footer";
+import { checkAndCleanExpiredTokens, getValidAccessToken } from "@/utils/tokenUtils";
+import { useTokenValidation } from "@/component/hooks/useTokenValidation";
+import { useAutoRefreshToken } from "@/component/hooks/useAutoRefreshToken";
+import TokenInfo from "@/component/debug/TokenInfo";
 
 const AppContent = (props: AppProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  
+  // Используем хук для валидации токенов
+  useTokenValidation();
+  
+  // Используем хук для автоматического обновления токенов
+  useAutoRefreshToken();
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
+    // Проверяем и очищаем истекшие токены при загрузке приложения
+    checkAndCleanExpiredTokens();
+    
+    const token = getValidAccessToken();
     if (token) {
       dispatch(fetchUserProfile());
     }
@@ -26,6 +42,7 @@ const AppContent = (props: AppProps) => {
         <props.Component {...props.pageProps} />
       </main>
       <Footer />
+      {process.env.NODE_ENV === 'development' && <TokenInfo />}
     </div>
   );
 };

@@ -10,6 +10,9 @@ interface ComplaintCardProps {
 }
 const getCurrentUserId = () => {
   try {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return null;
+
     const profile = localStorage.getItem("profile");
     if (!profile) return null;
 

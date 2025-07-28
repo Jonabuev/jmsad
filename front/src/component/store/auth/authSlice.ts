@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { fetchUserProfile as fetchUserProfileApi } from '@/api/userApi';
 import { IProfileData } from '@/component/type/users.interface';
+import { clearAllTokens } from '@/utils/tokenUtils';
 
 export const fetchUserProfile = createAsyncThunk(
   'auth/fetchUserProfile',
@@ -35,8 +36,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.profile = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      clearAllTokens();
     },
   },
   extraReducers: (builder) => {

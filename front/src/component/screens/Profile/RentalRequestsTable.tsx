@@ -17,6 +17,9 @@ const RentalRequestsTable: React.FC = () => {
   const { t } = useTranslation("common");
 
   const fetchRequests = async () => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
     const token = localStorage.getItem("access_token");
     if (!token) return setError("Нет токена авторизации");
 
@@ -35,6 +38,9 @@ const RentalRequestsTable: React.FC = () => {
     id: number,
     newStatus: "active" | "declined"
   ) => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
     const token = localStorage.getItem("access_token");
     if (!token) return;
 

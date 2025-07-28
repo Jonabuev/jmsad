@@ -9,6 +9,7 @@ import { useTranslation } from "next-i18next";
 import AdminComplaintsTable from "./admin-section/AdminSection";
 import UserSection from "./user-section/UserSection";
 import { fetchUserProfile, disputeComplaint } from "@/api/userApi";
+import { clearAllTokens } from "@/utils/tokenUtils";
 
 const tabs = [
   { key: "info", label: "profile.info" },
@@ -28,7 +29,7 @@ const Profile: FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
+    clearAllTokens();
     router.push("/login");
   };
 
@@ -73,6 +74,9 @@ const Profile: FC = () => {
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      // Проверяем, что мы на клиенте
+      if (typeof window === 'undefined') return;
+
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {

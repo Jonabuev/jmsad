@@ -35,6 +35,9 @@ const SubmitComplaintForm: React.FC = () => {
 
   // Загрузка аренды
   useEffect(() => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
@@ -45,6 +48,9 @@ const SubmitComplaintForm: React.FC = () => {
 
   // Загрузка причин для тенанта
   useEffect(() => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
     const token = localStorage.getItem("access_token");
     const profile = JSON.parse(localStorage.getItem("profile") || '{}');
     const role = profile?.user?.role || 'guest';
@@ -65,6 +71,9 @@ const SubmitComplaintForm: React.FC = () => {
 
   // Загрузка причин для лендлорда
   useEffect(() => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
     const token = localStorage.getItem("access_token");
     const profile = JSON.parse(localStorage.getItem("profile") || '{}');
     const role = profile?.user?.role || 'guest';

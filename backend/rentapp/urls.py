@@ -24,6 +24,7 @@ from .views.notification import NotificationListView, NotificationMarkAsReadView
 from .views.ml import (
     RecommendTenantsAPIView, ROCImageAPIView, OCRCheckView, evaluate_reliability
 )
+from .views.manual_verification import ManualVerificationView, PendingVerificationsView
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -37,6 +38,8 @@ urlpatterns = [
     path('apartments/', user_apartments, name='user_apartments'),
     path('verify-identity/', verify_identity, name='verify_identity'),
     path('verify-identity1/', OCRCheckView.as_view(), name='verify_identity1'),
+    path('manual-verification/', ManualVerificationView.as_view(), name='manual_verification'),
+    path('pending-verifications/', PendingVerificationsView.as_view(), name='pending_verifications'),
     path('complaints/<int:complaint_id>/update/', update_complaint_status, name='update_complaint_status'),
     path('complaints/submit/', submit_complaint, name='submit_complaint'),
     path('house-locations/', house_locations, name='house-locations'),

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { IProfile } from "@/component/type/users.interface";
 import { fetchUserProfile, refreshAccessToken } from "@/api/userApi";
+import { getValidAccessToken, getValidRefreshToken, saveTokens } from "@/utils/tokenUtils";
 
 export function useAuthProfile() {
   const [profile, setProfile] = useState<IProfile | null>(null);
@@ -10,8 +11,11 @@ export function useAuthProfile() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const token = localStorage.getItem("access_token");
-      const refreshToken = localStorage.getItem("refresh_token");
+      // Проверяем, что мы на клиенте
+      if (typeof window === 'undefined') return;
+
+      const token = getValidAccessToken();
+      const refreshToken = getValidRefreshToken();
 
       if (!token) {
         router.push("/login");
@@ -30,7 +34,7 @@ export function useAuthProfile() {
           try {
             const refreshRes = await refreshAccessToken(refreshToken);
             const newAccessToken = refreshRes.data.access;
-            localStorage.setItem("access_token", newAccessToken);
+            saveTokens(newAccessToken, refreshToken);
 
             // Повторно пробуем получить профиль
             const retryRes = await fetchUserProfile();

@@ -7,6 +7,7 @@ import {
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { googleAuth } from "@/api/authApi";
+import { saveTokens } from "@/utils/tokenUtils";
 
 const GoogleLoginPage: React.FC = () => {
   const handleLoginSuccess = async (response: CredentialResponse) => {
@@ -21,8 +22,7 @@ const GoogleLoginPage: React.FC = () => {
       const { data } = await googleAuth(response.credential);
       console.log("Backend response:", data);
 
-      localStorage.setItem("access_token", data.access);
-      localStorage.setItem("refresh_token", data.refresh);
+      saveTokens(data.access, data.refresh);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       window.location.href = "/profile";

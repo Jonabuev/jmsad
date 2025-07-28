@@ -9,6 +9,9 @@ const ChangePassword: FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return;
+
     const token = localStorage.getItem('access_token');
     setIsAuthenticated(!!token);
   }, []);

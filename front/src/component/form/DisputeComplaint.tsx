@@ -17,6 +17,9 @@ export default function DisputeComplaintPage() {
     
     useEffect(() => {
     const fetchComplaint = async () => {
+        // Проверяем, что мы на клиенте
+        if (typeof window === 'undefined') return;
+
         const token = localStorage.getItem("access_token");
         if (!token || !uuid) return;
 

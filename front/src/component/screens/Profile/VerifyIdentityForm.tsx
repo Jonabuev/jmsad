@@ -19,6 +19,9 @@ const VerifyIdentityForm: React.FC = () => {
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      // Проверяем, что мы на клиенте
+      if (typeof window === 'undefined') return;
+
       const token = localStorage.getItem("access_token");
       if (!token) return;
       try {

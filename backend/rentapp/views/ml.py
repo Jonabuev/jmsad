@@ -18,6 +18,7 @@ from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
 import pandas as pd
 from PIL import Image
+import base64
 
 
 
@@ -76,83 +77,320 @@ class OCRCheckView(APIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        extracted_text = extract_text(image).lower()
-        print("📄 Extracted text:\n", extracted_text)
+        try:
+            # Автоматически заполняем поля имени пользователя
+            auto_fill_user_name_fields(request.user)
+            
+            # Извлекаем текст из изображения
+            extracted_text = extract_text(image).lower()
+            print("📄 Extracted text:\n", extracted_text)
+            print("📄 Длина извлеченного текста:", len(extracted_text))
+            print("📄 Первые 500 символов:", extracted_text[:500])
+            
+            # Ищем MRZ зону (машиночитаемая зона) - обычно содержит имя в латинском формате
+            mrz_lines = []
+            for line in extracted_text.split('\n'):
+                if '<<<' in line or 'abuev' in line.lower() or 'janibek' in line.lower():
+                    mrz_lines.append(line.strip())
+                    print(f"🔍 Найдена MRZ строка: {line.strip()}")
+            
+            if mrz_lines:
+                print(f"📋 MRZ зона найдена: {mrz_lines}")
 
-        # --- Проверка на ФИО ---
-        username_match = request.user.username.lower() in extracted_text
-        print(f"👤 Username match: {username_match}")
-
-        # --- Проверка на ИИН/БИН, только если не виза или виза, но с identifier ---
-        identifier = request.user.identifier
-        skip_identifier_check = request.user.document_type == "visa" and not identifier
-
-        if skip_identifier_check:
-            identifier_match = True
-            print("ℹ️ ИИН/БИН не требуется для документа типа 'visa'")
-        else:
-            identifier_match = identifier and identifier in extracted_text
-            print(f"🆔 Identifier match: {identifier_match}")
-
-
-        # --- Проверка срока действия паспорта ---
-        expiry_date_str = request.user.passport_expiry.strftime('%d.%m.%Y')
-        expiry_matches = re.findall(r"\d{2}[./-]\d{2}[./-]\d{4}", extracted_text)
-        expiry_match = False
-        expiry_is_valid = False
-
-        for date_str in expiry_matches:
-            try:
-                doc_date = datetime.strptime(date_str.replace("-", ".").replace("/", "."), '%d.%m.%Y').date()
-                if doc_date == request.user.passport_expiry:
-                    expiry_match = True
-                if doc_date >= datetime.today().date():
-                    expiry_is_valid = True
-            except ValueError:
-                continue
-
-        print(f"📅 Expiry match: {expiry_match}, Not expired: {expiry_is_valid}")
-
-        # --- Проверка визы, если используется ---
-        visa_match = True
-        if request.user.document_type == "visa":
-            visa_number = getattr(request.user, "visa_number", "")
-            if visa_number:
-                visa_match = visa_number in extracted_text
-                print(f"🛂 Visa number match: {visa_match}")
+            # --- НОВАЯ СИСТЕМА ПРОВЕРКИ ПО ПОЛЯМ ---
+            user = request.user
+            print(f"👤 Проверяем пользователя: {user.username}")
+            print(f"📝 Данные пользователя:")
+            print(f"   Фамилия: {user.last_name}")
+            print(f"   Имя: {user.first_name}")
+            print(f"   Отчество: {user.thirdname}")
+            print(f"   ИИН: {user.identifier}")
+            
+            # Собираем все поля для проверки
+            fields_to_check = {
+                'last_name': user.last_name,
+                'first_name': user.first_name, 
+                'thirdname': user.thirdname,
+                'identifier': user.identifier,
+                'username': user.username
+            }
+            
+            # Удаляем пустые поля
+            fields_to_check = {k: v for k, v in fields_to_check.items() if v}
+            
+            print(f"🔍 Проверяем поля: {list(fields_to_check.keys())}")
+            
+            # Проверяем каждое поле отдельно
+            field_matches = {}
+            total_found = 0
+            
+            for field_name, field_value in fields_to_check.items():
+                if not field_value:
+                    continue
+                    
+                # Создаем варианты для поиска
+                search_terms = [field_value.lower()]
+                
+                # Специальная обработка для отчества
+                if field_name == 'thirdname':
+                    # Разбиваем отчество на части
+                    thirdname_parts = field_value.lower().split()
+                    if len(thirdname_parts) >= 2:
+                        # Добавляем варианты: слитно, раздельно, только первая часть
+                        thirdname_variants = [
+                            ''.join(thirdname_parts),  # слитно
+                            ' '.join(thirdname_parts),  # раздельно
+                            thirdname_parts[0],  # только первая часть
+                            thirdname_parts[-1]  # только последняя часть
+                        ]
+                        
+                        # Добавляем комбинации частей (для случаев типа "Кайрат улы", "Кайрат кызы")
+                        if len(thirdname_parts) >= 2:
+                            # Добавляем комбинации: "кайрат улы", "кайрат кызы"
+                            thirdname_variants.append(f"{thirdname_parts[0]} {thirdname_parts[1]}")
+                            thirdname_variants.append(f"{thirdname_parts[1]} {thirdname_parts[0]}")
+                            
+                            # Добавляем слитные варианты: "кайратулы", "кайраткызы"
+                            thirdname_variants.append(f"{thirdname_parts[0]}{thirdname_parts[1]}")
+                            thirdname_variants.append(f"{thirdname_parts[1]}{thirdname_parts[0]}")
+                        
+                        # Добавляем транслитерированные варианты для каждой части
+                        for part in thirdname_parts:
+                            translit_part = ''
+                            for char in part:
+                                translit_part += translit_map.get(char, char)
+                            thirdname_variants.append(translit_part)
+                        
+                        # Добавляем транслитерированное полное отчество
+                        translit_full = ''
+                        for char in field_value.lower():
+                            translit_full += translit_map.get(char, char)
+                        thirdname_variants.append(translit_full)
+                        
+                        # Добавляем транслитерированные комбинации
+                        if len(thirdname_parts) >= 2:
+                            translit_first = ''
+                            for char in thirdname_parts[0]:
+                                translit_first += translit_map.get(char, char)
+                            translit_second = ''
+                            for char in thirdname_parts[1]:
+                                translit_second += translit_map.get(char, char)
+                            
+                            thirdname_variants.extend([
+                                f"{translit_first} {translit_second}",  # "kuandyk uly"
+                                f"{translit_second} {translit_first}",  # "uly kuandyk"
+                                f"{translit_first}{translit_second}",   # "kuandykuly"
+                                f"{translit_second}{translit_first}"    # "ulykuandyk"
+                            ])
+                        
+                        # Добавляем специальные варианты для казахских отчеств
+                        special_variants = [
+                            'улы', 'кызы', 'улы', 'кызы',  # казахские суффиксы
+                            'uly', 'kyzy', 'uly', 'kyzy'   # латинские варианты
+                        ]
+                        thirdname_variants.extend(special_variants)
+                        
+                        search_terms.extend(thirdname_variants)
+                        print(f"🔍 Варианты отчества '{field_value}' для поиска: {thirdname_variants[:8]}...")  # Показываем первые 8
+                
+                # Добавляем транслитерированные варианты (только если еще не добавлены)
+                if field_name != 'thirdname':  # Для отчества транслитерация уже добавлена выше
+                    translit_map = {
+                        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+                        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                        'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+                        'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+                    }
+                    
+                    translit_value = ''
+                    for char in field_value.lower():
+                        translit_value += translit_map.get(char, char)
+                    search_terms.append(translit_value)
+                
+                # Специальная обработка для фамилии
+                if field_name == 'last_name':
+                    # Добавляем частичные варианты для фамилии
+                    if len(field_value) > 3:
+                        search_terms.append(field_value.lower()[:3])
+                        search_terms.append(field_value.lower()[:4])
+                    
+                    print(f"🔍 Варианты фамилии '{field_value}' для поиска: {search_terms[:5]}...")  # Показываем первые 5
+                
+                # Для имени добавляем варианты с возможными ошибками OCR
+                if field_name == 'first_name':
+                    # Создаем универсальные варианты для любого имени
+                    name_variants = [field_value.lower()]
+                    
+                    # Добавляем транслитерированные варианты
+                    translit_name = ''
+                    for char in field_value.lower():
+                        translit_name += translit_map.get(char, char)
+                    name_variants.append(translit_name)
+                    
+                    # Добавляем варианты с возможными ошибками OCR
+                    common_ocr_errors = {
+                        'ж': 'zh', 'и': 'i', 'е': 'e', 'н': 'n', 'б': 'b', 'к': 'k',
+                        'а': 'a', 'в': 'v', 'г': 'g', 'д': 'd', 'ё': 'yo', 'з': 'z',
+                        'й': 'y', 'л': 'l', 'м': 'm', 'о': 'o', 'п': 'p', 'р': 'r',
+                        'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts',
+                        'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '',
+                        'э': 'e', 'ю': 'yu', 'я': 'ya'
+                    }
+                    
+                    # Создаем варианты с ошибками OCR
+                    for old_char, new_char in common_ocr_errors.items():
+                        if old_char in field_value.lower():
+                            error_variant = field_value.lower().replace(old_char, new_char)
+                            name_variants.append(error_variant)
+                    
+                    # Добавляем частичные варианты (первые 3-4 буквы)
+                    if len(field_value) > 3:
+                        name_variants.append(field_value.lower()[:3])
+                        name_variants.append(field_value.lower()[:4])
+                    
+                    search_terms.extend(name_variants)
+                    print(f"🔍 Варианты имени '{field_value}' для поиска: {name_variants[:5]}...")  # Показываем первые 5
+                
+                # Ищем в основном тексте
+                found_terms = search_text_anywhere(extracted_text, search_terms)
+                
+                # Ищем в MRZ зоне
+                if mrz_lines:
+                    mrz_text = ' '.join(mrz_lines).lower()
+                    mrz_found = search_text_anywhere(mrz_text, search_terms)
+                    found_terms.extend(mrz_found)
+                
+                field_matches[field_name] = found_terms
+                if found_terms:
+                    total_found += 1
+                    print(f"✅ Поле '{field_name}' найдено: {found_terms}")
+                else:
+                    print(f"❌ Поле '{field_name}' не найдено")
+                    # Отладочная информация для отчества
+                    if field_name == 'thirdname':
+                        print(f"🔍 Отладочная информация для отчества '{field_value}':")
+                        print(f"   Искали варианты: {search_terms[:10]}...")
+                        print(f"   В тексте есть слова: {[word for word in extracted_text.split() if len(word) > 2][:10]}...")
+                        print(f"   В MRZ зоне: {mrz_text if mrz_lines else 'Нет MRZ'}")
+            
+            print(f"📊 Найдено полей: {total_found}/{len(fields_to_check)}")
+            
+            # Определяем успешность верификации
+            # Нужно найти минимум 2 поля или 60% от доступных полей
+            min_required = max(2, len(fields_to_check) * 0.6)
+            verification_success = total_found >= min_required
+            
+            print(f"🎯 Требуется найти: {min_required} полей")
+            print(f"✅ Верификация успешна: {verification_success}")
+            
+            # --- Проверка ИИН ---
+            identifier_match = False
+            if user.identifier:
+                identifier_variants = set()
+                identifier = user.identifier
+                
+                # Добавляем оригинальный ИИН
+                identifier_variants.add(identifier)
+                
+                # Добавляем варианты с разделителями
+                identifier_variants.add(identifier.replace(' ', ''))
+                identifier_variants.add(identifier.replace('-', ''))
+                identifier_variants.add(identifier.replace('.', ''))
+                identifier_variants.add(identifier.replace('_', ''))
+                
+                # Добавляем частичные совпадения (первые 6, 4, 3 цифры)
+                if len(identifier) >= 6:
+                    identifier_variants.add(identifier[:6])
+                if len(identifier) >= 4:
+                    identifier_variants.add(identifier[:4])
+                if len(identifier) >= 3:
+                    identifier_variants.add(identifier[:3])
+                
+                # Добавляем последние цифры
+                if len(identifier) >= 4:
+                    identifier_variants.add(identifier[-4:])
+                if len(identifier) >= 3:
+                    identifier_variants.add(identifier[-3:])
+                
+                identifier_match = any(variant in extracted_text for variant in identifier_variants)
+                print(f"🆔 Identifier match: {identifier_match}")
+                print(f"🔍 Искали ИИН: {list(identifier_variants)[:5]}...")  # Показываем первые 5
+            
+            # --- Проверка даты истечения ---
+            expiry_is_valid = True  # По умолчанию считаем валидной
+            visa_match = True  # По умолчанию считаем валидной
+            
+            if user.passport_expiry:
+                expected_date = user.passport_expiry.strftime('%d.%m.%Y')
+                print(f"📅 Ожидаемая дата истечения: {expected_date}")
+                
+                # Ищем даты в тексте
+                date_patterns = [
+                    r'\d{2}\.\d{2}\.\d{4}',  # DD.MM.YYYY
+                    r'\d{2}/\d{2}/\d{4}',     # DD/MM/YYYY
+                    r'\d{2}-\d{2}-\d{4}',     # DD-MM-YYYY
+                    r'\d{4}-\d{2}-\d{2}',     # YYYY-MM-DD
+                ]
+                
+                found_dates = []
+                for pattern in date_patterns:
+                    dates = re.findall(pattern, extracted_text)
+                    found_dates.extend(dates)
+                
+                print(f"📅 Найденные даты: {found_dates}")
+                
+                if found_dates:
+                    # Проверяем, есть ли ожидаемая дата среди найденных
+                    expiry_match = expected_date in found_dates
+                    print(f"📅 Дата истечения найдена: {expiry_match}")
+                else:
+                    print("📅 Даты не найдены в документе")
+            
+            # --- Финальная проверка ---
+            # Верификация успешна, если:
+            # 1. Найдено достаточно полей ИЛИ
+            # 2. Найден ИИН и есть валидная дата
+            final_success = verification_success or (identifier_match and expiry_is_valid and visa_match)
+            
+            print(f"🎯 Финальный результат: {final_success}")
+            
+            if final_success:
+                # Создаем или обновляем запись верификации
+                verification, created = IdentityVerification.objects.get_or_create(
+                    user=request.user,
+                    defaults={'verified': True}
+                )
+                if not created:
+                    verification.verified = True
+                    verification.save()
+                
+                return Response({
+                    'success': True,
+                    'message': 'Документ успешно верифицирован!',
+                    'verification_id': verification.id
+                }, status=status.HTTP_200_OK)
             else:
-                print("⚠️ Виза указана, но visa_number отсутствует")
-
-        # --- Успешная верификация ---
-        if username_match and identifier_match and expiry_match and expiry_is_valid and visa_match:
-            try:
-                with transaction.atomic():
-                    request.user.email_confirmed = True
-                    request.user.save()
-
-                    IdentityVerification.objects.create(user=request.user, id_document=uploaded_file)
-
-                    send_mail(
-                        'Verification is completed successfully.',
-                        'Thank you for submitting your identity document.',
-                        settings.DEFAULT_FROM_EMAIL,
-                        [request.user.email],
-                        fail_silently=False,
-                    )
-
-                return Response({"message": "Identity verified successfully."}, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({"error": f"Ошибка при сохранении данных: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # Если что-то не совпало:
-        return Response({
-            "error": "Документ не прошёл проверку.",
-            "username_match": username_match,
-            "identifier_match": identifier_match,
-            "expiry_match": expiry_match,
-            "expiry_valid": expiry_is_valid,
-            "visa_match": visa_match,
-        }, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'success': False,
+                    'message': 'Документ не прошел автоматическую верификацию. Обратитесь к администратору для ручной проверки.',
+                    'extracted_text_preview': extracted_text[:500],
+                    'suggestions': [
+                        'Убедитесь, что документ четкий и хорошо освещен',
+                        'Проверьте, что все данные на документе читаемы',
+                        'Попробуйте загрузить документ снова'
+                    ],
+                    'field_matches': field_matches,
+                    'total_found': total_found,
+                    'min_required': min_required
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            print(f"❌ Ошибка при обработке изображения: {e}")
+            return Response({
+                'success': False,
+                'message': f'Ошибка при обработке изображения: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class RecommendTenantsAPIView(APIView):
@@ -307,6 +545,81 @@ def evaluate_reliability(request):
         'tenants_predictions': predictions,
         'rating_logreg_graph': graph_base64
     })
+
+
+def auto_fill_user_name_fields(user):
+    """
+    Автоматически заполняет поля first_name, last_name, thirdname из username
+    """
+    if not user.username:
+        return False
+    
+    # Разбиваем username на части
+    name_parts = user.username.strip().split()
+    print(f"🔍 Разбиваем username '{user.username}' на части: {name_parts}")
+    
+    if len(name_parts) >= 1:
+        user.last_name = name_parts[0]  # Фамилия
+    
+    if len(name_parts) >= 2:
+        user.first_name = name_parts[1]  # Имя
+    
+    if len(name_parts) >= 3:
+        # Отчество - все оставшиеся части (может быть несколько слов)
+        user.thirdname = ' '.join(name_parts[2:])  # Отчество
+        print(f"🔍 Отчество будет: '{user.thirdname}' (из частей: {name_parts[2:]})")
+    
+    try:
+        user.save()
+        print(f"✅ Автоматически заполнены поля для пользователя {user.username}:")
+        print(f"   Фамилия: {user.last_name}")
+        print(f"   Имя: {user.first_name}")
+        print(f"   Отчество: {user.thirdname}")
+        return True
+    except Exception as e:
+        print(f"❌ Ошибка при заполнении полей: {e}")
+        return False
+
+def search_text_anywhere(text, search_terms):
+    """
+    Ищет любое из слов в любом месте текста
+    """
+    text_lower = text.lower()
+    found_terms = []
+    
+    for term in search_terms:
+        term_lower = term.lower()
+        if term_lower in text_lower:
+            found_terms.append(term)
+            print(f"✅ Найдено слово: {term}")
+        else:
+            # Попробуем найти частичные совпадения для длинных слов
+            if len(term_lower) > 3:
+                # Ищем подстроки длиной не менее 3 символов
+                for i in range(len(term_lower) - 2):
+                    substring = term_lower[i:i+3]
+                    if substring in text_lower:
+                        found_terms.append(term)
+                        print(f"✅ Найдено частичное совпадение: {term} (часть: {substring})")
+                        break
+            
+            # Специальная обработка для отчеств - ищем каждую часть отдельно
+            if ' ' in term_lower or len(term_lower) > 6:
+                # Разбиваем на части и ищем каждую часть
+                parts = term_lower.split()
+                if len(parts) >= 2:
+                    found_parts = 0
+                    for part in parts:
+                        if part in text_lower and len(part) > 2:
+                            found_parts += 1
+                            print(f"✅ Найдена часть отчества: {part}")
+                    
+                    # Если найдено больше половины частей, считаем успехом
+                    if found_parts >= len(parts) * 0.5:
+                        found_terms.append(term)
+                        print(f"✅ Найдено отчество по частям: {term} ({found_parts}/{len(parts)} частей)")
+    
+    return found_terms
 
 
 

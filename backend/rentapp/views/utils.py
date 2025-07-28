@@ -1,7 +1,10 @@
 import io
 from PIL import Image
 from pdf2image import convert_from_bytes
-import pytesseract
+import os
+
+# Импортируем настройку Tesseract
+from .tesseract_config import pytesseract
 
 def extract_text(image):
     """Извлекает текст с изображения с помощью Tesseract"""
@@ -9,8 +12,26 @@ def extract_text(image):
         if image.mode in ("RGBA", "P"):
             image = image.convert("RGB")
 
-        extracted_text = pytesseract.image_to_string(image, lang='eng+rus+kaz')
-        return extracted_text.strip()
+        # Попробуем разные языки
+        languages = ['eng+rus+kaz', 'eng+rus', 'eng', 'rus']
+        
+        for lang in languages:
+            try:
+                extracted_text = pytesseract.image_to_string(image, lang=lang)
+                if extracted_text.strip():
+                    print(f"✅ OCR успешен с языком: {lang}")
+                    return extracted_text.strip()
+            except Exception as e:
+                print(f"⚠️ Ошибка с языком {lang}: {str(e)}")
+                continue
+        
+        # Если ничего не получилось, попробуем без указания языка
+        try:
+            extracted_text = pytesseract.image_to_string(image)
+            return extracted_text.strip()
+        except Exception as e:
+            return f"Error during OCR processing: {str(e)}"
+            
     except Exception as e:
         return f"Error during OCR processing: {str(e)}"
 

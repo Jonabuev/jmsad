@@ -13,6 +13,11 @@ interface GetComplaintsResponse {
 }
 
 export const getComplaints = async (params: GetComplaintsParams): Promise<GetComplaintsResponse> => {
+  // Проверяем, что мы на клиенте
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot access localStorage on server side');
+  }
+
   const token = localStorage.getItem('access_token');
   if (!token) {
     throw new Error('No access token found');
