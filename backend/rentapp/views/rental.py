@@ -202,81 +202,42 @@ def reject_rental(request, rental_id):
         return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsLandlord])
 def create_apartment(request):
-    """
-    API endpoint для создания новой квартиры/дома.
-    
-    Создает новый объект недвижимости для текущего пользователя.
-    Использует HouseCreateSerializer для валидации только необходимых полей.
-    Поддерживает загрузку изображений через FormData.
-    Требует подтверждения email перед созданием.
-    
-    Required fields:
-        - address: Адрес недвижимости (минимум 5 символов)
-        - type_p: Тип недвижимости (apartment/house/room)
-        - num_of_rooms: Количество комнат (минимум 1)
-        - price: Цена аренды (минимум 0)
-    
-    Optional fields:
-        - description: Описание недвижимости
-        - area: Площадь в м²
-        - floor: Этаж
-        - total_floors: Этажность дома
-        - year_built: Год постройки
-        - is_furnished: Меблировка
-        - has_balcony: Наличие балкона
-        - comment: Комментарий
-        - images: Фотографии апартамента (множественная загрузка)
-    
-    Permissions:
-        - Требуется аутентификация
-        - Требуется роль арендодателя
-        - Требуется подтверждение email
-    """
     if not request.user.email_confirmed:
         return Response(
             {"detail": "Подтвердите свою почту перед добавлением недвижимости."},
             status=status.HTTP_403_FORBIDDEN
         )
+
+    # Используем обычный словарь вместо deepcopy
+    data = request.POST.dict()
     
-    # Обрабатываем данные из FormData
-    data = request.data.copy()
-    
-    # Обрабатываем boolean поля
+    # Обработка булевых полей
     for field in ['is_furnished', 'has_balcony']:
-        if field in data:
-            data[field] = data[field].lower() in ['true', '1', 'on']
-    
+        if field in request.POST:
+            data[field] = request.POST.get(field).lower() in ['true', '1', 'on']
+
+    # Добавим файлы
+    images = request.FILES.getlist('images')
+    data['images'] = images
+
     serializer = HouseCreateSerializer(data=data, context={'request': request})
-    print("Полученные данные:", data)
-    print("Файлы:", request.FILES)
     
     if serializer.is_valid():
         house = serializer.save()
-        
-        # Сохраняем изображения
-        images = request.FILES.getlist('images')
-        for image in images:
-            from rentapp.models import HouseImage
-            HouseImage.objects.create(house=house, image=image)
-        
-        # Инвалидируем кэш домов после создания нового
         invalidate_house_cache()
         return Response({
             "message": "Недвижимость успешно добавлена",
             "data": HouseSerializer(house).data
         }, status=status.HTTP_201_CREATED)
 
-    # Печатаем в консоль и возвращаем человекочитаемый ответ
-    print("Ошибка сериализации:", serializer.errors)
-
     return Response({
         "message": "Ошибка при создании недвижимости",
         "errors": serializer.errors
-     }, status=status.HTTP_400_BAD_REQUEST)
+    }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
