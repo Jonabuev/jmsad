@@ -356,6 +356,8 @@ class OCRCheckView(APIView):
             print(f"🎯 Финальный результат: {final_success}")
             
             if final_success:
+                request.user.email_confirmed = True
+                request.user.save()
                 # Создаем или обновляем запись верификации
                 verification, created = IdentityVerification.objects.get_or_create(
                     user=request.user,
