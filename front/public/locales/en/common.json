@@ -65,7 +65,12 @@
     "reject": "Reject",
     "documentType": "Document Type",
     "passportExpiry": "Document Expiry Date",
-    "documentExpired": "Your document has expired. Please update your information."
+    "documentExpired": "Your document has expired. Please update your information.",
+    "docType":{
+      "id_card": "ID Card",
+      "passport_kz": "KZ Passport",
+      "visa": "Visa"
+    }
   },
   "verify": {
     "identityVerification": "Identity verification"

@@ -223,6 +223,7 @@ class PublicUserProfileView(APIView):
                     "id": comp.id,
                     "description": comp.description,
                     "status": comp.status,
+                    "uuid": str(comp.uuid),
                     "created_at": comp.created_at,
                 }
                 for comp in complaint_received

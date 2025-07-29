@@ -164,7 +164,7 @@ const Profile: FC = () => {
           <div className="p-4 mt-4 border border-yellow-400 bg-yellow-100 text-yellow-800 rounded-lg">
             <p>
               {t("profile.documentType")}:{" "}
-              <strong>{t(`editProfile.docType.${profileData.user.document_type || "unknown"}`)}</strong>
+              <strong>{t(`profile.docType.${profileData.user.document_type || "unknown"}`)}</strong>
             </p>
             <p>
               {t("profile.passportExpiry")}:{" "}
