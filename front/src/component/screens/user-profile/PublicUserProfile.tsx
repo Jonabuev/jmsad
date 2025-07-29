@@ -147,7 +147,7 @@ const PublicUserProfile: FC = () => {
                 <p className="text-gray-700"><strong>{t("profile.phone")}:</strong> {profileData.phone_number}</p>
                 <p className="text-gray-700 flex items-center">
                   <strong>{t("profile.email")}:</strong> {profileData.email}
-                  {profileData.email_confirmed ? (
+                  {/* {profileData.email_confirmed ? (
                     <span className="ml-2 text-green-600 font-semibold bg-green-100 px-2 py-1 rounded-md">
                       {t("profile.verified")}
                     </span>
@@ -157,7 +157,7 @@ const PublicUserProfile: FC = () => {
                         {t("profile.notverify")}
                       </button>
                     </Link>
-                  )}
+                  )} */}
                 </p>
               </div>
             </div>
@@ -215,6 +215,7 @@ const PublicUserProfile: FC = () => {
                         <th className="border px-4 py-2">{t("profile.description")}</th>
                         <th className="border px-4 py-2">{t("profile.status")}</th>
                         <th className="border px-4 py-2">{t("profile.date")}</th>
+                        <th className="border px-4 py-2">{t("profile.details")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -230,6 +231,14 @@ const PublicUserProfile: FC = () => {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
+                          </td>
+                          <td>
+                            <Link
+                              href={`/complaints/${complaint.uuid}`}
+                              className="text-blue-600 underline hover:text-blue-800"
+                            >
+                              {t("profile.details")}
+                            </Link>
                           </td>
                         </tr>
                       ))}

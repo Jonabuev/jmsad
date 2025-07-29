@@ -554,7 +554,10 @@ class TenantRegistryView1(ListAPIView):
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
             start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
             end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
-            queryset = queryset.filter(r_date__range=[start_date, end_date])
+            queryset = queryset.filter(
+                received_rental_complaints__created_at__range=[start_date, end_date]
+            ).distinct()
+
 
         # Теперь аннотируем complaint_count по ВСЕМ жалобам с status='reviewed' без учета фильтров по причинам и court_score
         queryset = queryset.annotate(
@@ -613,7 +616,10 @@ class TenantRegistryView2(ListAPIView):
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
             start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
             end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
-            queryset = queryset.filter(r_date__range=[start_date, end_date])
+            queryset = queryset.filter(
+                received_rental_complaints__created_at__range=[start_date, end_date]
+            ).distinct()
+
 
         queryset = queryset.annotate(
             complaint_count=Count(

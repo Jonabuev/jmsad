@@ -103,7 +103,7 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
                           {t(`profile.${rental.status}`)}
                         </p>
                         <p>
-                          <strong>{t("profile.period")}:</strong>{" "}
+                          <strong>{t("profile.date")}:</strong>{" "}
                           {new Date(rental.start_date).toLocaleDateString()} -{" "}
                           {new Date(rental.end_date).toLocaleDateString()}
                         </p>
