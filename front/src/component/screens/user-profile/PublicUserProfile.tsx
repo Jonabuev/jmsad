@@ -27,6 +27,18 @@ const PublicUserProfile: FC = () => {
   const router = useRouter();
   const { username } = router.query;
 
+
+  let reviewedComplaints: IComplaint[] = [];
+
+  if (profileData?.complaint_received) {
+    reviewedComplaints = profileData.complaint_received.filter(
+      (complaint) => complaint.status === "reviewed"
+    );
+  } else {
+    console.warn("No complaint_received data in profileData");
+  }
+
+
   const { profile: currentUserProfile, loading: currentUserLoading } = useSelector((state: RootState) => state.auth);
   const isOwnProfile = username === currentUserProfile?.user.username;
 
@@ -45,6 +57,7 @@ const PublicUserProfile: FC = () => {
   }, [username, currentUserProfile, publicProfileData]);
 
   const loading = currentUserLoading || publicProfileLoading;
+
 
   if (loading) return <div>Загрузка...</div>;
   if (error) return <div className="text-center mt-10 text-red-500">{error.message || 'Ошибка'}</div>;
@@ -168,13 +181,13 @@ const PublicUserProfile: FC = () => {
             <div className="bg-white p-4 rounded-lg shadow flex-1 min-w-[280px] mt-4">
               {profileData.role === "landlord" ? (
                 <>
-                  <h2 className="font-semibold mb-2 text-gray-700">Апартаменты</h2>
+                  <h2 className="font-semibold mb-2 text-gray-700">{t("profile.apartments")}</h2>
                   {profileData.houses?.length ? (
                     <ul className="space-y-2">
                       {profileData.houses.map((house: IHouse) => (
                         <li key={house.id} className="bg-gray-100 p-3 rounded-md shadow-sm">
                           <p><strong>{house.address}</strong></p>
-                          <p>{t(`profile.${house.type_p}`)} • Комнат: {house.num_of_rooms}</p>
+                          <p>{t(`profile.${house.type_p}`)} • {t("profile.rooms")}: {house.num_of_rooms}</p>
                         </li>
                       ))}
                     </ul>
@@ -184,13 +197,13 @@ const PublicUserProfile: FC = () => {
                 </>
               ) : (
                 <>
-                  <h2 className="font-semibold mb-2 text-gray-700">Аренды</h2>
+                  <h2 className="font-semibold mb-2 text-gray-700">{t("profile.apartments")}</h2>
                   {profileData.rentals?.length ? (
                     <ul className="space-y-2">
                       {profileData.rentals.map((rental: IRental) => (
                         <li key={rental.id} className="bg-gray-100 p-3 rounded-md shadow-sm">
                           <p><strong>{rental.house.address}</strong></p>
-                          <p>{t(`profile.${rental.house.type_p}`)} • Комнат: {rental.house.num_of_rooms}</p>
+                          <p>{t(`profile.${rental.house.type_p}`)} • {t("profile.rooms")}: {rental.house.num_of_rooms}</p>
                           <p><strong>{t("profile.rentalStatus")}:</strong> {rental.status}</p>
                         </li>
                       ))}
@@ -206,8 +219,8 @@ const PublicUserProfile: FC = () => {
           {/* Complaints tab */}
           {activeTab === "complaints" && (
             <div className="mt-5 p-4 rounded-lg shadow bg-white">
-              <h2 className="font-semibold mb-2 text-gray-700">Жалобы</h2>
-              {profileData.complaint_received?.length ? (
+              <h2 className="font-semibold mb-2 text-gray-700">{t("profile.complaints")}</h2>
+              {reviewedComplaints.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full border text-sm">
                     <thead className="bg-gray-100">
@@ -219,7 +232,7 @@ const PublicUserProfile: FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {profileData.complaint_received.map((complaint: IComplaint) => (
+                      {reviewedComplaints.map((complaint: IComplaint) => (
                         <tr key={complaint.id} className="text-center">
                           <td className="border px-4 py-2">{complaint.description}</td>
                           <td className="border px-4 py-2">{t(`profile.${complaint.status}`)}</td>
@@ -246,8 +259,9 @@ const PublicUserProfile: FC = () => {
                   </table>
                 </div>
               ) : (
-                <p className="text-gray-500">Нет жалоб.</p>
+                <p className="text-gray-500">{t("profile.noComplaints")}</p>
               )}
+
             </div>
           )}
         </div>
