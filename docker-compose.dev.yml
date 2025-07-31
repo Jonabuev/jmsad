@@ -1,0 +1,63 @@
+services:
+  # База данных
+  postgres:
+    image: postgres:16.9
+    container_name: jmsad_postgres_dev
+    environment:
+      POSTGRES_DB: jmsad_db
+      POSTGRES_USER: jmsad_user
+      POSTGRES_PASSWORD: jmsad_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - jmsad-network
+
+  # Бэкенд
+  backend:
+    build: ./backend
+    container_name: jmsad_backend_dev
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=your-secret-key-here
+      - DEBUG=True
+      - DATABASE_URL=postgresql://jmsad_user:jmsad_password@postgres:5432/jmsad_db
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/staticfiles
+    restart: unless-stopped
+    networks:
+      - jmsad-network
+
+  # Фронтенд для разработки
+  frontend:
+    build: 
+      context: ./front
+      dockerfile: Dockerfile.dev
+    container_name: jmsad_frontend_dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - jmsad-network
+
+volumes:
+  postgres_data:
+  backend_static:
+
+networks:
+  jmsad-network:
+    driver: bridge 

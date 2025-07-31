@@ -139,12 +139,12 @@ class ComplaintForm(forms.ModelForm):
     landlord_identity_iin = forms.CharField(label="ИИН арендодателя", max_length=12)
     
     adress = forms.ChoiceField(
-        choices=[(adress, adress) for adress in House.objects.values_list('address', flat=True).distinct()],
+        choices=[],  # Пустой список, будет заполнен динамически
         widget=forms.Select,  # Для выпадающего списка
         label="Адрес"
     )
     reason = forms.ModelMultipleChoiceField(
-        queryset=ComplaintReason.objects.all(),  # Получаем причины из базы данных
+        queryset=ComplaintReason.objects.none(),  # Пустой queryset, будет заполнен динамически
         widget=forms.CheckboxSelectMultiple,  # Виджет для множественного выбора
         label="Причины жалобы"
     )
