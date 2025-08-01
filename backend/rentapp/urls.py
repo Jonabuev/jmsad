@@ -6,7 +6,7 @@ from .views.auth import (
 )
 from .views.profile import (
     IssueViolationAPIView, RemoveBanAPIView, profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
-    TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, regenerate_anonymous_name, get_anonymous_name
+    TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, verification_status, regenerate_anonymous_name, get_anonymous_name
 )
 from .views.rental import (
     MyRentalsAPIView, RentalListCreateView, RentalDetailView, RentalRequestListView,
@@ -59,6 +59,7 @@ urlpatterns = [
     path("complaints1/<int:pk>/status/", update_complaint_status1, name="update_complaint_status1"),
     path('complaints/<int:complaint_id>/dispute/', dispute_complaint),
     path("api/user-info/", user_info),
+    path("api/verification-status/", verification_status),
     path('auth/google/', GoogleAuthView.as_view(), name='google-auth'),
     path('complaints/<uuid:uuid>/', ComplaintDetailByUUIDView.as_view(), name='complaint-detail'),
     path('register/', register, name='register'),

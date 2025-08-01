@@ -26,4 +26,7 @@ export const disputeComplaint = (complaintId: number, newDescription: string, to
 
 // Обновление access_token по refresh_token
 export const refreshAccessToken = (refreshToken: string) =>
-  api.post("/token/refresh/", { refresh: refreshToken }); 
+  api.post("/token/refresh/", { refresh: refreshToken });
+
+// Проверка статуса верификации пользователя
+export const getVerificationStatus = () => api.get("/api/verification-status/"); 

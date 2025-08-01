@@ -321,6 +321,30 @@ def user_info(request):
     })
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def verification_status(request):
+    """
+    API endpoint для проверки статуса верификации пользователя.
+    
+    Возвращает информацию о том, верифицирован ли пользователь.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    user = request.user
+    try:
+        verification = IdentityVerification.objects.get(user=user)
+        is_verified = verification.verified
+    except IdentityVerification.DoesNotExist:
+        is_verified = False
+    
+    return Response({
+        "is_verified": is_verified,
+        "email_confirmed": user.email_confirmed,
+    })
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_identity(request):

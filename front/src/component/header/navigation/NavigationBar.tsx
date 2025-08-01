@@ -52,26 +52,52 @@ const NavigationBar: React.FC = () => {
 
   return (
     <div className="flex flex-1 justify-end gap-8 relative h-14">
-      <div className="flex items-center gap-9">
-        <Link className="text-[#0d151c] text-sm font-medium" href="/search">
+      <div className="flex items-center gap-12">
+        <Link 
+          className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+            router.pathname === "/search" ? "text-blue-600" : ""
+          }`} 
+          href="/search"
+        >
           {t("navigation.registry")}
+          {router.pathname === "/search" && (
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
+          )}
         </Link>
         {isAuthenticated && user?.user.role !== "tenant" && (
-          <Link className="text-[#0d151c] text-sm font-medium" href="/forum">
+          <Link 
+            className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+              router.pathname === "/forum" ? "text-blue-600" : ""
+            }`} 
+            href="/forum"
+          >
             {t("navigation.forum")}
+            {router.pathname === "/forum" && (
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
+            )}
           </Link>
         )}
         <Link
-          className="text-[#0d151c] text-sm font-medium"
+          className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+            router.pathname === "/rental-catalog" ? "text-blue-600" : ""
+          }`}
           href="/rental-catalog"
         >
           {t("navigation.catalog")}
+          {router.pathname === "/rental-catalog" && (
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
+          )}
         </Link>
         <Link
-          className="text-[#0d151c] text-sm font-medium"
+          className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+            router.pathname === "/analiticsML" ? "text-blue-600" : ""
+          }`}
           href="/analiticsML"
         >
           {t("navigation.analytics")}
+          {router.pathname === "/analiticsML" && (
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
+          )}
         </Link>
       </div>
 
@@ -81,7 +107,7 @@ const NavigationBar: React.FC = () => {
             className="flex items-center gap-1 text-[#0d151c] text-sm font-medium"
             onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
           >
-            {t("navigation.language")}
+            <Image src="/home/earth.svg" alt="language" width={20} height={20} />
             <svg
               className="w-4 h-4"
               fill="none"
@@ -140,16 +166,16 @@ const NavigationBar: React.FC = () => {
           </div>
         ) : (
           <>
-            <Link href="/register">
-              <button className="h-10 px-4 bg-[#2094f3] text-white rounded-xl text-sm font-bold">
-                {t("navigation.register")}
-              </button>
-            </Link>
-            <Link href="/login">
-              <button className="h-10 px-4 bg-[#e7eef4] text-[#0d151c] rounded-xl text-sm font-bold">
-                {t("navigation.login")}
-              </button>
-            </Link>
+                         <Link href="/register">
+               <button className="h-10 px-4 bg-[#2094f3] text-white rounded-xl text-sm font-normal">
+                 {t("navigation.register")}
+               </button>
+             </Link>
+             <Link href="/login">
+               <button className="h-10 px-4 bg-[#e7eef4] text-[#0d151c] rounded-xl text-sm font-normal">
+                 {t("navigation.login")}
+               </button>
+             </Link>
           </>
         )}
       </div>
