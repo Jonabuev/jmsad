@@ -351,9 +351,33 @@ class OCRCheckView(APIView):
             # Верификация успешна, если:
             # 1. Найдено достаточно полей ИЛИ
             # 2. Найден ИИН и есть валидная дата
-            final_success = verification_success or (identifier_match and expiry_is_valid and visa_match)
-            
+            # Проверяем наличие ФИО
+            required_fields = ['last_name', 'first_name', 'thirdname']
+            missing_fields = [f for f in required_fields if not field_matches.get(f)]
+            missing_fio = bool(missing_fields)
+
+            # Проверка даты
+            expiry_match = expected_date in found_dates if found_dates else False
+
+            # Тип документа
+            document_type = request.data.get('document_type', '').lower()  # Предполагается, что приходит в запросе
+            is_visa = 'visa' in document_type
+
+            # Логика финального успеха:
+            # ФИО и дата обязательны
+            # ИИН обязателен, если документ не виза
+            final_success = (
+                not missing_fio and
+                expiry_match and
+                (is_visa or identifier_match)
+            )
+
+            print(f"🧩 ФИО все найдены: {not missing_fio}")
+            print(f"📅 Дата истечения совпала: {expiry_match}")
+            print(f"🆔 ИИН найден: {identifier_match}")
+            print(f"📄 Тип документа: {document_type}")
             print(f"🎯 Финальный результат: {final_success}")
+
             
             if final_success:
                 request.user.email_confirmed = True
