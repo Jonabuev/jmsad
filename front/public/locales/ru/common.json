@@ -250,7 +250,7 @@
     "address_placeholder": "Введите адрес",
     "apply_filters": "Применить фильтры",
     "no_complaints": "Жалобы не найдены",
-    "tenant": "Арендатор",
+    "tenant": "ФИО",
     "iin": "ИИН",
     "complaints_count": "Кол-во жалоб",
     "entry_date": "Дата внесения",
