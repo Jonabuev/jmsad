@@ -22,9 +22,22 @@ env.bak/
 venv.bak/
 
 # Django migrations
-migrations/
-media/
-# Static and media files
+**/migrations/
+
+# Media files
+# Игнорировать всё в media
+media/*
+
+# НЕ игнорировать avatars/ саму папку
+!media/avatars/
+
+# Игнорировать всё внутри avatars/
+media/avatars/*
+
+# НЕ игнорировать def.png в avatars/
+!media/avatars/def.png
+
+# Static files
 /static/
 
 # Local environment settings

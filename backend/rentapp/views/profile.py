@@ -1,3 +1,4 @@
+import os
 from rentapp.permissions.document_valid import NotBlacklistedOrProfileEdit
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -113,10 +114,20 @@ def edit_profile(request):
     if serializer.is_valid():
         # Обработка удаления аватара
         if request.data.get('clear_avatar') == 'true':
-            user.avatar = "avatars/def.jpg"
+            if user.avatar and user.avatar.name != 'avatars/def.jpg':
+                old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
+            user.avatar = 'avatars/def.jpg'
+
 
         # Обработка нового аватара
         if 'avatar' in request.FILES:
+            # Удалим старый файл, если не дефолтный
+            if user.avatar and user.avatar.name != 'avatars/def.jpg':
+                old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
             user.avatar = request.FILES['avatar']
 
         serializer.save()

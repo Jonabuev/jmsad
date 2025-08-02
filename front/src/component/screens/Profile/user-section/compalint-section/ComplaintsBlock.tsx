@@ -100,7 +100,7 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
             </div>
           )}
 
-          {complaint_received?.length > 0 && (
+          {complaint_send?.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-2">
                 {t("profile.receivedComplaints")}

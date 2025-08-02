@@ -19,7 +19,7 @@ from rest_framework.decorators import api_view, permission_classes
 import pandas as pd
 from PIL import Image
 import base64
-
+from django.core.files.base import ContentFile
 
 
 class ROCImageAPIView(APIView):
@@ -382,11 +382,15 @@ class OCRCheckView(APIView):
             if final_success:
                 request.user.email_confirmed = True
                 request.user.save()
-                # Создаем или обновляем запись верификации
-                verification, created = IdentityVerification.objects.get_or_create(
-                    user=request.user,
-                    defaults={'verified': True}
-                )
+
+                # Сохраняем документ в IdentityVerification
+                uploaded_file.seek(0)  # Вернём указатель в начало файла
+                verification, created = IdentityVerification.objects.get_or_create(user=request.user)
+
+                ext = uploaded_file.name.split('.')[-1]
+                filename = f'id_document.{ext}'
+                file_content = ContentFile(uploaded_file.read())
+                verification.id_document.save(filename, file_content, save=True)
                 if not created:
                     verification.verified = True
                     verification.save()

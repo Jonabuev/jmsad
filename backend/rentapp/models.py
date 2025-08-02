@@ -7,6 +7,14 @@ from django.core.validators import RegexValidator
 from django.dispatch import receiver
 import random
 from PIL import Image
+import os
+
+def user_avatar_upload_path(instance, filename):
+    # Используем ID пользователя. Можно заменить на UUID, если у тебя есть поле UUID.
+    user_id = str(instance.id) or 'anonymous'
+    ext = filename.split('.')[-1]
+    filename = f"avatar.{ext}"
+    return os.path.join('avatars', user_id, filename)
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -330,7 +338,7 @@ class CustomUser(AbstractUser):
     identifier = models.CharField(max_length=15, blank=True, null=True)  
     confirmation_code = models.CharField(max_length=6, blank=True, null=True)
     #rating = models.PositiveSmallIntegerField(default=5)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default='avatars/def.jpg')
+    avatar = models.ImageField(upload_to=user_avatar_upload_path, blank=True, null=True, default='avatars/def.jpg')
     r_date = models.DateTimeField(null=True)
     anonymous_name = models.CharField(max_length=100, blank=True, null=True, unique=True)
 
@@ -424,14 +432,21 @@ class PasswordChangeRequest(models.Model):
 
 
 from .models import CustomUser
+import os
+
+def user_id_document_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'id_document.{ext}'
+    return os.path.join(f'id_documents/{instance.user.id}', filename)
 
 class IdentityVerification(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    id_document = models.FileField(upload_to='id_documents/')
+    id_document = models.FileField(upload_to=user_id_document_upload_path)
     verified = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
+
 
 
 @receiver(user_signed_up)
@@ -550,13 +565,27 @@ class House(models.Model):
     def __str__(self):
         return f'{self.type_p} at {self.address}'
 
+
+def house_image_upload_path(instance, filename):
+    # Получаем расширение файла
+    ext = os.path.splitext(filename)[1]
+    
+    # Считаем, сколько изображений уже есть у этого дома
+    count = instance.house.images.count() + 1  # +1 для нового изображения
+
+    # Имя файла будет photo_1.jpg, photo_2.png, ...
+    filename = f'photo_{count}{ext}'
+
+    return f'house_images/{instance.house.id}/{filename}'
+
 class HouseImage(models.Model):
     house = models.ForeignKey('House', on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='house_images/')
-    description = models.CharField(max_length=255, blank=True, null=True)  # опционально
+    image = models.ImageField(upload_to=house_image_upload_path)
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Image for {self.house.address}"
+
 
 class ComplaintReason(models.Model):
     TENANT = 'tenant'
@@ -798,6 +827,9 @@ from .models import CustomUser
 from .models import House
 from .models import Rental
 from .models import ComplaintReason  # если ты хранишь причины отдельно
+def complaint_evidence_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return f"evidence/{instance.id}/evidence.{ext}"
 
 class RentalComplaint(models.Model):
     STATUS_CHOICES = [
@@ -812,7 +844,7 @@ class RentalComplaint(models.Model):
     accused = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_rental_complaints')
     reasons = models.ManyToManyField(ComplaintReason)
     description = models.TextField()
-    evidence = models.FileField(upload_to='evidence/', blank=True, null=True)
+    evidence = models.FileField(upload_to=complaint_evidence_path, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=timezone.now)
     support_count = models.IntegerField(default=0)
@@ -820,17 +852,33 @@ class RentalComplaint(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     court_decision_score = models.IntegerField(default=0)
 
+    def save(self, *args, **kwargs):
+        if not self.id and self.evidence:
+            evidence_file = self.evidence
+            self.evidence = None
+            super().save(*args, **kwargs)
+            self.evidence = evidence_file
+            return self.save(update_fields=['evidence'])
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Жалоба от {self.complainant} на {self.accused} по аренде {self.rental.id}"
 
+import os
+
+def complaint_image_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    count = instance.complaint.images.count() + 1 if instance.complaint_id else 1
+    new_filename = f'фото {count}.{ext}'
+    return os.path.join(f'complaint_images/{instance.complaint.id if instance.complaint_id else "temp"}', new_filename)
 
 class ComplaintImage(models.Model):
     complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='complaint_images/')
+    image = models.ImageField(upload_to=complaint_image_upload_path)
     
     def __str__(self):
         return f"Изображение для жалобы {self.complaint.id}"
+
     
 class Comment(models.Model):
     complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name="comments")
@@ -885,13 +933,32 @@ class UserViolation(models.Model):
         super().save(*args, **kwargs)
         self.user.check_violation_block_status()  # автоматическая проверка на блокировку при сохранении
 
+import os
+from django.core.files.storage import default_storage
+
+def dispute_evidence_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    base_path = f'dispute_evidence/{instance.complaint.id}/'
+    base_filename = 'evidence'
+
+    # Начинаем с 1 и ищем свободное имя
+    counter = 1
+    while True:
+        final_filename = f'{base_filename}_{counter}.{ext}'
+        full_path = os.path.join(base_path, final_filename)
+        if not default_storage.exists(full_path):
+            break
+        counter += 1
+
+    return full_path
+
 class ComplaintDispute(models.Model):
     complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name="disputes")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     explanation = models.TextField()
-    evidence = models.FileField(upload_to='dispute_evidence/', null=True, blank=True)
+    evidence = models.FileField(upload_to=dispute_evidence_upload_path, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-   
     def __str__(self):
         return f"Dispute by {self.user.username} on Complaint {self.complaint.id}"
+

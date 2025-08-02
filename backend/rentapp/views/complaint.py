@@ -72,9 +72,17 @@ def createRentalComplaint(request):
         complaint.reasons.set(reasons_ids)
 
     # Пример: все картинки приходят под ключом 'images' как список
-    images = request.FILES.getlist('evidence_images')  # ключ 'images' может быть другим, зависит от фронта
+    images = request.FILES.getlist('evidence_images')
+
+    # Ограничение на максимум 10 изображений
+    if len(images) > 10:
+        return Response(
+            {'detail': 'Максимум 10 изображений разрешено.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     for img in images:
-       ComplaintImage.objects.create(complaint=complaint, image=img)
+        ComplaintImage.objects.create(complaint=complaint, image=img)
 
     # Отправляем уведомление о создании жалобы
     send_complaint_received_notification(complaint)

@@ -212,7 +212,8 @@
     "damageCost": "Court Decision",
     "submitedit": "Submit Changes",
     "editTitle": "Edit Complaint",
-    "descriptionedit": "To dispute the complaint, you need to modify its content"
+    "descriptionedit": "To dispute the complaint, you need to modify its content",
+    "photoerror": "Maximum of 10 images can be uploaded"
   },
   "editProfile": {
     "fullName": "Full Name",
