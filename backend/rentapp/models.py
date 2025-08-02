@@ -329,7 +329,7 @@ class CustomUser(AbstractUser):
     documents = models.JSONField(default=dict, blank=True, null=True)
     identifier = models.CharField(max_length=15, blank=True, null=True)  
     confirmation_code = models.CharField(max_length=6, blank=True, null=True)
-    rating = models.PositiveSmallIntegerField(default=5)
+    #rating = models.PositiveSmallIntegerField(default=5)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default='avatars/def.jpg')
     r_date = models.DateTimeField(null=True)
     anonymous_name = models.CharField(max_length=100, blank=True, null=True, unique=True)
@@ -612,7 +612,7 @@ class Complaint(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=timezone.now)
     support_count = models.IntegerField(default=0)
-    rating = models.PositiveSmallIntegerField(default=3)
+    #rating = models.PositiveSmallIntegerField(default=3)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self):
@@ -816,7 +816,7 @@ class RentalComplaint(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=timezone.now)
     support_count = models.IntegerField(default=0)
-    rating = models.PositiveSmallIntegerField(default=3)
+    #rating = models.PositiveSmallIntegerField(default=3)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     court_decision_score = models.IntegerField(default=0)
 

@@ -470,17 +470,17 @@ def evaluate_reliability(request):
         'Просрочка платежей': 2,
     }
 
-    def calculate_rating(score, count):
-        if count == 0:
-            return 5
-        elif count == 1 and score <= 2:
-            return 4
-        elif count <= 2 and score <= 4:
-            return 3
-        elif count <= 3 or score <= 6:
-            return 2
-        else:
-            return 1
+    # def calculate_rating(score, count):
+    #     if count == 0:
+    #         return 5
+    #     elif count == 1 and score <= 2:
+    #         return 4
+    #     elif count <= 2 and score <= 4:
+    #         return 3
+    #     elif count <= 3 or score <= 6:
+    #         return 2
+    #     else:
+    #         return 1
 
     tenants = CustomUser.objects.filter(role='tenant', is_superuser=False)
     predictions = []
@@ -496,12 +496,12 @@ def evaluate_reliability(request):
 
         complaint_count = len(complaints)
         complaint_score = sum(all_weights)
-        rating = calculate_rating(complaint_score, complaint_count)
+        # rating = calculate_rating(complaint_score, complaint_count)
 
         X = pd.DataFrame([{
             'complaint_count': complaint_count,
             'complaint_score': complaint_score,
-            'rating': rating
+            # 'rating': rating
         }])
 
         try:
@@ -515,7 +515,7 @@ def evaluate_reliability(request):
             'username': tenant.username,
             'complaint_count': complaint_count,
             'complaint_score': complaint_score,
-            'rating': rating,
+            # 'rating': rating,
             'rf_prediction': 'Reliable' if rf_pred == 0 else 'Unreliable',
             'knn_prediction': 'Reliable' if knn_pred == 0 else 'Unreliable',
             'logreg_prediction': 'Reliable' if logreg_pred == 0 else 'Unreliable',
@@ -528,27 +528,27 @@ def evaluate_reliability(request):
             df_real = pd.DataFrame([{
                 'complaint_count': p['complaint_count'],
                 'complaint_score': p['complaint_score'],
-                'rating': p['rating']
+                # 'rating': p['rating']
             } for p in predictions])
             probs_real = logreg_model.predict_proba(df_real)[:, 1]
             df_real['prob_unreliable'] = probs_real
 
-            avg_probs_by_rating = df_real.groupby('rating')['prob_unreliable'].mean().reset_index()
+            # avg_probs_by_rating = df_real.groupby('rating')['prob_unreliable'].mean().reset_index()
 
             # ==== 2. Теоретическая кривая ====
             df_theoretical = pd.DataFrame([{
                 'complaint_count': 0,
                 'complaint_score': 0,
-                'rating': r
+                # 'rating': r
             } for r in range(1, 6)])
             probs_theoretical = logreg_model.predict_proba(df_theoretical)[:, 1]
 
             # ==== 3. Построение графика ====
             plt.figure()
             # Теоретическая кривая (линия)
-            plt.plot(df_theoretical['rating'], probs_theoretical, label='LogReg кривая', linestyle='--', color='blue')
+            # plt.plot(df_theoretical['rating'], probs_theoretical, label='LogReg кривая', linestyle='--', color='blue')
             # Реальные средние вероятности (точки)
-            plt.scatter(avg_probs_by_rating['rating'], avg_probs_by_rating['prob_unreliable'], color='red', label='Средние вероятности')
+            # plt.scatter(avg_probs_by_rating['rating'], avg_probs_by_rating['prob_unreliable'], color='red', label='Средние вероятности')
 
             plt.title('Зависимость вероятности ненадёжности от рейтинга')
             plt.xlabel('Рейтинг')

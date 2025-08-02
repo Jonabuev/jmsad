@@ -17,9 +17,9 @@ const GeneralInfo: FC<{
       <strong>{t("profile.role")}:</strong>{" "}
       {profileData.user.role === "landlord" ? "Арендодатель" : "Арендатор"}
     </p>
-    <p className="text-gray-700">
+    {/* <p className="text-gray-700">
       <strong>{t("profile.rating")}:</strong> {profileData.user.rating}
-    </p>
+    </p> */}
     <p className="text-gray-700">
       <strong>{t("profile.phone")}:</strong> {profileData.user.phone_number}
     </p>

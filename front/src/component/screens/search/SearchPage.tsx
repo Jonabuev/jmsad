@@ -256,7 +256,7 @@ const TenantRegistry: React.FC = () => {
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.iin")}</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.complaints_count")}</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.complaint_dates")}</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.rating")}</th>
+                {/* <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.rating")}</th> */}
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.court_scores")}</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.complaint_reasons")}</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("search.profile")}</th>
@@ -275,9 +275,9 @@ const TenantRegistry: React.FC = () => {
                           .join(", ")
                       : "-"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {user.rating ? <MyComponent value={user.rating} /> : "—"}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.court_scores || "-"}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                     {getTranslatedReasons(user.complaint_reasons)}

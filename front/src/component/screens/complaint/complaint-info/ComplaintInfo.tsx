@@ -107,9 +107,9 @@ const ComplaintInfo: FC<Props> = ({ complaint, t }) => {
         {t(`complaint.${complaint.status}`)}
       </div>
 
-      <div>
+      {/* {<div>
         <strong>{t("complaint.rating")}:</strong> {complaint.rating}
-      </div>
+      </div>} */}
 
       <div>
         <strong>{t("complaint.complainant")}:</strong>{" "}

@@ -156,7 +156,7 @@ const PublicUserProfile: FC = () => {
                 </h2>
                 <p className="text-gray-700"><strong>{t("profile.iin")}:</strong> {profileData.identifier}</p>
                 <p className="text-gray-700"><strong>{t("profile.role")}:</strong> {profileData.role === "landlord" ? "Арендодатель" : "Арендатор"}</p>
-                <p className="text-gray-700"><strong>{t("profile.rating")}:</strong> {profileData.rating}</p>
+                {/* <p className="text-gray-700"><strong>{t("profile.rating")}:</strong> {profileData.rating}</p> */}
                 <p className="text-gray-700"><strong>{t("profile.phone")}:</strong> {profileData.phone_number}</p>
                 <p className="text-gray-700 flex items-center">
                   <strong>{t("profile.email")}:</strong> {profileData.email}

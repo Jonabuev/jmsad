@@ -17,7 +17,7 @@ const EditComplaintForm: React.FC = () => {
   const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
   const [formData, setFormData] = useState({
     description: "",
-    rating: "3",
+    /*rating: "3",*/
     reason: [] as number[],
     evidence: null as File | null,
     evidenceImages: [] as File[],
@@ -41,7 +41,7 @@ const EditComplaintForm: React.FC = () => {
         const data = res.data;
         setFormData({
           description: data.description || "",
-          rating: data.rating || "3",
+          /*rating: data.rating || "3",*/
           reason: (data.reason || []).map(Number),
           evidence: null,
           evidenceImages: [],
@@ -108,7 +108,7 @@ const EditComplaintForm: React.FC = () => {
 
     const data = new FormData();
     data.append("description", formData.description);
-    data.append("rating", formData.rating);
+    /*data.append("rating", formData.rating);*/
     formData.reason.forEach((id) => data.append("reason", String(id)));
     if (formData.evidence) data.append("evidence", formData.evidence);
     formData.evidenceImages.forEach((file) =>
@@ -184,7 +184,7 @@ const EditComplaintForm: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        {/*<div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {t("Scomplaint.rating")}
           </label>
@@ -211,7 +211,7 @@ const EditComplaintForm: React.FC = () => {
               </label>
             ))}
           </div>
-        </div>
+        </div>*/}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -149,11 +149,11 @@ class ComplaintForm(forms.ModelForm):
         label="Причины жалобы"
     )
     description = forms.CharField(widget=forms.Textarea, label="Описание жалобы")
-    rating = forms.ChoiceField(
+    """rating = forms.ChoiceField(
         label="Рейтинг", 
         choices=[(i, f'{i} звезда') for i in range(1, 6)], 
         widget=forms.RadioSelect
-    )
+    )"""
     evidence = forms.FileField(
         label="Прикрепить документы",
         widget=forms.FileInput(attrs={'multiple': False}),
@@ -163,7 +163,7 @@ class ComplaintForm(forms.ModelForm):
 
     class Meta:
         model = Complaint
-        fields = [ 'description', 'rating']
+        fields = [ 'description']
 
     
     def clean(self):

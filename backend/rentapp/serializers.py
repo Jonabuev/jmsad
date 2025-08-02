@@ -117,7 +117,7 @@ class ComplaintRegistrySerializer(serializers.ModelSerializer):
     class Meta:
         model = RentalComplaint
         fields = [
-            'id', 'uuid', 'created_at', 'rating', 'accused', 'property'
+            'id', 'uuid', 'created_at', 'accused', 'property'
         ]
 
     def get_property(self, obj):
@@ -147,7 +147,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'type_entity',
             'type_identify',
             'identifier',
-            'rating',
             'avatar',
             'r_date'
         ]
@@ -231,7 +230,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         # Только публичные поля по умолчанию
         fields = [
-            'id', 'username', 'anonymous_name', 'display_name', 'role', 'avatar', 'rating', 'is_current_user'
+            'id', 'username', 'anonymous_name', 'display_name', 'role', 'avatar', 'is_current_user'
         ]
 
     def get_avatar(self, obj):
@@ -291,7 +290,7 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
     class Meta:
         model = RentalComplaint
         fields = [
-            'id', 'uuid', 'description', 'support_count', 'status', 'rating',
+            'id', 'uuid', 'description', 'support_count', 'status',
             'complainant', 'accused', 'property', 'reasons', 'evidence',
             'comments', 'created_at', 'user', 'court_decision_score', 'images', 'disputes'
         ]
@@ -341,7 +340,7 @@ class ComplaintCreateSerializer(serializers.Serializer):
     landlord_identity_iin = serializers.CharField(max_length=12, min_length=12, required=True)
     address = serializers.CharField(max_length=255, min_length=5, required=True)
     description = serializers.CharField(max_length=1000, min_length=10, required=True)
-    rating = serializers.IntegerField(min_value=1, max_value=5, required=True)
+    #rating = serializers.IntegerField(min_value=1, max_value=5, required=True)
     reason = serializers.ListField(child=serializers.IntegerField(), min_length=1, required=True)
     evidence = serializers.FileField(required=False)
 
@@ -349,7 +348,7 @@ class ReputationSerializer(serializers.ModelSerializer):
     comment = serializers.CharField(max_length=500, required=False)
     class Meta:
         model = Reputation
-        fields = ['id', 'tenant_identifier', 'author_identifier', 'rating', 'comment', 'status', 'created_at']
+        fields = ['id', 'tenant_identifier', 'author_identifier', 'comment', 'status', 'created_at']
         read_only_fields = ['created_at']
 
 from rest_framework import serializers

@@ -7,10 +7,10 @@ export interface IUser {
   identifier: string;
   role: string;
   phone_number: string;
-  average_rating?: number;
+  // average_rating?: number;
   avatar?: string;
   is_superuser: boolean;
-  rating?: number;
+  // rating?: number;
   complaints_rental: IComplaint[];
   document_type: "id_card" | "passport_kz" | "visa";
   passport_expiry: string;
@@ -49,7 +49,7 @@ export interface ITenant {
   phone_number: string;
   avatar?: string;
   is_superuser: boolean;
-  rating?: number;
+  // rating?: number;
   complaints_rental: IComplaint[];
   complaint_count: number;
   r_date: Date;
@@ -85,7 +85,7 @@ export interface IComplaint {
   created_at: string;
   uuid: string;
   support_count: number;
-  rating: number;
+  // rating: number;
   accused: IUser;
   complainant: IUser;
   property: IHouse;
@@ -118,7 +118,7 @@ export interface IProfileData {
   type_entity: string;
   type_identify: string;
   identifier: string;
-  rating: number;
+  // rating: number;
   avatar: string;
   r_date: string;
   houses: IHouse[]; // <- убрал ?
@@ -144,7 +144,7 @@ export interface IPublicProfileData {
   identifier: string;
   role: "tenant" | "landlord";
   avatar: string | null;
-  rating: number;
+  // rating: number;
   is_banned: boolean;
 
   houses?: IHouse[]; // если landlord

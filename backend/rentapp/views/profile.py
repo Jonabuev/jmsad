@@ -190,7 +190,7 @@ class PublicUserProfileView(APIView):
             "username": user.username,
             "identifier": user.identifier,
             "role": user.role,
-            "rating": user.rating,
+            #"rating": user.rating,
             "phone_number": user.phone_number,
             "email": user.email,
             "is_banned": hasattr(user, "blacklist"),

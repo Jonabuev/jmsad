@@ -19,7 +19,7 @@ const SubmitComplaintForm: React.FC = () => {
   const [formData, setFormData] = useState({
     rental: "",
     description: "",
-    rating: "3",
+    /*rating: "3",*/
     reason: [] as number[],
     evidence: null as File | null,
     evidenceImages: [] as File[],
@@ -132,7 +132,7 @@ const SubmitComplaintForm: React.FC = () => {
     const data = new FormData();
     data.append("rental_id", formData.rental);
     data.append("description", formData.description);
-    data.append("rating", formData.rating);
+    /*data.append("rating", formData.rating);*/
     formData.reason.forEach((id) => data.append("reason", String(id)));
     if (formData.evidence) data.append("evidence", formData.evidence);
     formData.evidenceImages.forEach((file) => {
@@ -230,7 +230,7 @@ const SubmitComplaintForm: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        {/*<div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {t("Scomplaint.rating")}
           </label>
@@ -257,7 +257,7 @@ const SubmitComplaintForm: React.FC = () => {
               </label>
             ))}
           </div>
-        </div>
+        </div>*/}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

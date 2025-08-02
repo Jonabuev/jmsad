@@ -41,22 +41,22 @@ def createRentalComplaint(request):
     accused = rental.tenant if user == rental.house.owner else rental.house.owner
 
     # Создаём жалобу
-    new_rating = float(request.data.get('rating', 3))
+    #new_rating = float(request.data.get('rating', 3))
     dmg = request.data.get('damage_cost') 
     complaint = RentalComplaint(
         rental=rental,
         complainant=user,
         accused=accused,
         description=request.data.get('description'),
-        rating=new_rating,
+        #rating=new_rating,
         court_decision_score = dmg
         )
     
     # Получаем текущий рейтинг из модели (если его нет — считаем за 0)
-    current_rating = accused.rating or 0
+    #current_rating = accused.rating or 0
 
     # Обновляем рейтинг как среднее значение
-    accused.rating = (current_rating + new_rating) / 2
+    #accused.rating = (current_rating + new_rating) / 2
 
     # Сохраняем изменения
     accused.save()
@@ -110,20 +110,20 @@ def submit_complaint(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        new_rating = float(request.data.get('rating', 3))
+        #new_rating = float(request.data.get('rating', 3))
 
         complaint = Complaint(
             complainant=complainant,
             accused=accused,
             description=request.data.get('description'),
-            rating=new_rating
+            #rating=new_rating
         )
 
         # Получаем текущий рейтинг из модели (если его нет — считаем за 0)
-        current_rating = accused.rating or 0
+        #current_rating = accused.rating or 0
 
         # Обновляем рейтинг как среднее значение
-        accused.rating = (current_rating + new_rating) / 2
+        #accused.rating = (current_rating + new_rating) / 2
 
         # Сохраняем изменения
         accused.save()
@@ -191,12 +191,12 @@ def update_complaint(request, uuid):
         complaint.description = new_description
 
     # Обновление рейтинга
-    new_rating = request.data.get("rating")
-    if new_rating is not None:
+    #new_rating = request.data.get("rating")
+    """if new_rating is not None:
         try:
             complaint.rating = int(new_rating)
         except ValueError:
-            return Response({"error": "Некорректное значение рейтинга."}, status=400)
+            return Response({"error": "Некорректное значение рейтинга."}, status=400)"""
 
     # Обновление стоимости ущерба
     damage_cost = request.data.get("damage_cost")

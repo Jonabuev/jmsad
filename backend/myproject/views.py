@@ -100,22 +100,22 @@ def createRentalComplaint(request):
     accused = rental.tenant if user == rental.house.owner else rental.house.owner
 
     # Создаём жалобу
-    new_rating = float(request.data.get('rating', 3))
+    #new_rating = float(request.data.get('rating', 3))
     dmg = request.data.get('damage_cost') 
     complaint = RentalComplaint(
         rental=rental,
         complainant=user,
         accused=accused,
         description=request.data.get('description'),
-        rating=new_rating,
+        #rating=new_rating,
         court_decision_score = dmg
         )
     
     # Получаем текущий рейтинг из модели (если его нет — считаем за 0)
-    current_rating = accused.rating or 0
+    #current_rating = accused.rating or 0
 
     # Обновляем рейтинг как среднее значение
-    accused.rating = (current_rating + new_rating) / 2
+    #accused.rating = (current_rating + new_rating) / 2
 
     # Сохраняем изменения
     accused.save()
@@ -696,7 +696,7 @@ class PublicUserProfileView(APIView):
             "username": user.username,
             "identifier": user.identifier,
             "role": user.role,
-            "rating": user.rating,
+            #"rating": user.rating,
             "phone_number": user.phone_number,
             "email": user.email,
             "email_confirmed": user.email_confirmed,
@@ -784,20 +784,20 @@ def submit_complaint(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        new_rating = float(request.data.get('rating', 3))
+        #new_rating = float(request.data.get('rating', 3))
 
         complaint = Complaint(
             complainant=complainant,
             accused=accused,
             description=request.data.get('description'),
-            rating=new_rating
+            #rating=new_rating
         )
 
         # Получаем текущий рейтинг из модели (если его нет — считаем за 0)
-        current_rating = accused.rating or 0
+        #current_rating = accused.rating or 0
 
         # Обновляем рейтинг как среднее значение
-        accused.rating = (current_rating + new_rating) / 2
+        #accused.rating = (current_rating + new_rating) / 2
 
         # Сохраняем изменения
         accused.save()
@@ -1138,7 +1138,7 @@ from .models import Complaint, CustomUser
 from django.db.models import Prefetch
 
 
-@api_view(['GET'])
+"""@api_view(['GET'])
 def evaluate_reliability(request):
     try:
         with open('rental_models1.pkl', 'rb') as f:
@@ -1182,12 +1182,12 @@ def evaluate_reliability(request):
 
         complaint_count = len(complaints)
         complaint_score = sum(all_weights)
-        rating = calculate_rating(complaint_score, complaint_count)
+        #rating = calculate_rating(complaint_score, complaint_count)
 
         X = pd.DataFrame([{
             'complaint_count': complaint_count,
             'complaint_score': complaint_score,
-            'rating': rating
+            #'rating': rating
         }])
 
         try:
@@ -1201,7 +1201,7 @@ def evaluate_reliability(request):
             'username': tenant.username,
             'complaint_count': complaint_count,
             'complaint_score': complaint_score,
-            'rating': rating,
+            #'rating': rating,
             'rf_prediction': 'Reliable' if rf_pred == 0 else 'Unreliable',
             'knn_prediction': 'Reliable' if knn_pred == 0 else 'Unreliable',
             'logreg_prediction': 'Reliable' if logreg_pred == 0 else 'Unreliable',
@@ -1214,7 +1214,7 @@ def evaluate_reliability(request):
             df_real = pd.DataFrame([{
                 'complaint_count': p['complaint_count'],
                 'complaint_score': p['complaint_score'],
-                'rating': p['rating']
+                #'rating': p['rating']
             } for p in predictions])
             probs_real = logreg_model.predict_proba(df_real)[:, 1]
             df_real['prob_unreliable'] = probs_real
@@ -1232,9 +1232,9 @@ def evaluate_reliability(request):
             # ==== 3. Построение графика ====
             plt.figure()
             # Теоретическая кривая (линия)
-            plt.plot(df_theoretical['rating'], probs_theoretical, label='LogReg кривая', linestyle='--', color='blue')
+            #plt.plot(df_theoretical['rating'], probs_theoretical, label='LogReg кривая', linestyle='--', color='blue')
             # Реальные средние вероятности (точки)
-            plt.scatter(avg_probs_by_rating['rating'], avg_probs_by_rating['prob_unreliable'], color='red', label='Средние вероятности')
+            #plt.scatter(avg_probs_by_rating['rating'], avg_probs_by_rating['prob_unreliable'], color='red', label='Средние вероятности')
 
             plt.title('Зависимость вероятности ненадёжности от рейтинга')
             plt.xlabel('Рейтинг')
@@ -1257,7 +1257,7 @@ def evaluate_reliability(request):
         'tenants_predictions': predictions,
         'rating_logreg_graph': graph_base64
     })
-
+"""
 
 # users/views.py
 import requests
