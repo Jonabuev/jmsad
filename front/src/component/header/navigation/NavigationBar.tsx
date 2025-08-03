@@ -51,10 +51,10 @@ const NavigationBar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-1 justify-end gap-8 relative h-14">
-      <div className="flex items-center gap-12">
+    <div className="flex flex-1 justify-end gap-4 lg:gap-6 xl:gap-8 relative h-14 bg-white">
+      <div className="flex items-center gap-6 lg:gap-8 xl:gap-12">
         <Link 
-          className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+          className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
             router.pathname === "/search" ? "text-blue-600" : ""
           }`} 
           href="/search"
@@ -66,19 +66,19 @@ const NavigationBar: React.FC = () => {
         </Link>
         {isAuthenticated && user?.user.role !== "tenant" && (
           <Link 
-            className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
-              router.pathname === "/forum" ? "text-blue-600" : ""
+            className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
+              router.pathname === "/faq" ? "text-blue-600" : ""
             }`} 
-            href="/forum"
+            href="/faq"
           >
-            {t("navigation.forum")}
-            {router.pathname === "/forum" && (
+            {t("navigation.faq")}
+            {router.pathname === "/faq" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
             )}
           </Link>
         )}
         <Link
-          className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+          className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
             router.pathname === "/rental-catalog" ? "text-blue-600" : ""
           }`}
           href="/rental-catalog"
@@ -89,7 +89,7 @@ const NavigationBar: React.FC = () => {
           )}
         </Link>
         <Link
-          className={`text-[#0d151c] text-sm font-normal transition-all duration-200 hover:text-blue-600 relative ${
+          className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
             router.pathname === "/analiticsML" ? "text-blue-600" : ""
           }`}
           href="/analiticsML"
@@ -101,15 +101,15 @@ const NavigationBar: React.FC = () => {
         </Link>
       </div>
 
-      <div className="flex gap-4 items-center relative">
+      <div className="flex gap-2 lg:gap-4 items-center relative">
         <div className="relative" ref={languageDropdownRef}>
           <button
-            className="flex items-center gap-1 text-[#0d151c] text-sm font-medium"
+            className="flex items-center gap-1 text-[#0d151c] text-sm lg:text-base font-medium hover:text-blue-600 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-50"
             onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
           >
             <Image src="/home/earth.svg" alt="language" width={20} height={20} />
             <svg
-              className="w-4 h-4"
+              className={`w-4 h-4 transition-transform duration-200 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -123,12 +123,27 @@ const NavigationBar: React.FC = () => {
             </svg>
           </button>
           {isLanguageDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg py-2 z-50">
-              <button onClick={() => changeLanguage("ru")}>Русский</button>
-              <br />
-              <button onClick={() => changeLanguage("en")}>English</button>
-              <br />
-              <button onClick={() => changeLanguage("kz")}>Қазақша</button>
+            <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-[60]">
+              <button 
+                onClick={() => changeLanguage("ru")}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+              >
+                Русский
+              </button>
+              <div className="border-t border-gray-100 my-1"></div>
+              <button 
+                onClick={() => changeLanguage("en")}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+              >
+                English
+              </button>
+              <div className="border-t border-gray-100 my-1"></div>
+              <button 
+                onClick={() => changeLanguage("kz")}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+              >
+                Қазақша
+              </button>
             </div>
           )}
         </div>
@@ -140,7 +155,7 @@ const NavigationBar: React.FC = () => {
               alt="Аватар"
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full object-cover object-center cursor-pointer"
+              className="w-8 h-8 rounded-full object-cover object-center cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all duration-200"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = "/default-avatar.png";
@@ -148,16 +163,17 @@ const NavigationBar: React.FC = () => {
             />
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg py-2 z-50">
+              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-[60]">
                 <Link
                   href="/profile"
-                  className="px-4 py-2 text-sm font-medium text-gray-800 cursor-default block"
+                  className="px-4 py-2 text-sm font-medium text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 block"
                 >
                   <span>{t("navigation.profile")}</span>
                 </Link>
+                <div className="border-t border-gray-100 my-1"></div>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
                 >
                   {t("logout")}
                 </button>
@@ -166,16 +182,16 @@ const NavigationBar: React.FC = () => {
           </div>
         ) : (
           <>
-                         <Link href="/register">
-               <button className="h-10 px-4 bg-[#2094f3] text-white rounded-xl text-sm font-normal">
-                 {t("navigation.register")}
-               </button>
-             </Link>
-             <Link href="/login">
-               <button className="h-10 px-4 bg-[#e7eef4] text-[#0d151c] rounded-xl text-sm font-normal">
-                 {t("navigation.login")}
-               </button>
-             </Link>
+            <Link href="/register">
+              <button className="h-10 px-3 lg:px-4 bg-[#2094f3] text-white rounded-xl text-sm lg:text-base font-normal hover:bg-blue-600 transition-colors duration-200">
+                {t("navigation.register")}
+              </button>
+            </Link>
+            <Link href="/login">
+              <button className="h-10 px-3 lg:px-4 bg-[#e7eef4] text-[#0d151c] rounded-xl text-sm lg:text-base font-normal hover:bg-gray-200 transition-colors duration-200">
+                {t("navigation.login")}
+              </button>
+            </Link>
           </>
         )}
       </div>

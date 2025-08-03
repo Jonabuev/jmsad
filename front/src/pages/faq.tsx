@@ -1,20 +1,19 @@
 import React from "react";
-
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import FAQ from "@/component/screens/faq/Faq";
 
-import Forum from "@/component/screens/forum/Forum";
 
-const ForumPage: React.FC = () => {
-  return <Forum />;
+const FaqPage: React.FC = () => {
+  return <FAQ />;
 };
 
-export default ForumPage;
+export default FaqPage;
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "ru", ["common", "forum"])),
+      ...(await serverSideTranslations(locale ?? "ru", ["common"])),
     },
   };
 };

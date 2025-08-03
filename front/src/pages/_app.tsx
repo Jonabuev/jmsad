@@ -11,7 +11,7 @@ import Footer from "@/component/footer/Footer";
 import { checkAndCleanExpiredTokens, getValidAccessToken } from "@/utils/tokenUtils";
 import { useTokenValidation } from "@/component/hooks/useTokenValidation";
 import { useAutoRefreshToken } from "@/component/hooks/useAutoRefreshToken";
-import TokenInfo from "@/component/debug/TokenInfo";
+
 
 const AppContent = (props: AppProps) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -42,7 +42,7 @@ const AppContent = (props: AppProps) => {
         <props.Component {...props.pageProps} />
       </main>
       <Footer />
-      {process.env.NODE_ENV === 'development' && <TokenInfo />}
+
     </div>
   );
 };

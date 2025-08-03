@@ -5,6 +5,10 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+        <meta name="theme-color" content="#3B82F6" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <Script
           src="https://api-maps.yandex.ru/2.1/?apikey=718c3dc5-6c50-469a-886a-4ab165ea7876&suggest_apikey=b58e9c89-1936-4791-9b21-992744890054&lang=ru_RU"
           strategy="afterInteractive"

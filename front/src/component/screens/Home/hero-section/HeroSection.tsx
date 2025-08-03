@@ -5,7 +5,7 @@ const HeroSection: FC = () => {
   const { t } = useTranslation(); // Using the translation hook
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center text-center overflow-hidden pt-[80px]">
+    <section className="relative min-h-screen flex items-center justify-center text-center overflow-x-hidden pt-[80px]">
       <video
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
         autoPlay
