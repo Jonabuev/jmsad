@@ -243,6 +243,16 @@ const TenantRegistry: React.FC = () => {
       >
         {t("search.apply_filters")}
       </button>
+      <Link
+        href="/profile/add-complaint"
+        className="inline-block bg-blue-600 text-white py-3 px-8 ml-8 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg mt-6"
+      >
+        {t("profile.addComplaint")}
+      </Link>
+
+
+
+
       {users.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">{t("search.no_complaints")}</p>
