@@ -226,8 +226,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_PORT = 465  
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.gmail.com'  
-EMAIL_HOST_USER = 'maksvelikiy2@gmail.com'  
-EMAIL_HOST_PASSWORD = 'goui pcfm agox xgzo'  
+EMAIL_HOST_USER = 'arno.help.service@gmail.com'  
+EMAIL_HOST_PASSWORD = 'goyd cusy zzzk gxdk'  
 DEFAULT_FROM_EMAIL = 'noreply@example.com'
 
 MEDIA_URL = '/media/'
