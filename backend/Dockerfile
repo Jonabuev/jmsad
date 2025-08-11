@@ -1,13 +1,19 @@
 # Используем Python 3.12.6
 FROM python:3.12.6-slim
 
-# Устанавливаем системные зависимости
+# Устанавливаем системные зависимости включая Tesseract OCR
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libpq-dev \
     libmariadb-dev \
     pkg-config \
+    tesseract-ocr \
+    tesseract-ocr-rus \
+    tesseract-ocr-eng \
+    tesseract-ocr-kaz \
+    libtesseract-dev \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем рабочую директорию
@@ -17,7 +23,7 @@ WORKDIR /app
 COPY req.txt .
 
 # Устанавливаем Python зависимости
-RUN pip install --no-cache-dir -r req.txt
+RUN pip install --no-cache-dir -r req.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
 # Копируем исходный код
 COPY . .

@@ -1,15 +1,28 @@
 import os
 import sys
 
-# Добавляем путь к Tesseract в PATH
-tesseract_path = r'C:\Program Files\Tesseract-OCR'
-if os.path.exists(tesseract_path):
-    if tesseract_path not in os.environ['PATH']:
-        os.environ['PATH'] = tesseract_path + os.pathsep + os.environ['PATH']
-    print(f"✅ Tesseract добавлен в PATH: {tesseract_path}")
+# Определяем путь к Tesseract в зависимости от окружения
+if os.path.exists('/usr/bin/tesseract'):
+    # Docker/Linux окружение
+    tesseract_path = '/usr/bin/tesseract'
+    print(f"✅ Tesseract найден в Docker: {tesseract_path}")
+elif os.path.exists(r'C:\Program Files\Tesseract-OCR\tesseract.exe'):
+    # Windows окружение
+    tesseract_path = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    print(f"✅ Tesseract найден в Windows: {tesseract_path}")
 else:
-    print(f"❌ Tesseract не найден по пути: {tesseract_path}")
+    # Попробуем найти в PATH
+    tesseract_path = 'tesseract'
+    print(f"⚠️ Используем Tesseract из PATH: {tesseract_path}")
 
 # Настройка pytesseract
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe' 
+pytesseract.pytesseract.tesseract_cmd = tesseract_path
+
+# Проверяем доступность Tesseract
+try:
+    import pytesseract
+    version = pytesseract.get_tesseract_version()
+    print(f"✅ Tesseract версия: {version}")
+except Exception as e:
+    print(f"❌ Ошибка при проверке Tesseract: {str(e)}") 

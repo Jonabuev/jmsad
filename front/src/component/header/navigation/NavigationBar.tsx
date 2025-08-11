@@ -151,14 +151,14 @@ const NavigationBar: React.FC = () => {
         {isAuthenticated && user ? (
           <div className="relative" ref={dropdownRef}>
             <Image
-              src={`http://127.0.0.1:8000${user.user.avatar}`}
+              src={user.user.avatar ? `http://127.0.0.1:8000${user.user.avatar}` : "http://127.0.0.1:8000/media/avatars/def.jpg"}
               alt="Аватар"
               width={32}
               height={32}
               className="w-8 h-8 rounded-full object-cover object-center cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all duration-200"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/default-avatar.png";
+                (e.target as HTMLImageElement).src = "http://127.0.0.1:8000/media/avatars/def.jpg";
               }}
             />
 

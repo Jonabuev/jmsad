@@ -135,13 +135,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
                <div className="flex items-center gap-3">
                  <Image
-                   src={`http://127.0.0.1:8000${user.user.avatar}`}
+                   src={user.user.avatar ? `http://127.0.0.1:8000${user.user.avatar}` : "http://127.0.0.1:8000/media/avatars/def.jpg"}
                    alt="Аватар"
                    width={40}
                    height={40}
                    className="w-10 h-10 rounded-full object-cover object-center"
                    onError={(e) => {
-                     (e.target as HTMLImageElement).src = "/default-avatar.png";
+                     (e.target as HTMLImageElement).src = "http://127.0.0.1:8000/media/avatars/def.jpg";
                    }}
                  />
                  <div className="flex-1 min-w-0">

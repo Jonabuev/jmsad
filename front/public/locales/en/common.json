@@ -176,7 +176,16 @@
     "visa": "Visa",
     "passport_expiry": "Document expiry date",
     "visa_number": "Visa number",
-    "doc_expired": "Document has expired"
+    "doc_expired": "Document has expired",
+    "already_have_account": "Already have an account?",
+    "sign_in_with_google": "Sign in with Google",
+    "or": "or",
+    "document_expiry": "Document expiry date",
+    "full_name_placeholder": "Enter full name",
+    "iin_placeholder": "Enter IIN",
+    "bin_placeholder": "Enter BIN",
+    "select_citizenship": "Select citizenship",
+    "done": "Done"
   },
   "Scomplaint": {
     "title": "Submit a Complaint",

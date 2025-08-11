@@ -18,6 +18,12 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Настройки кодировки
+import sys
+if sys.platform.startswith('win'):
+    import locale
+    locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -27,7 +33,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend', 'frontend']
 
 
 # Application definition
@@ -70,7 +76,12 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://frontend:3000",
+    "http://0.0.0.0:3000",
 ]
+
+# Разрешаем загрузку изображений
+CORS_ALLOW_ALL_ORIGINS = True  # Временно для отладки
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -140,6 +151,9 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+        },
     }
 }
 
@@ -167,19 +181,41 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Almaty'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
+
+# Настройки локализации для UTF-8
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+LANGUAGES = [
+    ('ru', 'Russian'),
+    ('en', 'English'),
+]
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Настройки для правильной работы с файлами
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
+# Максимальный размер файла (5MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -191,9 +227,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 
 AUTH_USER_MODEL = 'rentapp.CustomUser'
 
@@ -222,13 +255,23 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = '/profile/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Настройки SMTP для Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+<<<<<<< Updated upstream
 EMAIL_PORT = 465  
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.gmail.com'  
 EMAIL_HOST_USER = 'arno.help.service@gmail.com'  
 EMAIL_HOST_PASSWORD = 'goyd cusy zzzk gxdk'  
 DEFAULT_FROM_EMAIL = 'noreply@example.com'
+=======
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587  # Используем порт 587 для TLS
+EMAIL_USE_TLS = True  # Включаем TLS вместо SSL
+EMAIL_HOST_USER = 'arno.help.service@gmail.com'
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='your_app_password_here')
+DEFAULT_FROM_EMAIL = 'arno.help.service@gmail.com'
+>>>>>>> Stashed changes
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

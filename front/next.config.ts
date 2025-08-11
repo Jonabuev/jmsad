@@ -5,7 +5,27 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: 'standalone', // Включаем standalone режим для Docker
   images: {
-    domains: ["127.0.0.1", "localhost"],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'backend',
+        port: '8000',
+        pathname: '/**',
+      },
+    ],
+    unoptimized: true,
   },
   i18n, // 👈 подключение локалей
   transpilePackages: ['antd', '@ant-design/icons'],
@@ -16,6 +36,9 @@ const nextConfig: NextConfig = {
   typescript: {
     // Игнорируем ошибки TypeScript при сборке
     ignoreBuildErrors: true,
+  },
+  publicRuntimeConfig: {
+    googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
   },
 };
 

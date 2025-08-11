@@ -17,7 +17,7 @@ export const useTokenValidation = () => {
       const token = getValidAccessToken();
       if (!token) {
         // Если нет валидного токена, перенаправляем на логин
-        if (router.pathname !== '/login' && router.pathname !== '/register' && router.pathname !== '/google') {
+        if (router.pathname !== '/login' && router.pathname !== '/register') {
           router.push('/login');
         }
         return;
@@ -40,7 +40,7 @@ export const useTokenValidation = () => {
       const currentToken = getValidAccessToken();
       if (!currentToken) {
         // Если токен стал невалидным, перенаправляем на логин
-        if (router.pathname !== '/login' && router.pathname !== '/register' && router.pathname !== '/google') {
+        if (router.pathname !== '/login' && router.pathname !== '/register') {
           router.push('/login');
         }
       } else {

@@ -11,7 +11,7 @@ import Footer from "@/component/footer/Footer";
 import { checkAndCleanExpiredTokens, getValidAccessToken } from "@/utils/tokenUtils";
 import { useTokenValidation } from "@/component/hooks/useTokenValidation";
 import { useAutoRefreshToken } from "@/component/hooks/useAutoRefreshToken";
-
+import Head from "next/head";
 
 const AppContent = (props: AppProps) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,14 +36,18 @@ const AppContent = (props: AppProps) => {
   }, [dispatch]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1">
-        <props.Component {...props.pageProps} />
-      </main>
-      <Footer />
-
-    </div>
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+      </Head>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1">
+          <props.Component {...props.pageProps} />
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 };
 

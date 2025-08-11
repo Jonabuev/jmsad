@@ -7,6 +7,9 @@ services:
       POSTGRES_DB: jmsad_db
       POSTGRES_USER: jmsad_user
       POSTGRES_PASSWORD: jmsad_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+      LANG: "en_US.utf8"
+      LC_ALL: "en_US.utf8"
     ports:
       - "5432:5432"
     volumes:
@@ -23,18 +26,23 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SECRET_KEY=your-secret-key-here
+      - SECRET_KEY=django-insecure-z)^b%(b7lo42jz78kirb%l%d$%@@%i_vd9rv94944nftz5mjgc
       - DEBUG=True
       - DB_NAME=jmsad_db
       - DB_USER=jmsad_user
       - DB_PASSWORD=jmsad_password
       - DB_HOST=postgres
       - DB_PORT=5432
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-your_app_password_here}
+      - DEFAULT_FROM_EMAIL=arno.help.service@gmail.com
     depends_on:
       - postgres
     volumes:
       - ./backend:/app
       - backend_static:/app/staticfiles
+      - backend_media:/app/media
     restart: unless-stopped
     networks:
       - jmsad-network
@@ -47,6 +55,7 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     depends_on:
       - backend
     restart: unless-stopped
@@ -56,6 +65,7 @@ services:
 volumes:
   postgres_data:
   backend_static:
+  backend_media:
 
 networks:
   jmsad-network:

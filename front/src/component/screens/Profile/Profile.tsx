@@ -138,11 +138,14 @@ const Profile: FC = () => {
             <div className="w-28 h-28 relative rounded-full overflow-hidden shadow">
               <Image
                 src={`http://127.0.0.1:8000${
-                  profileData.avatar || profileData.user?.avatar || ""
+                  profileData.avatar || profileData.user?.avatar || "/media/avatars/def.jpg"
                 }`}
                 alt="Avatar"
                 fill
                 className="object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "http://127.0.0.1:8000/media/avatars/def.jpg";
+                }}
               />
             </div>
             <h1 className="text-2xl font-bold text-gray-800">

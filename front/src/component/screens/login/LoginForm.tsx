@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login, fetchProfileWithToken } from "@/api/authApi";
 import { saveTokens } from "@/utils/tokenUtils";
+import GoogleLoginButton from "@/component/common/GoogleLoginButton";
+import { useTranslation } from "next-i18next";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +12,13 @@ const LoginForm = () => {
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation("common");
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,13 +53,52 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
-        <h2 className="text-2xl font-bold text-blue-500 mb-6">Войти</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="text-left">
-          <div className="mb-4">
-            <label htmlFor="username" className="block font-bold mb-1">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        {/* Заголовок */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Войти</h1>
+          <p className="text-gray-600">
+            Нет аккаунта?{" "}
+            <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+              Зарегистрироваться
+            </Link>
+          </p>
+        </div>
+
+        {/* Google кнопка */}
+        {isClient && (
+          <div className="mb-6">
+            <GoogleLoginButton 
+              onSuccess={() => {
+                console.log("Google login successful from login form");
+              }}
+              onError={(error) => {
+                console.error("Google login error:", error);
+              }}
+              className="w-full"
+            />
+          </div>
+        )}
+
+        {/* Разделитель */}
+        {isClient && (
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">{t("registration.or")}</span>
+            </div>
+          </div>
+        )}
+
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        
+        {isClient && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
               Имя пользователя
             </label>
             <input
@@ -61,12 +108,12 @@ const LoginForm = () => {
               value={formData.username}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Введите имя пользователя"
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block font-bold mb-1">
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Пароль
             </label>
             <input
@@ -76,29 +123,18 @@ const LoginForm = () => {
               value={formData.password}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Введите пароль"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md font-semibold"
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 mt-6"
           >
             Войти
           </button>
         </form>
-        <p className="mt-4 text-sm">
-          Нет аккаунта?{" "}
-          <Link href="/register" className="text-blue-500 hover:underline">
-            Зарегистрироваться
-          </Link>
-        </p>
-        <p className="mt-4 text-sm">
-          Другой способ входа: {" "}
-          <Link href="/google" className="text-blue-500 hover:underline">
-            Gmail
-          </Link>
-        </p>
+        )}
       </div>
     </div>
   );

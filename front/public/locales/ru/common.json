@@ -176,7 +176,16 @@
     "visa": "Виза",
     "passport_expiry": "Дата окончания действия документа",
     "visa_number": "Номер визы",
-    "doc_expired": "Срок действия документа истёк"
+    "doc_expired": "Срок действия документа истёк",
+    "already_have_account": "Уже есть аккаунт?",
+    "sign_in_with_google": "Войти через Google",
+    "or": "или",
+    "document_expiry": "Дата окончания срока документа",
+    "full_name_placeholder": "Введите полное имя",
+    "iin_placeholder": "Введите ИИН",
+    "bin_placeholder": "Введите БИН",
+    "select_citizenship": "Выберите гражданство",
+    "done": "Готово"
   },
   "Scomplaint": {
     "title": "Подать жалобу",

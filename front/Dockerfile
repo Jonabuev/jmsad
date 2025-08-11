@@ -1,14 +1,22 @@
 # Многоэтапная сборка для оптимизации размера образа
-FROM node:18-alpine AS builder
+FROM node:18-alpine AS deps
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы зависимостей
+# Копируем только файлы зависимостей для лучшего кэширования
 COPY package*.json ./
 
-# Устанавливаем зависимости
-RUN npm ci --only=production
+# Устанавливаем зависимости с кэшированием
+RUN npm ci --only=production --prefer-offline --no-audit
+
+# Builder этап
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Копируем зависимости из deps этапа
+COPY --from=deps /app/node_modules ./node_modules
 
 # Копируем исходный код
 COPY . .
@@ -22,8 +30,8 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 
 # Создаем пользователя для безопасности
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 # Копируем собранное приложение из builder этапа
 COPY --from=builder /app/public ./public
@@ -32,14 +40,16 @@ COPY --from=builder /app/.next/static ./.next/static
 
 # Меняем владельца файлов
 RUN chown -R nextjs:nodejs /app
+
 USER nextjs
 
 # Открываем порт 3000
 EXPOSE 3000
 
-# Устанавливаем переменную окружения для Next.js
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+# Устанавливаем переменные окружения для Next.js
+ENV PORT=3000 \
+    HOSTNAME="0.0.0.0" \
+    NODE_ENV=production
 
 # Запускаем приложение
 CMD ["node", "server.js"] 
