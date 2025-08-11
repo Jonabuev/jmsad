@@ -257,21 +257,14 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Настройки SMTP для Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-<<<<<<< Updated upstream
-EMAIL_PORT = 465  
-EMAIL_USE_SSL = True
-EMAIL_HOST = 'smtp.gmail.com'  
-EMAIL_HOST_USER = 'arno.help.service@gmail.com'  
-EMAIL_HOST_PASSWORD = 'goyd cusy zzzk gxdk'  
-DEFAULT_FROM_EMAIL = 'noreply@example.com'
-=======
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Используем порт 587 для TLS
 EMAIL_USE_TLS = True  # Включаем TLS вместо SSL
 EMAIL_HOST_USER = 'arno.help.service@gmail.com'
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='your_app_password_here')
 DEFAULT_FROM_EMAIL = 'arno.help.service@gmail.com'
->>>>>>> Stashed changes
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
