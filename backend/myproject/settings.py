@@ -20,9 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Настройки кодировки
 import sys
-if sys.platform.startswith('win'):
-    import locale
-    locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+import locale
+
+if sys.platform.startswith('linux'):
+    locale.setlocale(locale.LC_ALL, 'C.UTF-8')  # для Docker/Linux
+else:
+    locale.setlocale(locale.LC_ALL, '')  # оставить системную локаль для Windows
+
 
 
 # Quick-start development settings - unsuitable for production
