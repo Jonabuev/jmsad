@@ -223,7 +223,9 @@
     "editTitle": "Edit Complaint",
     "descriptionedit": "To dispute the complaint, you need to modify its content",
     "photoerror": "Maximum of 10 images can be uploaded",
-    "isCourtCase" : "Court Decision"
+    "isCourtCase" : "Court Decision",
+    "iin":"Accused IIN",
+    "iinplace":"Enter IIN (12 characters)"
   },
   "editProfile": {
     "fullName": "Full Name",

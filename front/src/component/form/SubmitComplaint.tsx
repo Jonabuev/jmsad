@@ -168,7 +168,7 @@ const SubmitComplaintForm: React.FC = () => {
         {/* Поле для ИИН */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            ИИН обвиняемого
+            {t("Scomplaint.iin")}
           </label>
           <input
             type="text"
@@ -178,7 +178,7 @@ const SubmitComplaintForm: React.FC = () => {
             onChange={handleChange}
             required
             className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Введите ИИН (12 символов)"
+            placeholder={t("Scomplaint.iinplace")}
           />
           {/* Подсказки */}
           {iinSuggestions.length > 0 && (
