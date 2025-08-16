@@ -44,3 +44,9 @@ export const disputeRentalComplaint = (uuid: string, formData: FormData, token: 
   api.post(`/complaints/${uuid}/dispute/`, formData, {
     headers: { Authorization: `Bearer ${token}` },
   }); 
+
+  // Поиск пользователей по ИИН
+export const searchUsersByIin = (iin: string, token: string) =>
+  api.get(`/users/search/?iin=${iin}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });

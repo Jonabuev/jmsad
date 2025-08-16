@@ -1,104 +1,82 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { fetchMyRentals, fetchComplaintReasons, submitRentalComplaint } from "@/api/complaintsApi";
+import { fetchComplaintReasons, submitRentalComplaint, searchUsersByIin } from "@/api/complaintsApi";
 
 interface ComplaintReason {
   id: number;
   reason: string;
 }
-interface RentalOption {
-  id: number;
-  house_address: string;
-  landlord_iin: string;
+
+interface UserSuggestion {
+  identifier: string;
+  full_name: string;
 }
 
 const SubmitComplaintForm: React.FC = () => {
   const { t } = useTranslation();
   const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
   const [formData, setFormData] = useState({
-    rental: "",
-    description: "",
-    /*rating: "3",*/
-    reason: [] as number[],
-    evidence: null as File | null,
-    evidenceImages: [] as File[],
-    damageCost: "",
-  });
+  accusedIin: "",
+  description: "",
+  reason: [] as number[],
+  evidence: null as File | null,
+  evidenceImages: [] as File[],
+  damageCost: "",
+  isCourtCase: false,
+  courtDecisionNumber: "",
+  courtDocument: null as File | null,
+});
 
-  const [rentals, setRentals] = useState<RentalOption[]>([]);
+
+  const [iinSuggestions, setIinSuggestions] = useState<UserSuggestion[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
 
-  // Загрузка аренды
+  // Загрузка причин
   useEffect(() => {
-    // Проверяем, что мы на клиенте
-    if (typeof window === 'undefined') return;
-
     const token = localStorage.getItem("access_token");
     if (!token) return;
-
-    fetchMyRentals(token)
-      .then((res) => setRentals(res.data))
-      .catch(() => setErrorMessage(t("Scomplaint.loadRentalsError")));
-  }, [t]);
-
-  // Загрузка причин для тенанта
-  useEffect(() => {
-    // Проверяем, что мы на клиенте
-    if (typeof window === 'undefined') return;
-
-    const token = localStorage.getItem("access_token");
-    const profile = JSON.parse(localStorage.getItem("profile") || '{}');
-    const role = profile?.user?.role || 'guest';
-    if (!token || role !== "tenant") return;
     fetchComplaintReasons(token)
       .then((res) => {
-        const data = res.data;
-        if (Array.isArray(data)) {
-          setComplaintReasons(data);
+        if (Array.isArray(res.data)) {
+          setComplaintReasons(res.data);
         } else {
           setErrorMessage(t("Scomplaint.invalidDataFormat"));
         }
       })
-      .catch((error) => {
-        setErrorMessage(t("Scomplaint.loadReasonsError"));
-      });
+      .catch(() => setErrorMessage(t("Scomplaint.loadReasonsError")));
   }, [t]);
 
-  // Загрузка причин для лендлорда
-  useEffect(() => {
-    // Проверяем, что мы на клиенте
-    if (typeof window === 'undefined') return;
-
-    const token = localStorage.getItem("access_token");
-    const profile = JSON.parse(localStorage.getItem("profile") || '{}');
-    const role = profile?.user?.role || 'guest';
-    if (!token || role !== "landlord") return;
-    fetchComplaintReasons(token)
-      .then((res) => {
-        const data = res.data;
-        if (Array.isArray(data)) {
-          setComplaintReasons(data);
-        } else {
-          setErrorMessage(t("Scomplaint.invalidDataFormat"));
-        }
-      })
-      .catch((error) => {
-        setErrorMessage(t("Scomplaint.loadReasonsError"));
-      });
-  }, [t]);
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
+  // Обработчик изменения полей
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "accusedIin") {
+      if (value.length > 12) {
+        setErrorMessage("ИИН не может быть длиннее 12 символов");
+      } else {
+        setErrorMessage("");
+      }
+
+      // Подсказки по ИИН (например, только если больше 5 символов)
+      if (value.length >= 5 && value.length <= 12) {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+          searchUsersByIin(value, token)
+            .then((res) => {
+              setIinSuggestions(res.data.slice(0, 3));
+            })
+            .catch(() => setIinSuggestions([]));
+        }
+      } else {
+        setIinSuggestions([]);
+      }
+    }
   };
 
   const handleReasonChange = (id: number) => {
@@ -122,6 +100,12 @@ const SubmitComplaintForm: React.FC = () => {
     setErrorMessage("");
     setSuccessMessage("");
 
+    if (formData.accusedIin.length !== 12) {
+      setErrorMessage("Введите корректный ИИН (12 символов)");
+      setIsSubmitting(false);
+      return;
+    }
+
     const token = localStorage.getItem("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
@@ -130,15 +114,24 @@ const SubmitComplaintForm: React.FC = () => {
     }
 
     const data = new FormData();
-    data.append("rental_id", formData.rental);
+    data.append("is_court_case", String(formData.isCourtCase));
+    if (formData.isCourtCase) {
+      if (formData.damageCost) {
+        data.append("damage_cost", formData.damageCost);
+      }
+      if (formData.evidence) {
+        data.append("evidence", formData.evidence);
+      }
+    }
+
+    data.append("accused_iin", formData.accusedIin);
     data.append("description", formData.description);
-    /*data.append("rating", formData.rating);*/
     formData.reason.forEach((id) => data.append("reason", String(id)));
-    if (formData.evidence) data.append("evidence", formData.evidence);
+    
     formData.evidenceImages.forEach((file) => {
       data.append("evidence_images", file);
     });
-    data.append("damage_cost", formData.damageCost);
+    
 
     try {
       await submitRentalComplaint(data, token);
@@ -150,9 +143,6 @@ const SubmitComplaintForm: React.FC = () => {
         error.response?.data?.message ||
         t("Scomplaint.submitError");
       setErrorMessage(errorMessage);
-      if (error.response?.status === 403) {
-        setErrorMessage(t("Scomplaint.noActiveRental"));
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -175,26 +165,42 @@ const SubmitComplaintForm: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Поле для ИИН */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Scomplaint.selectRental")}
+            ИИН обвиняемого
           </label>
-          <select
-            name="rental"
-            value={formData.rental}
+          <input
+            type="text"
+            name="accusedIin"
+            value={formData.accusedIin}
+            maxLength={12}
             onChange={handleChange}
             required
             className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">{t("Scomplaint.chooseOption")}</option>
-            {rentals.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.house_address} ({r.landlord_iin})
-              </option>
-            ))}
-          </select>
+            placeholder="Введите ИИН (12 символов)"
+          />
+          {/* Подсказки */}
+          {iinSuggestions.length > 0 && (
+            <ul className="mt-2 border rounded bg-white shadow-md divide-y">
+              {iinSuggestions.map((u, idx) => (
+                <li
+                  key={idx}
+                  className="cursor-pointer p-2 hover:bg-blue-50"
+                  onClick={() =>
+                    setFormData((prev) => ({ ...prev, accusedIin: u.identifier }))
+                  }
+                >
+                  <div className="text-lg font-semibold text-gray-900">{u.identifier}</div>
+                  <div className="text-sm text-gray-500">{u.full_name}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+
         </div>
 
+        {/* Остальное без изменений */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Scomplaint.description")}
@@ -229,37 +235,7 @@ const SubmitComplaintForm: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/*<div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t("Scomplaint.rating")}
-          </label>
-          <div className="flex gap-3">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <label key={star} className="flex items-center">
-                <input
-                  type="radio"
-                  name="rating"
-                  value={star}
-                  checked={formData.rating === String(star)}
-                  onChange={handleChange}
-                  className="sr-only"
-                />
-                <span
-                  className={`text-xl cursor-pointer ${
-                    formData.rating >= String(star)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                >
-                  ★
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>*/}
-
-        <div>
+         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Scomplaint.additionalPhotos")}
           </label>
@@ -284,33 +260,56 @@ const SubmitComplaintForm: React.FC = () => {
 
             className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Scomplaint.damageCost")}
-          </label>
+        </div>   
+        <div className="flex items-center space-x-2">
           <input
-            type="number"
-            name="damageCost"
-            value={formData.damageCost}
+            type="checkbox"
+            id="isCourtCase"
+            checked={formData.isCourtCase}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, damageCost: e.target.value }))
+              setFormData((prev) => ({ ...prev, isCourtCase: e.target.checked }))
             }
-            required
-            className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+            className="rounded text-blue-600"
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Scomplaint.evidence")}
+          <label htmlFor="isCourtCase" className="text-sm font-medium text-gray-700">
+            {t("Scomplaint.isCourtCase")}
           </label>
-          <input
-            type="file"
-            name="evidence"
-            onChange={handleFileChange}
-            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
         </div>
+
+        {formData.isCourtCase && (
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("Scomplaint.damageCost")}
+              </label>
+              <input
+                type="text"
+                name="damageCost"
+                value={formData.damageCost}
+                onChange={handleChange}
+                className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("Scomplaint.evidence")}
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,image/*"
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    courtDocument: e.target.files ? e.target.files[0] : null,
+                  }))
+                }
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          </div>
+        )}
+
 
         <button
           type="submit"

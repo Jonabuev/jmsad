@@ -25,69 +25,57 @@ from rest_framework.parsers import MultiPartParser, FormParser
 @permission_classes([IsAuthenticated, IsTenant | IsLandlord])
 def createRentalComplaint(request):
     user = request.user
-    rental_id = request.data.get('rental_id')
+    accused_iin = request.data.get('accused_iin')
 
-    # Проверка аренды
-    try:
-        rental = Rental.objects.select_related('house', 'house__owner', 'tenant').get(id=rental_id)
-    except Rental.DoesNotExist:
-        return Response({'detail': 'Аренда не найдена.'}, status=status.HTTP_404_NOT_FOUND)
+    if not accused_iin:
+        return Response({'detail': 'Не указан ИИН обвиняемого.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Проверяем, имеет ли отношение пользователь к этой аренде
-    if rental.tenant != user and rental.house.owner != user:
-        return Response({'detail': 'Вы не имеете доступа к этой аренде.'}, status=status.HTTP_403_FORBIDDEN)
+    accused_iin = accused_iin.strip()
+    accused = CustomUser.objects.filter(identifier__iexact=accused_iin).first()
 
-    # Определяем обвиняемого
-    accused = rental.tenant if user == rental.house.owner else rental.house.owner
+    if not accused:
+        return Response({'detail': f'Пользователь с таким ИИН {accused_iin} не найден.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if accused == user:
+        return Response({'detail': 'Вы не можете подать жалобу на самого себя.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Создаём жалобу
-    #new_rating = float(request.data.get('rating', 3))
-    dmg = request.data.get('damage_cost') 
     complaint = RentalComplaint(
-        rental=rental,
         complainant=user,
         accused=accused,
         description=request.data.get('description'),
-        #rating=new_rating,
-        court_decision_score = dmg
-        )
-    
-    # Получаем текущий рейтинг из модели (если его нет — считаем за 0)
-    #current_rating = accused.rating or 0
+        court_decision_score=request.data.get('damage_cost'),
+        is_court_case=request.data.get('is_court_case') == "true",  # чекбокс с фронта
+    )
 
-    # Обновляем рейтинг как среднее значение
-    #accused.rating = (current_rating + new_rating) / 2
-
-    # Сохраняем изменения
-    accused.save()
 
     if 'evidence' in request.FILES:
         complaint.evidence = request.FILES['evidence']
-
+    if 'damage_cost' in request.FILES:
+        complaint.court_decision_score = request.FILES['damage_cost']
     complaint.save()
 
-    # Ожидаем, что reasons — это список ID
+    # Привязываем причины
     reasons_ids = request.data.getlist('reason')
     if reasons_ids:
         complaint.reasons.set(reasons_ids)
 
-    # Пример: все картинки приходят под ключом 'images' как список
+    # Картинки
     images = request.FILES.getlist('evidence_images')
-
-    # Ограничение на максимум 10 изображений
     if len(images) > 10:
-        return Response(
-            {'detail': 'Максимум 10 изображений разрешено.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'detail': 'Максимум 10 изображений разрешено.'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     for img in images:
         ComplaintImage.objects.create(complaint=complaint, image=img)
 
-    # Отправляем уведомление о создании жалобы
     send_complaint_received_notification(complaint)
 
-    return Response({'message': 'Жалоба успешно создана.', 'id': complaint.id}, status=status.HTTP_201_CREATED)
+    return Response(
+        {'message': 'Жалоба успешно создана.', 'id': complaint.id},
+        status=status.HTTP_201_CREATED
+    )
+
 
 
 @api_view(['POST'])
@@ -370,13 +358,12 @@ class ComplaintDetailListView(generics.ListAPIView):
     serializer_class = RentalComplaintSerializer
     permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'complainant', 'accused', 'rental']
+    filterset_fields = ['status', 'complainant', 'accused',]
     search_fields = ['description', 'complainant__username', 'accused__username']
     ordering_fields = ['created_at', 'support_count']
 
     def get_queryset(self):
         return RentalComplaint.objects.select_related(
-            'rental', 'rental__house', 'rental__house__owner',
             'complainant', 'accused'
         ).prefetch_related(
             'reasons', 'comments', 'comments__user'
@@ -390,7 +377,6 @@ class ComplaintDetailByUUIDView(RetrieveAPIView):
 
     def get_queryset(self):
         return RentalComplaint.objects.select_related(
-            'rental', 'rental__house', 'rental__house__owner',
             'complainant', 'accused'
         ).prefetch_related(
             'reasons', 'comments', 'comments__user'
@@ -516,3 +502,21 @@ class CreateComplaintAPIView(APIView):
 
 
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from ..models import CustomUser
+from ..serializers import UserSearchSerializer
+
+
+@api_view(["GET"])
+def search_users_by_iin(request):
+    iin = request.query_params.get("iin")
+    if not iin:
+        return Response({"error": "iin is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # фильтруем пользователей, берем максимум 3
+    users = CustomUser.objects.filter(identifier__icontains=iin)[:3]
+    serializer = UserSearchSerializer(users, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)

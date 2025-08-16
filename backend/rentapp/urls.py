@@ -14,7 +14,7 @@ from .views.rental import (
     FavoriteListCreateView
 )
 from .views.complaint import (
-    createRentalComplaint, dispute_complaintFinal, get_complaint_by_uuid, submit_complaint, dispute_complaint, update_complaint, update_complaint_status,
+    createRentalComplaint, dispute_complaintFinal, get_complaint_by_uuid, search_users_by_iin, submit_complaint, dispute_complaint, update_complaint, update_complaint_status,
     update_complaint_status1, complaint_reasons, all_complaint_reasons, ComplaintReasonListTenant,
     ComplaintReasonListLandlord, ComplaintDetailByUUIDView, AddCommentAPIView, SupportComplaintAPIView,
     house_locations, CreateComplaintAPIView)
@@ -63,7 +63,6 @@ urlpatterns = [
     path('auth/google/', GoogleAuthView.as_view(), name='google-auth'),
     path('complaints/<uuid:uuid>/', ComplaintDetailByUUIDView.as_view(), name='complaint-detail'),
     path('register/', register, name='register'),
-    path('rental-complaints/create/', createRentalComplaint, name='create_rental_complaint'),
     path("my-rentals/", MyRentalsAPIView.as_view(), name="my-rentals"),
     path('rentals/', RentalListCreateView.as_view(), name='rental-list-create'),
     path('rentals/<int:pk>/', RentalDetailView.as_view(), name='rental-detail'),
@@ -99,5 +98,7 @@ urlpatterns = [
     path("rental-complaints/<uuid:uuid>/update/", update_complaint),
     path("rental-complaints/<uuid:uuid>/", get_complaint_by_uuid),
     path("complaints/<uuid:uuid>/dispute/", dispute_complaintFinal, name='dispute-complaint'),
+    path('rental-complaints/create/', createRentalComplaint, name='create_rental_complaint'),
+    path("users/search/", search_users_by_iin, name="search_users_by_iin"),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

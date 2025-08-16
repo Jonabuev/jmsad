@@ -46,23 +46,26 @@ def profile(request):
         # print(f"Average user rating: {average_rating}")
 
         # Жалобы
-        complaint_send = RentalComplaint.objects.filter(accused=user)
-        complaint_received = RentalComplaint.objects.filter(complainant=user)
-        print(f"Sent complaints: {complaint_send.count()}, Received complaints: {complaint_received.count()}")  # Логируем количество жалоб
+        complaint_send = RentalComplaint.objects.filter(complainant=user)
+        complaint_received = RentalComplaint.objects.filter(accused=user)
 
         # Дома (только если арендодатель)
         houses = House.objects.filter(owner=user) if user.role == "landlord" else []
         rentals_all = Rental.objects.all()
 
-
         # Аренды (только если арендатор)
         rentals = Rental.objects.filter(tenant=user) if user.role == "tenant" else []
-        rental_complaints = RentalComplaint.objects.filter(
-            rental__tenant=user
-        ) if user.role == "tenant" else RentalComplaint.objects.filter(
-            rental__house__owner=user
+
+        # Жалобы по арендам (раньше rental__..., теперь по complainant / accused)
+        rental_complaints = (
+            RentalComplaint.objects.filter(complainant=user)
+            if user.role == "tenant"
+            else RentalComplaint.objects.filter(accused=user.identifier)
         )
+
+        # Админские жалобы
         admin_complaints = RentalComplaint.objects.filter(status='pending')
+
         
         
 

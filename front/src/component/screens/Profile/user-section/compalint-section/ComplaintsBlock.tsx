@@ -65,7 +65,7 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {complaint_received.map((c: IComplaint) => (
+                    {complaint_send.map((c: IComplaint) => (
                       <tr key={c.id} className="text-center">
                         <td className="border px-4 py-2">{c.description}</td>
                         <td className="border px-4 py-2">
@@ -100,7 +100,7 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
             </div>
           )}
 
-          {complaint_send?.length > 0 && (
+          {complaint_received?.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-2">
                 {t("profile.receivedComplaints")}
@@ -125,7 +125,7 @@ const ComplaintsBlock: FC<Props> = ({ profileData, t, handleDispute }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {complaint_send.map((c: IComplaint) => (
+                    {complaint_received.map((c: IComplaint) => (
                       <tr key={c.id} className="text-center">
                         <td className="border px-4 py-2">{c.description}</td>
                         <td className="border px-4 py-2">

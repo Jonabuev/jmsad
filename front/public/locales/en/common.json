@@ -222,7 +222,8 @@
     "submitedit": "Submit Changes",
     "editTitle": "Edit Complaint",
     "descriptionedit": "To dispute the complaint, you need to modify its content",
-    "photoerror": "Maximum of 10 images can be uploaded"
+    "photoerror": "Maximum of 10 images can be uploaded",
+    "isCourtCase" : "Court Decision"
   },
   "editProfile": {
     "fullName": "Full Name",

@@ -281,7 +281,6 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
     accused = UserSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     reasons = ComplaintReasonSerializer(many=True, read_only=True)
-    property = serializers.SerializerMethodField()
     evidence = serializers.FileField(read_only=True)
     user = UserSerializer(read_only=True)
     disputes = ComplaintDisputeSerializer(many=True, read_only=True)
@@ -291,7 +290,7 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
         model = RentalComplaint
         fields = [
             'id', 'uuid', 'description', 'support_count', 'status',
-            'complainant', 'accused', 'property', 'reasons', 'evidence',
+            'complainant', 'accused', 'reasons', 'evidence',
             'comments', 'created_at', 'user', 'court_decision_score', 'images', 'disputes'
         ]
         read_only_fields = [
@@ -300,8 +299,7 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
 
     def get_images(self, obj):
         return [image.image.url for image in obj.images.all()]
-    def get_property(self, obj):
-        return HouseSerializer(obj.rental.house).data if obj.rental and obj.rental.house else None
+
     
 
     
@@ -446,3 +444,18 @@ class ConfirmPasswordChangeSerializer(serializers.Serializer):
 
 # rentapp/serializers.py
 
+from rest_framework import serializers
+from .models import CustomUser
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ["identifier", "full_name"]
+
+    def get_full_name(self, obj):
+        # Собираем ФИО из стандартных полей
+        parts = [obj.first_name, obj.last_name, obj.thirdname]
+        return " ".join([p for p in parts if p])

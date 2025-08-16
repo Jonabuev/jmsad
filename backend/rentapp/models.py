@@ -335,7 +335,7 @@ class CustomUser(AbstractUser):
     type_entity = models.CharField(max_length=30, choices=type_chose, default='individual')
     type_identify = models.CharField(max_length=12, choices=type_chose1)
     documents = models.JSONField(default=dict, blank=True, null=True)
-    identifier = models.CharField(max_length=15, blank=True, null=True)  
+    identifier = models.CharField(max_length=15, blank=True, null=True, unique=True)  
     confirmation_code = models.CharField(max_length=6, blank=True, null=True)
     #rating = models.PositiveSmallIntegerField(default=5)
     avatar = models.ImageField(upload_to=user_avatar_upload_path, blank=True, null=True, default='avatars/def.jpg')
@@ -839,18 +839,26 @@ class RentalComplaint(models.Model):
     ]
 
     id = models.AutoField(primary_key=True)
-    rental = models.ForeignKey(Rental, on_delete=models.CASCADE, related_name='complaints')
-    complainant = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='filed_rental_complaints')
+
+    complainant = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='filed_rental_complaints'
+    )
+
     accused = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_rental_complaints')
+
     reasons = models.ManyToManyField(ComplaintReason)
     description = models.TextField()
     evidence = models.FileField(upload_to=complaint_evidence_path, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=timezone.now)
     support_count = models.IntegerField(default=0)
-    #rating = models.PositiveSmallIntegerField(default=3)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    court_decision_score = models.IntegerField(default=0)
+    court_decision_score = models.IntegerField(null=True)
+
+    # Флаг судебная жалоба или нет
+    is_court_case = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.id and self.evidence:
@@ -862,7 +870,8 @@ class RentalComplaint(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Жалоба от {self.complainant} на {self.accused} по аренде {self.rental.id}"
+        return f"Жалоба от {self.complainant} на {self.accused.identifier}"
+
 
 import os
 
