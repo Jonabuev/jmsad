@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Настройки кодировки
 import sys
+<<<<<<< Updated upstream
 import locale
 
 if sys.platform.startswith('linux'):
@@ -27,6 +28,11 @@ if sys.platform.startswith('linux'):
 else:
     locale.setlocale(locale.LC_ALL, '')  # оставить системную локаль для Windows
 
+=======
+if sys.platform.startswith('win'):
+    import locale
+    locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+>>>>>>> Stashed changes
 
 
 # Quick-start development settings - unsuitable for production
@@ -261,14 +267,20 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Настройки SMTP для Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Используем порт 587 для TLS
 EMAIL_USE_TLS = True  # Включаем TLS вместо SSL
 EMAIL_HOST_USER = 'arno.help.service@gmail.com'
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='your_app_password_here')
 DEFAULT_FROM_EMAIL = 'arno.help.service@gmail.com'
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

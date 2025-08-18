@@ -8,7 +8,16 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libmariadb-dev \
     pkg-config \
+<<<<<<< Updated upstream
     wget \
+=======
+    tesseract-ocr \
+    tesseract-ocr-rus \
+    tesseract-ocr-eng \
+    tesseract-ocr-kaz \
+    libtesseract-dev \
+    poppler-utils \
+>>>>>>> Stashed changes
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Tesseract и языковые пакеты
