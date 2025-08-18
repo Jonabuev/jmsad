@@ -6,73 +6,98 @@ import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplain
 interface ComplaintReason {
   id: number;
   reason: string;
+  type: string;
 }
 
+interface Accused {
+  role: "tenant" | "landlord";
+}
 
+interface ComplaintData {
+  description: string;
+  reason: number[];
+  evidence: File | null;
+  damage_cost: string;
+  is_court_case: boolean;
+  court_decision_score: string | null;
+  accused: Accused;
+}
 
 const EditComplaintForm: React.FC = () => {
   const router = useRouter();
   const { uuid } = router.query;
   const { t } = useTranslation();
   const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
+  const [accusedRole, setAccusedRole] = useState<"tenant" | "landlord" | null>(null);
   const [formData, setFormData] = useState({
     description: "",
-    /*rating: "3",*/
     reason: [] as number[],
     evidence: null as File | null,
     evidenceImages: [] as File[],
     damageCost: "",
+    isCourtCase: false,
+    courtDocument: null as File | null,
   });
-
   const [isLoading, setIsLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Загрузка данных жалобы
   const [loadError, setLoadError] = useState(false);
 
-  // useEffect без t
+  // Загрузка данных жалобы
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token || typeof uuid !== "string") return;
+    if (!token || typeof uuid !== "string") {
+      setErrorMessage(t("Scomplaint.authRequired"));
+      setLoadError(true);
+      setIsLoading(false);
+      return;
+    }
     fetchRentalComplaintByUuid(uuid, token)
       .then((res) => {
-        const data = res.data;
+        const data: ComplaintData = res.data;
         setFormData({
           description: data.description || "",
-          /*rating: data.rating || "3",*/
           reason: (data.reason || []).map(Number),
           evidence: null,
           evidenceImages: [],
           damageCost: data.damage_cost || "",
+          isCourtCase: !!data.court_decision_score,
+          courtDocument: null,
         });
+        setAccusedRole(data.accused.role);
       })
-      .catch(() => setLoadError(true))
+      .catch(() => {
+        setLoadError(true);
+        setErrorMessage(t("Scomplaint.loadEditError"));
+      })
       .finally(() => setIsLoading(false));
-  }, [uuid]);
-
-  // локальный вывод с переводом
-  {loadError && (
-    <div className="...">
-      {t("Scomplaint.loadEditError")}
-    </div>
-  )}
-
+  }, [uuid, t]);
 
   // Загрузка причин
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token) return;
+    if (!token) {
+      setErrorMessage(t("Scomplaint.authRequired"));
+      return;
+    }
     fetchComplaintReasons(token)
-      .then((res) => setComplaintReasons(res.data))
-      .catch(() => setLoadError(true));
-  }, []);
-
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setComplaintReasons(res.data);
+        } else {
+          setErrorMessage(t("Scomplaint.invalidDataFormat"));
+        }
+      })
+      .catch(() => {
+        setLoadError(true);
+        setErrorMessage(t("Scomplaint.loadReasonsError"));
+      });
+  }, [t]);
 
   // Обработчики
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -93,11 +118,29 @@ const EditComplaintForm: React.FC = () => {
     }
   };
 
+  const handleCourtDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.length) {
+      setFormData((prev) => ({ ...prev, courtDocument: e.target.files![0] }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
     setSuccessMessage("");
+
+    if (formData.reason.length === 0) {
+      setErrorMessage(t("Scomplaint.reasonRequired"));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (formData.isCourtCase && !formData.damageCost) {
+      setErrorMessage(t("Scomplaint.damageCostRequired"));
+      setIsSubmitting(false);
+      return;
+    }
 
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -108,34 +151,44 @@ const EditComplaintForm: React.FC = () => {
 
     const data = new FormData();
     data.append("description", formData.description);
-    /*data.append("rating", formData.rating);*/
     formData.reason.forEach((id) => data.append("reason", String(id)));
     if (formData.evidence) data.append("evidence", formData.evidence);
     formData.evidenceImages.forEach((file) =>
       data.append("evidence_images", file)
     );
     data.append("damage_cost", formData.damageCost);
+    data.append("is_court_case", String(formData.isCourtCase));
+    if (formData.courtDocument) data.append("court_document", formData.courtDocument);
 
     try {
       await updateRentalComplaint(uuid as string, data, token);
       setSuccessMessage(t("Scomplaint.success"));
       router.push("/profile");
-    } catch (err) {
-      setErrorMessage(t("Scomplaint.submitError"));
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        t("Scomplaint.submitError");
+      setErrorMessage(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   if (isLoading) return <p>{t("Scomplaint.loading")}</p>;
-  console.log("Отмеченные:", formData.reason);
-  console.log("Все причины:", complaintReasons);
+
   return (
     <div className="max-w-xl mx-auto mt-10 p-4 border rounded-xl shadow-sm bg-white">
       <h2 className="text-2xl font-bold mb-4">{t("Scomplaint.editTitle")}</h2>
       <label className="block text-sm font-medium text-red-700 mb-4">
-            {t("Scomplaint.descriptionedit")}
-          </label>
+        {t("Scomplaint.descriptionedit")}
+      </label>
+
+      {loadError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {t("Scomplaint.loadEditError")}
+        </div>
+      )}
 
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -168,75 +221,22 @@ const EditComplaintForm: React.FC = () => {
             {t("Scomplaint.reasons")}
           </label>
           <div className="grid grid-cols-2 gap-2">
-            {complaintReasons.map((reason) => (
-              <label key={reason.id} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.reason.includes(reason.id)}
-                  onChange={() => handleReasonChange(reason.id)}
-                  className="rounded text-blue-600"
-                />
-                <span className="text-sm">
-                  {t(`Scomplaint.reason.${reason.reason}`)}
-                </span>
-              </label>
-            ))}
+            {complaintReasons
+              .filter((reason) => reason.type === accusedRole)
+              .map((reason) => (
+                <label key={reason.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.reason.includes(reason.id)}
+                    onChange={() => handleReasonChange(reason.id)}
+                    className="rounded text-blue-600"
+                  />
+                  <span className="text-sm">
+                    {t(`Scomplaint.reason.${reason.reason}`)}
+                  </span>
+                </label>
+              ))}
           </div>
-        </div>
-
-        {/*<div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t("Scomplaint.rating")}
-          </label>
-          <div className="flex gap-3">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <label key={star} className="flex items-center">
-                <input
-                  type="radio"
-                  name="rating"
-                  value={star}
-                  checked={formData.rating === String(star)}
-                  onChange={handleChange}
-                  className="sr-only"
-                />
-                <span
-                  className={`text-xl cursor-pointer ${
-                    formData.rating >= String(star)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                >
-                  ★
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>*/}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Scomplaint.damageCost")}
-          </label>
-          <input
-            type="number"
-            name="damageCost"
-            value={formData.damageCost}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Scomplaint.evidence")}
-          </label>
-          <input
-            type="file"
-            name="evidence"
-            onChange={handleFileChange}
-            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
         </div>
 
         <div>
@@ -250,7 +250,10 @@ const EditComplaintForm: React.FC = () => {
             onChange={(e) => {
               const files = e.target.files;
               if (!files) return;
-
+              if (files.length > 10) {
+                setErrorMessage(t("Scomplaint.photoerror"));
+                return;
+              }
               setFormData((prev) => ({
                 ...prev,
                 evidenceImages: Array.from(files).slice(0, 10),
@@ -259,6 +262,48 @@ const EditComplaintForm: React.FC = () => {
             className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
         </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="isCourtCase"
+            checked={formData.isCourtCase}
+            disabled
+            className="rounded text-blue-600"
+          />
+          <label htmlFor="isCourtCase" className="text-sm font-medium text-gray-700">
+            {t("Scomplaint.isCourtCase")}
+          </label>
+        </div>
+
+        {formData.isCourtCase && (
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("Scomplaint.damageCost")}
+              </label>
+              <input
+                type="text"
+                name="damageCost"
+                value={formData.damageCost}
+                onChange={handleChange}
+                className="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("Scomplaint.evidence")}
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,image/*"
+                onChange={handleCourtDocumentChange}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          </div>
+        )}
 
         <button
           type="submit"
