@@ -21,7 +21,7 @@ export const fetchMyRentals = (token: string) =>
 
 // Получить причины жалоб
 export const fetchComplaintReasons = (token: string) =>
-  api.get("/complaint-reasons/", { headers: { Authorization: `Bearer ${token}` } });
+  api.get("/all-complaint-reasons/", { headers: { Authorization: `Bearer ${token}` } });
 
 // Создать жалобу (submit complaint)
 export const submitRentalComplaint = (data: FormData, token: string) =>

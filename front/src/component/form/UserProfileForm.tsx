@@ -21,6 +21,7 @@ type FormValues = {
   document_type?: string;
   passport_expiry?: string;
   visa_num?: string;
+  identifier:string;
 };
 
 
@@ -55,6 +56,7 @@ const UserProfileForm = () => {
     const formPayload = new FormData();
     
     if (data.username?.trim()) formPayload.append("username", data.username);
+    if(data.identifier?.trim()) formPayload.append("identifier", data.identifier);
     if (data.phone_number?.trim()) formPayload.append("phone_number", data.phone_number);
     if (data.email?.trim()) formPayload.append("email", data.email);
     formPayload.append("clear_avatar", String(data.clearAvatar));
@@ -110,8 +112,7 @@ const UserProfileForm = () => {
         </label>
         <input
           type="text"
-          value={profileData?.identifier || ''}
-          readOnly
+          {...register("identifier")}
           className="w-full p-2 border border-gray-300 rounded bg-gray-100"
         />
       </div>

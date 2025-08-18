@@ -857,7 +857,7 @@ def complaint_reasons(request):
 def all_complaint_reasons(request):
     # Возвращаем все причины жалоб без фильтрации
     reasons = ComplaintReason.objects.all()
-    data = [{'id': r.id, 'reason': r.reason} for r in reasons]
+    data = [{'id': r.id, 'reason': r.reason, 'type': r.type} for r in reasons]
 
     return Response(data)
 

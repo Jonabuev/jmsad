@@ -268,7 +268,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class ComplaintReasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplaintReason
-        fields = ['id', 'reason']
+        fields = ['id', 'reason', 'type']
 
 
 class ComplaintImageSerializer(serializers.ModelSerializer):
@@ -453,7 +453,7 @@ class UserSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["identifier", "full_name"]
+        fields = ["identifier", "full_name", "role"]
 
     def get_full_name(self, obj):
         # Собираем ФИО из стандартных полей

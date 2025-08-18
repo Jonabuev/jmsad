@@ -6,33 +6,44 @@ import { fetchComplaintReasons, submitRentalComplaint, searchUsersByIin } from "
 interface ComplaintReason {
   id: number;
   reason: string;
+  type: string;
 }
+
 
 interface UserSuggestion {
   identifier: string;
   full_name: string;
+  role: string;  // 👈 добавляем
 }
+
 
 const SubmitComplaintForm: React.FC = () => {
   const { t } = useTranslation();
   const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
-  const [formData, setFormData] = useState({
-  accusedIin: "",
-  description: "",
-  reason: [] as number[],
-  evidence: null as File | null,
-  evidenceImages: [] as File[],
-  damageCost: "",
-  isCourtCase: false,
-  courtDecisionNumber: "",
-  courtDocument: null as File | null,
-});
+  const initialFormState = {
+    accusedIin: "",
+    accusedRole: "" as "tenant" | "landlord" | "",
+    description: "",
+    reason: [] as number[],
+    evidence: null as File | null,
+    evidenceImages: [] as File[],
+    damageCost: "",
+    isCourtCase: false,
+    courtDecisionNumber: "",
+    courtDocument: null as File | null,
+  };
+  const [formData, setFormData] = useState(initialFormState);
+
+
+  
 
 
   const [iinSuggestions, setIinSuggestions] = useState<UserSuggestion[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeRole, setActiveRole] = useState<"tenant" | "landlord">("tenant");
+  
 
   const router = useRouter();
 
@@ -63,20 +74,39 @@ const SubmitComplaintForm: React.FC = () => {
         setErrorMessage("");
       }
 
-      // Подсказки по ИИН (например, только если больше 5 символов)
-      if (value.length >= 5 && value.length <= 12) {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-          searchUsersByIin(value, token)
-            .then((res) => {
-              setIinSuggestions(res.data.slice(0, 3));
-            })
-            .catch(() => setIinSuggestions([]));
-        }
+      const token = localStorage.getItem("access_token");
+
+      if (token && value.length === 12) {
+        // если ровно 12 — ищем сразу и сохраняем роль
+        searchUsersByIin(value, token)
+          .then((res) => {
+            const foundUser = res.data?.[0];
+            if (foundUser) {
+              setFormData((prev) => ({
+                ...prev,
+                accusedRole: foundUser.role as "tenant" | "landlord",
+              }));
+            } else {
+              setFormData((prev) => ({ ...prev, accusedRole: "" }));
+            }
+          })
+          .catch(() => {
+            setFormData((prev) => ({ ...prev, accusedRole: "" }));
+          });
+      }
+
+      // подсказки — если от 5 до 11 символов
+      if (token && value.length >= 5 && value.length < 12) {
+        searchUsersByIin(value, token)
+          .then((res) => {
+            setIinSuggestions(res.data.slice(0, 3));
+          })
+          .catch(() => setIinSuggestions([]));
       } else {
         setIinSuggestions([]);
       }
     }
+
   };
 
   const handleReasonChange = (id: number) => {
@@ -105,7 +135,22 @@ const SubmitComplaintForm: React.FC = () => {
       setIsSubmitting(false);
       return;
     }
-
+    if (!formData.accusedRole) {
+          setErrorMessage("Пользователь с таким ИИН не найден");
+          setIsSubmitting(false);
+          return;
+        }
+    if (formData.reason.length === 0) {
+      setErrorMessage("Необходимо выбрать хотя бы одну причину жалобы");
+      setIsSubmitting(false);
+      return;
+    }
+   
+    if (formData.accusedRole !== activeRole) {
+      setErrorMessage("Выбранный пользователь имеет другую роль, чем выбранная в табе");
+      setIsSubmitting(false);
+      return;
+    }
     const token = localStorage.getItem("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
@@ -147,7 +192,7 @@ const SubmitComplaintForm: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
+  
   return (
     <div className="max-w-xl mx-auto mt-10 p-4 border rounded-xl shadow-sm bg-white">
       <h2 className="text-2xl font-bold mb-4">{t("Scomplaint.title")}</h2>
@@ -165,6 +210,44 @@ const SubmitComplaintForm: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex space-x-2 mb-4">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveRole("tenant");
+              setFormData(initialFormState); // 👈 сброс формы
+              setErrorMessage("");
+              setSuccessMessage("");
+              setIinSuggestions([]);
+            }}
+            className={`flex-1 py-2 rounded-lg font-medium ${
+              activeRole === "tenant"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            Арендатор
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveRole("landlord");
+              setFormData(initialFormState); // 👈 сброс формы
+              setErrorMessage("");
+              setSuccessMessage("");
+              setIinSuggestions([]);
+            }}
+            className={`flex-1 py-2 rounded-lg font-medium ${
+              activeRole === "landlord"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            Владелец
+          </button>
+        </div>
+
+
         {/* Поле для ИИН */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -182,21 +265,29 @@ const SubmitComplaintForm: React.FC = () => {
           />
           {/* Подсказки */}
           {iinSuggestions.length > 0 && (
-            <ul className="mt-2 border rounded bg-white shadow-md divide-y">
+            <ul className="mt-2 border rounded-md bg-white shadow-sm divide-y max-h-40 overflow-y-auto">
               {iinSuggestions.map((u, idx) => (
                 <li
                   key={idx}
-                  className="cursor-pointer p-2 hover:bg-blue-50"
-                  onClick={() =>
-                    setFormData((prev) => ({ ...prev, accusedIin: u.identifier }))
-                  }
+                  className="cursor-pointer px-2 py-1 hover:bg-blue-50 text-sm"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      accusedIin: u.identifier,
+                      accusedRole: u.role as "tenant" | "landlord", // 👈 сохраняем роль
+                    }));
+                    setIinSuggestions([]); // 👈 скрыть подсказки после выбора
+                  }}
                 >
-                  <div className="text-lg font-semibold text-gray-900">{u.identifier}</div>
-                  <div className="text-sm text-gray-500">{u.full_name}</div>
+                  <div className="font-medium text-gray-900">{u.identifier}</div>
+                  <div className="text-gray-500">{u.full_name}</div>
+                  <div className="text-xs text-gray-400">{u.role}</div>
                 </li>
+
               ))}
             </ul>
           )}
+
 
         </div>
 
@@ -215,12 +306,10 @@ const SubmitComplaintForm: React.FC = () => {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t("Scomplaint.reasons")}
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {complaintReasons.map((reason) => (
+        <div className="grid grid-cols-2 gap-2">
+          {complaintReasons
+            .filter((reason) => reason.type === activeRole)
+            .map((reason) => (
               <label key={reason.id} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -233,9 +322,10 @@ const SubmitComplaintForm: React.FC = () => {
                 </span>
               </label>
             ))}
-          </div>
         </div>
-         <div>
+
+
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Scomplaint.additionalPhotos")}
           </label>
