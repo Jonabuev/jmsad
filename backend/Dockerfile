@@ -8,6 +8,11 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libmariadb-dev \
     pkg-config \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем Tesseract и языковые пакеты
+RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-rus \
     tesseract-ocr-eng \
@@ -15,6 +20,11 @@ RUN apt-get update && apt-get install -y \
     libtesseract-dev \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# Проверяем установку Tesseract
+RUN tesseract --version && \
+    tesseract --list-langs && \
+    echo "✅ Tesseract успешно установлен"
 
 # Устанавливаем рабочую директорию
 WORKDIR /app

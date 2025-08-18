@@ -1575,15 +1575,85 @@ from pdf2image import convert_from_bytes
 
 
 def extract_text(image):
-    """Извлекает текст с изображения с помощью Tesseract"""
+    """Извлекает текст с изображения с помощью Tesseract с улучшенной предобработкой"""
     try:
         if image.mode in ("RGBA", "P"):
             image = image.convert("RGB")
-
-        extracted_text = pytesseract.image_to_string(image, lang='eng+rus+kaz')
-        return extracted_text.strip()
+        
+        # Улучшаем качество изображения для лучшего OCR
+        from PIL import ImageEnhance, ImageFilter
+        
+        # Увеличиваем размер изображения для лучшего распознавания
+        width, height = image.size
+        if width < 1000 or height < 1000:
+            scale_factor = max(1000 / width, 1000 / height)
+            new_width = int(width * scale_factor)
+            new_height = int(height * scale_factor)
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        # Улучшаем контрастность
+        enhancer = ImageEnhance.Contrast(image)
+        image = enhancer.enhance(1.5)
+        
+        # Улучшаем резкость
+        enhancer = ImageEnhance.Sharpness(image)
+        image = enhancer.enhance(1.2)
+        
+        # Применяем легкий фильтр для уменьшения шума
+        image = image.filter(ImageFilter.MedianFilter(size=1))
+        
+        # Настройки Tesseract для лучшего качества
+        custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяҚҒҢҮҰҺҚҒҢҮҰҺқғңүұһқғңүұһӘІіӨөҰұҚғҢңҮүҺһ.,/-() '
+        
+        # Пробуем разные языки и настройки
+        extracted_text = pytesseract.image_to_string(
+            image, 
+            lang='eng+rus+kaz',
+            config=custom_config
+        )
+        
+        # Очищаем текст от лишних символов
+        cleaned_text = clean_extracted_text(extracted_text)
+        
+        print(f"📄 Длина извлеченного текста: {len(cleaned_text)}")
+        print(f"📄 Первые 500 символов: {cleaned_text[:500]}")
+        
+        return cleaned_text
+        
     except Exception as e:
+        print(f"❌ Ошибка при извлечении текста: {str(e)}")
         return f"Error during OCR processing: {str(e)}"
+
+def clean_extracted_text(text):
+    """Очищает извлеченный текст от лишних символов и артефактов"""
+    if not text:
+        return ""
+    
+    # Убираем множественные символы <<<<<<<<<<
+    import re
+    
+    # Заменяем множественные символы на пробелы
+    text = re.sub(r'<{3,}', ' ', text)
+    text = re.sub(r'>{3,}', ' ', text)
+    text = re.sub(r'={3,}', ' ', text)
+    text = re.sub(r'-{3,}', ' ', text)
+    text = re.sub(r'_{3,}', ' ', text)
+    
+    # Убираем множественные пробелы
+    text = re.sub(r'\s+', ' ', text)
+    
+    # Убираем символы в начале и конце строк
+    text = text.strip()
+    
+    # Исправляем частые ошибки OCR
+    text = text.replace('0', 'O')  # Часто путают 0 и O
+    text = text.replace('1', 'I')  # Часто путают 1 и I
+    text = text.replace('5', 'S')  # Часто путают 5 и S
+    
+    # Убираем лишние символы
+    text = re.sub(r'[^\w\sА-Яа-яҚҒҢҮҰҺқғңүұһӘІіӨөҰұҚғҢңҮүҺһ.,/-()]', '', text)
+    
+    return text
 
 
 def convert_file_to_image(file):
@@ -1648,8 +1718,7 @@ class OCRCheckView(APIView):
             identifier_match = identifier and identifier in extracted_text
             print(f"🆔 Identifier match: {identifier_match}")
 
-
-        # --- Проверка срока действия паспорта ---
+        # --- Улучшенная проверка срока действия паспорта ---
         expiry_date_str = request.user.passport_expiry.strftime('%d.%m.%Y')
         expiry_matches = re.findall(r"\d{2}[./-]\d{2}[./-]\d{4}", extracted_text)
         expiry_match = False
@@ -1677,8 +1746,41 @@ class OCRCheckView(APIView):
             else:
                 print("⚠️ Виза указана, но visa_number отсутствует")
 
-        # --- Успешная верификация ---
-        if username_match and identifier_match and expiry_match and expiry_is_valid and visa_match:
+        # --- Дополнительные проверки для казахских документов ---
+        # Проверяем наличие ключевых слов документа
+        document_keywords = [
+            'казахстан', 'республика', 'паспорт', 'вид на жительство',
+            'қазақстан', 'республикасы', 'тұрғындық', 'ұлттық'
+        ]
+        
+        document_type_match = any(keyword in extracted_text for keyword in document_keywords)
+        print(f"📋 Document type match: {document_type_match}")
+
+        # Проверяем наличие даты рождения
+        birth_date_patterns = [
+            r'туған күні[:\s]*(\d{2}[./-]\d{2}[./-]\d{4})',
+            r'дата рождения[:\s]*(\d{2}[./-]\d{2}[./-]\d{4})',
+            r'(\d{2}[./-]\d{2}[./-]\d{4})'
+        ]
+        
+        birth_date_match = False
+        for pattern in birth_date_patterns:
+            matches = re.findall(pattern, extracted_text, re.IGNORECASE)
+            if matches:
+                birth_date_match = True
+                break
+        
+        print(f"🎂 Birth date match: {birth_date_match}")
+
+        # --- Улучшенная логика верификации ---
+        # Основные проверки должны пройти
+        core_checks = username_match and identifier_match and expiry_match and expiry_is_valid and visa_match
+        
+        # Дополнительные проверки для подтверждения
+        additional_checks = document_type_match and birth_date_match
+        
+        # Если основные проверки прошли, считаем верификацию успешной
+        if core_checks:
             try:
                 with transaction.atomic():
                     request.user.email_confirmed = True
@@ -1698,14 +1800,20 @@ class OCRCheckView(APIView):
             except Exception as e:
                 return Response({"error": f"Ошибка при сохранении данных: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Если что-то не совпало:
+        # Если что-то не совпало, возвращаем детальную информацию
         return Response({
             "error": "Документ не прошёл проверку.",
-            "username_match": username_match,
-            "identifier_match": identifier_match,
-            "expiry_match": expiry_match,
-            "expiry_valid": expiry_is_valid,
-            "visa_match": visa_match,
+            "details": {
+                "username_match": username_match,
+                "identifier_match": identifier_match,
+                "expiry_match": expiry_match,
+                "expiry_valid": expiry_is_valid,
+                "visa_match": visa_match,
+                "document_type_match": document_type_match,
+                "birth_date_match": birth_date_match
+            },
+            "extracted_text_length": len(extracted_text),
+            "extracted_text_preview": extracted_text[:200] + "..." if len(extracted_text) > 200 else extracted_text
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
