@@ -3,7 +3,6 @@ import sys
 import subprocess
 import shutil
 
-<<<<<<< Updated upstream
 def install_tesseract_if_needed():
     """Автоматически устанавливает Tesseract, если он не найден"""
     try:
@@ -124,7 +123,6 @@ else:
     print("   - Windows: https://github.com/UB-Mannheim/tesseract/wiki")
     print("   - Linux: sudo apt-get install tesseract-ocr")
     print("   - macOS: brew install tesseract") 
-=======
 # Определяем путь к Tesseract в зависимости от окружения
 if os.path.exists('/usr/bin/tesseract'):
     # Docker/Linux окружение
@@ -150,4 +148,3 @@ try:
     print(f"✅ Tesseract версия: {version}")
 except Exception as e:
     print(f"❌ Ошибка при проверке Tesseract: {str(e)}") 
->>>>>>> Stashed changes
