@@ -14,7 +14,7 @@ import ViolationForm from "@/component/form/ViolationForm"; // Подключа�
 
 const tabs = [
   { key: "info", label: "profile.info" },
-  { key: "apartments", label: "profile.apartments" },
+  // { key: "apartments", label: "profile.apartments" },
   { key: "complaints", label: "profile.complaints" },
 ];
 
@@ -26,8 +26,80 @@ const PublicUserProfile: FC = () => {
   const { t } = useTranslation("common");
   const router = useRouter();
   const { username } = router.query;
+  const [comments, setComments] = useState<any[]>([]);
+  const [showComments, setShowComments] = useState(false);
+  const [showAddComment, setShowAddComment] = useState(false);
+  const [newComment, setNewComment] = useState("");
+
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/comments/?target_user=${username}`);
+      const data = await res.json();
+      setComments(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddComment = async () => {
+    if (!profileData || !currentUserProfile) return;
+
+    // клиентская проверка
+    if (profileData.id === currentUserProfile.user.id) {
+      setErrorMessage(t("profile.selfError"));
+      return;
+    }
+
+    const alreadyWritten = comments.filter(
+      (c) => c.author === currentUserProfile.user.id
+    );
+    if (alreadyWritten.length >= 2) {
+      setErrorMessage(t("profile.limitError"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const res = await fetch(`http://127.0.0.1:8000/api/comments/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ text: newComment, target_user: profileData.id }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorMessage(data.non_field_errors?.[0] || t("profile.submitError"));
+        return;
+      }
+
+      setNewComment("");
+      setShowAddComment(false);
+      fetchComments();
+    } catch (err) {
+      setErrorMessage(t("profile.connectionError"));
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
 
+
+
+
+
+
+  
   let reviewedComplaints: IComplaint[] = [];
 
   if (profileData?.complaint_received) {
@@ -49,19 +121,17 @@ const PublicUserProfile: FC = () => {
   );
 
   useEffect(() => {
-    if (isOwnProfile) {
-      setProfileData(currentUserProfile as IPublicProfileData);
-    } else if (publicProfileData) {
-      setProfileData(publicProfileData);
-    }
-  }, [username, currentUserProfile, publicProfileData]);
+    if (showComments) fetchComments();
+   
+    setProfileData(publicProfileData);
+  }, [username, currentUserProfile, publicProfileData, showComments]);
 
   const loading = currentUserLoading || publicProfileLoading;
 
 
-  if (loading) return <div>Загрузка...</div>;
+  if (loading) return <div>{t("profile.loading")}</div>;
   if (error) return <div className="text-center mt-10 text-red-500">{error.message || 'Ошибка'}</div>;
-  if (!profileData) return <div className="text-center mt-10">Профиль не найден.</div>;
+  if (!profileData) return <div className="text-center mt-10">{t("profile.profileNotFound")}</div>;
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-10 bg-gray-50 min-h-screen">
@@ -265,6 +335,81 @@ const PublicUserProfile: FC = () => {
             </div>
           )}
         </div>
+        {/* Комментарии */}
+        <div className="mt-8 border-t pt-4">
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => setShowAddComment(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
+            >
+              {t("profile.addComment")}
+            </button>
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="px-4 py-2 bg-gray-600 text-white rounded shadow hover:bg-gray-700"
+            >
+              {showComments ? t("profile.toggleComments") : t("profile.showComments")}
+            </button>
+          </div>
+
+          {/* Модалка добавления комментария */}
+          {showAddComment && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+                <h2 className="text-lg font-bold mb-3">{t("profile.newComment")}</h2>
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="w-full border rounded p-2 mb-2"
+                  rows={4}
+                  placeholder={t("profile.newComment")}
+                />
+                {errorMessage && (
+                  <p className="text-red-500 text-sm mb-2">{errorMessage}</p>
+                )}
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setShowAddComment(false)}
+                    className="px-3 py-1 border rounded"
+                  >
+                    {t("profile.cancel")}
+                  </button>
+                  <button
+                    onClick={handleAddComment}
+                    disabled={isSubmitting}
+                    className={`px-3 py-1 rounded text-white ${
+                      isSubmitting
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {isSubmitting ? t("profile.sending") : t("profile.send")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+          {/* Список комментариев */}
+          {showComments && (
+            <div className="mt-4 max-h-500 overflow-y-auto border rounded-lg p-3 bg-gray-50">
+              {comments.length > 0 ? (
+                comments.map((c) => (
+                  <div key={c.id} className="mb-3 p-2 bg-white rounded shadow-sm">
+                    <p className="font-semibold text-sm text-gray-700">{c.author_name}</p>
+                    <p className="text-gray-800">{c.text}</p>
+                    <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">{t("profile.noComments")}</p>
+              )}
+              
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

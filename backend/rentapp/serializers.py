@@ -459,3 +459,16 @@ class UserSearchSerializer(serializers.ModelSerializer):
         # Собираем ФИО из стандартных полей
         parts = [obj.first_name, obj.last_name, obj.thirdname]
         return " ".join([p for p in parts if p])
+
+
+# serializers.py
+from rest_framework import serializers
+from .models import UserComment
+
+class UserCommentSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source="author.anonymous_name", read_only=True)
+
+    class Meta:
+        model = UserComment
+        fields = ["id", "author", "author_name", "target_user", "text", "created_at"]
+        read_only_fields = ["author", "created_at"]

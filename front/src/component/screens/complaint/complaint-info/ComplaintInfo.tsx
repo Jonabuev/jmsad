@@ -121,10 +121,10 @@ const ComplaintInfo: FC<Props> = ({ complaint, t }) => {
         {complaint.accused?.username}
       </div>
 
-      <div>
+      {/* <div>
         <strong>{t("complaint.property")}:</strong>{" "}
         {complaint.property?.city}, {complaint.property?.address}
-      </div>
+      </div> */}
 
       <div>
         <strong>{t("complaint.reasons")}:</strong>{" "}

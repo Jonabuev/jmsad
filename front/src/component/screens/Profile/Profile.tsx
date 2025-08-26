@@ -13,7 +13,7 @@ import { clearAllTokens } from "@/utils/tokenUtils";
 
 const tabs = [
   { key: "info", label: "profile.info" },
-  { key: "apartments", label: "profile.apartments" },
+  // { key: "apartments", label: "profile.apartments" },
   { key: "complaints", label: "profile.complaints" },
 ];
 

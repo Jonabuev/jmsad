@@ -131,26 +131,26 @@ const SubmitComplaintForm: React.FC = () => {
     setSuccessMessage("");
 
     if (formData.accusedIin.length !== 12) {
-      setErrorMessage("Введите корректный ИИН (12 символов)");
+      setErrorMessage(t("Scomplaint.invalidIin"));
       setIsSubmitting(false);
       return;
     }
     if (!formData.accusedRole) {
-          setErrorMessage("Пользователь с таким ИИН не найден");
-          setIsSubmitting(false);
-          return;
-        }
+      setErrorMessage(t("Scomplaint.userNotFound"));
+      setIsSubmitting(false);
+      return;
+    }
     if (formData.reason.length === 0) {
-      setErrorMessage("Необходимо выбрать хотя бы одну причину жалобы");
+      setErrorMessage(t("Scomplaint.reasonRequired"));
       setIsSubmitting(false);
       return;
     }
-   
     if (formData.accusedRole !== activeRole) {
-      setErrorMessage("Выбранный пользователь имеет другую роль, чем выбранная в табе");
+      setErrorMessage(t("Scomplaint.roleMismatch"));
       setIsSubmitting(false);
       return;
     }
+
     const token = localStorage.getItem("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));

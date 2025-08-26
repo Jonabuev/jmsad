@@ -8,6 +8,7 @@ from django.dispatch import receiver
 import random
 from PIL import Image
 import os
+from django.conf import settings
 
 def user_avatar_upload_path(instance, filename):
     # Используем ID пользователя. Можно заменить на UUID, если у тебя есть поле UUID.
@@ -314,7 +315,7 @@ class CustomUser(AbstractUser):
     ANONYMOUS_ANIMALS = [
         'Кот', 'Пес', 'Лев', 'Тигр', 'Медведь', 'Волк', 'Лиса', 'Заяц', 'Еж',
         'Белка', 'Олень', 'Лось', 'Кабан', 'Косуля', 'Кролик', 'Хомяк', 'Мышь',
-        'Крыса', 'Морская свинка', 'Хорек', 'Норка', 'Выдра', 'Бобр', 'Ондатра'
+        'Бобр', 'Сокол', 'Орел', 'Лебедь', 'Журавль', 'Фазан', 'Павлин'
     ]
 
     citizenship = models.CharField(
@@ -971,3 +972,32 @@ class ComplaintDispute(models.Model):
     def __str__(self):
         return f"Dispute by {self.user.username} on Complaint {self.complaint.id}"
 
+
+
+from rest_framework.exceptions import ValidationError  # ✅ правильно для DRF
+
+class UserComment(models.Model):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="written_comments"
+    )
+    target_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="received_comments"
+    )
+    text = models.TextField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        # Ограничение: не больше 2 комментариев на 1 юзера от одного автора
+        if UserComment.objects.filter(author=self.author, target_user=self.target_user).count() >= 2 and not self.pk:
+            raise ValidationError("Вы можете оставить только 2 комментария этому пользователю")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # проверка перед сохранением
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Comment by {self.author} on {self.target_user}"

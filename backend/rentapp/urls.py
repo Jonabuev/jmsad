@@ -5,7 +5,7 @@ from .views.auth import (
     RequestPasswordChangeView, ConfirmPasswordChangeView, GoogleAuthView
 )
 from .views.profile import (
-    IssueViolationAPIView, RemoveBanAPIView, profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
+    IssueViolationAPIView, RemoveBanAPIView, UserCommentDetailAPIView, UserCommentListCreateAPIView, profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
     TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, verification_status, regenerate_anonymous_name, get_anonymous_name
 )
 from .views.rental import (
@@ -88,6 +88,8 @@ urlpatterns = [
     path('all-houses/', AllHousesView.as_view(), name='all-houses'),
     path('rentals/<int:rental_id>/confirm/', confirm_rental, name='confirm-rental'),
     path('rentals/<int:rental_id>/reject/', reject_rental, name='reject-rental'),
+    path("comments/", UserCommentListCreateAPIView.as_view(), name="comment-list-create"),
+    path("comments/<int:pk>/", UserCommentDetailAPIView.as_view(), name="comment-detail"),
     # Анонимные имена
     path('anonymous-name/regenerate/', regenerate_anonymous_name, name='regenerate-anonymous-name'),
     path('anonymous-name/', get_anonymous_name, name='get-anonymous-name'),

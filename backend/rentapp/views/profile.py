@@ -649,3 +649,27 @@ def get_anonymous_name(request):
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+
+# views/comment.py
+from rest_framework import generics, permissions
+from ..models import UserComment
+from ..serializers import UserCommentSerializer
+
+class UserCommentListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = UserCommentSerializer
+
+    def get_queryset(self):
+        target_username = self.request.query_params.get("target_user")
+        if target_username:
+            return UserComment.objects.filter(
+                target_user__username=target_username
+            ).order_by("-created_at")
+        return UserComment.objects.none()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class UserCommentDetailAPIView(generics.RetrieveDestroyAPIView):
+    queryset = UserComment.objects.all()
+    serializer_class = UserCommentSerializer

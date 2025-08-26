@@ -70,7 +70,21 @@
       "id_card": "ID Card",
       "passport_kz": "KZ Passport",
       "visa": "Visa"
-    }
+    },
+    "noComments": "No comments yet",
+    "sending": "Sending...",
+    "send": "Send",
+    "cancel": "Cancel",
+    "newComment": "New comment",
+    "addComment": "Add comment",
+    "toggleComments": "Hide comments",
+    "showComments": "View all comments",
+    "profileNotFound": "Profile not found",
+    "loading": "Loading...",
+    "connectionError": "Connection error",
+    "submitError": "Error while submitting",
+    "limitError": "You can leave a maximum of 2 comments",
+    "selfError": "You cannot comment on yourself"
   },
   "verify": {
     "identityVerification": "Identity verification"
@@ -225,7 +239,11 @@
     "photoerror": "Maximum of 10 images can be uploaded",
     "isCourtCase" : "Court Decision",
     "iin":"Accused IIN",
-    "iinplace":"Enter IIN (12 characters)"
+    "iinplace":"Enter IIN (12 characters)",
+    "invalidIin": "Enter a valid IIN (12 characters)",
+    "userNotFound": "User with this IIN was not found",
+    "reasonRequired": "At least one complaint reason must be selected",
+    "roleMismatch": "The selected user has a different role than the one chosen in the tab"
   },
   "editProfile": {
     "fullName": "Full Name",

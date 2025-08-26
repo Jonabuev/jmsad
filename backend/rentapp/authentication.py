@@ -63,7 +63,9 @@ ALLOWED_PATHS_FOR_EXPIRED = [
     "/api/issue-violation/",
     "/api/remove-ban/",
     "/api/rental-complaints/<uuid:uuid>/update/",
-    "/api/rental-complaints/<uuid:uuid>/"
+    "/api/rental-complaints/<uuid:uuid>/",
+    "api/comments/",
+    "comments/<int:pk>/"
 
 ]
 
