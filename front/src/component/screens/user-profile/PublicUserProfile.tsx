@@ -114,17 +114,53 @@ const PublicUserProfile: FC = () => {
   const { profile: currentUserProfile, loading: currentUserLoading } = useSelector((state: RootState) => state.auth);
   const isOwnProfile = username === currentUserProfile?.user.username;
 
-  const { data: publicProfileData, loading: publicProfileLoading, error } = useApi<IPublicProfileData>(
-    `/user/profile/${username}/`,
-    {},
-    { skip: !username || isOwnProfile }
-  );
+
+  const [publicProfileData, setPublicProfileData] = useState<IPublicProfileData | null>(null);
+  const [publicProfileLoading, setPublicProfileLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
 
   useEffect(() => {
-    if (showComments) fetchComments();
-   
-    setProfileData(publicProfileData);
-  }, [username, currentUserProfile, publicProfileData, showComments]);
+    if (!router.isReady || !username) return;
+
+    const fetchProfile = async () => {
+      try {
+        setPublicProfileLoading(true);
+        setError(null);
+
+        const res = await fetch(`http://127.0.0.1:8000/api/user/profile/${username}/`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Ошибка загрузки профиля");
+
+        const data = await res.json();
+        setPublicProfileData(data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setPublicProfileLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [router.isReady, username]);
+
+
+  useEffect(() => {
+    if (publicProfileData) {
+      setProfileData(publicProfileData);
+    }
+  }, [publicProfileData]);
+
+  useEffect(() => {
+    if (showComments) {
+      fetchComments();
+    }
+  }, [showComments]);
+
 
   const loading = currentUserLoading || publicProfileLoading;
 
