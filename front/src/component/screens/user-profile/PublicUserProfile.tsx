@@ -47,17 +47,9 @@ const PublicUserProfile: FC = () => {
   const handleAddComment = async () => {
     if (!profileData || !currentUserProfile) return;
 
-    // клиентская проверка
+    // клиентская проверка: нельзя писать себе
     if (profileData.id === currentUserProfile.user.id) {
       setErrorMessage(t("profile.selfError"));
-      return;
-    }
-
-    const alreadyWritten = comments.filter(
-      (c) => c.author === currentUserProfile.user.id
-    );
-    if (alreadyWritten.length >= 2) {
-      setErrorMessage(t("profile.limitError"));
       return;
     }
 
@@ -65,6 +57,26 @@ const PublicUserProfile: FC = () => {
     setErrorMessage("");
 
     try {
+      // перед отправкой загружаем актуальные комментарии
+      const resCheck = await fetch(`http://127.0.0.1:8000/api/comments/?target_user=${profileData.username}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+        },
+      });
+
+      const freshComments = await resCheck.json();
+
+      const alreadyWritten = freshComments.filter(
+        (c: any) => c.author === currentUserProfile.user.id
+      );
+
+      if (alreadyWritten.length >= 2) {
+        setErrorMessage(t("profile.limitError"));
+        setIsSubmitting(false);
+        return;
+      }
+
+      // теперь можно постить
       const token = localStorage.getItem("access_token");
 
       const res = await fetch(`http://127.0.0.1:8000/api/comments/`, {
@@ -84,7 +96,7 @@ const PublicUserProfile: FC = () => {
 
       setNewComment("");
       setShowAddComment(false);
-      fetchComments();
+      fetchComments(); // обновим список
     } catch (err) {
       setErrorMessage(t("profile.connectionError"));
       console.error(err);
@@ -92,6 +104,7 @@ const PublicUserProfile: FC = () => {
       setIsSubmitting(false);
     }
   };
+
 
 
 
