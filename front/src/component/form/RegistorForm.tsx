@@ -6,6 +6,10 @@ import { useTranslation } from "next-i18next";
 import { COUNTRY_OPTIONS } from "../constants/countries";
 import Link from "next/link";
 import GoogleLoginButton from "../common/GoogleLoginButton";
+import { useDispatch } from "react-redux";
+import { fetchUserProfile } from "@/component/store/auth/authSlice";
+import { useRouter } from "next/router";
+import { AppDispatch } from "@/component/store/store";
 
 interface IRegisterErrors {
   username?: string;
@@ -43,6 +47,8 @@ const RegisterForm: FC = () => {
   const [errors, setErrors] = useState<IRegisterErrors>({});
   const [isClient, setIsClient] = useState(false);
   const { t } = useTranslation("common");
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -112,13 +118,22 @@ const RegisterForm: FC = () => {
     if (Object.keys(validationErrors).length > 0) return;
 
     try {
+      console.log("📝 Начинаем процесс регистрации...");
       const response = await register(formData);
       if (response.status === 200 || response.status === 201) {
+        console.log("✅ Регистрация успешна, сохраняем токены...");
         saveTokens(response.data.access_token, response.data.refresh_token);
-        window.location.href = response.data.profile_url;
+        
+        console.log("🔄 Обновляем Redux store...");
+        await dispatch(fetchUserProfile());
+        
+        console.log("🚀 Перенаправляем на профиль...");
+        router.push(response.data.profile_url || "/profile");
+        
         alert(t("registration.successful_registration"));
       }
     } catch (error: any) {
+      console.error("❌ Ошибка при регистрации:", error);
       if (error.response?.data) {
         const djangoErrors = error.response.data;
         const newErrors: IRegisterErrors = {};
@@ -159,8 +174,18 @@ const RegisterForm: FC = () => {
         {isClient && (
           <div className="mb-6">
             <GoogleLoginButton 
-              onSuccess={() => {
-                console.log("Google login successful from registration form");
+              onSuccess={async () => {
+                console.log("✅ Google login successful from registration form");
+                console.log("🔄 Обновляем Redux store...");
+                try {
+                  await dispatch(fetchUserProfile());
+                  console.log("🚀 Перенаправляем на профиль...");
+                  router.push("/profile");
+                } catch (error) {
+                  console.error("❌ Ошибка при обновлении Redux store:", error);
+                  // Fallback на window.location
+                  window.location.href = "/profile";
+                }
               }}
               onError={(error) => {
                 console.error("Google login error:", error);

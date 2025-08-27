@@ -8,6 +8,9 @@ import { googleAuth } from "@/api/authApi";
 import { saveTokens } from "@/utils/tokenUtils";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/component/store/store";
+import { fetchUserProfile } from "@/component/store/auth/authSlice";
 
 interface GoogleLoginButtonProps {
   onSuccess?: () => void;
@@ -26,6 +29,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   const [loading, setLoading] = useState(true);
   const [showGoogleLogin, setShowGoogleLogin] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const { t } = useTranslation("common");
 
   // Проверяем, что мы на клиенте
@@ -63,27 +67,60 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   }, []);
   
   const handleLoginSuccess = async (response: CredentialResponse) => {
-    console.log("Google Login Success:", response);
+    console.log("🔐 Google Login Success:", response);
+    console.log("📍 Текущий путь до входа:", router.asPath);
 
     if (!response.credential) {
-      console.error("Нет токена");
+      console.error("❌ Нет токена");
       return;
     }
 
     try {
+      console.log("📡 Отправляем токен на backend...");
       const { data } = await googleAuth(response.credential);
-      console.log("Backend response:", data);
+      console.log("✅ Backend response:", data);
 
+      console.log("💾 Сохраняем токены...");
       saveTokens(data.access, data.refresh);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      console.log("🔄 Обновляем Redux store...");
+      await dispatch(fetchUserProfile());
+      console.log("✅ Redux store обновлен");
+
+      console.log("🚀 Перенаправляем на профиль...");
+      console.log("📍 Текущий путь:", router.asPath);
+      
       if (onSuccess) {
+        console.log("✅ Вызываем onSuccess callback");
         onSuccess();
       } else {
-        router.push("/profile");
+        // Если onSuccess не передан, выполняем перенаправление здесь
+        try {
+          console.log("🔄 Способ 1: router.push()");
+          await router.push("/profile");
+          
+          // Если router.push не сработал, попробуем альтернативы
+          setTimeout(() => {
+            console.log("⏰ Проверяем, произошло ли перенаправление...");
+            console.log("📍 Новый путь:", router.asPath);
+            
+            if (router.asPath === "/profile") {
+              console.log("✅ Перенаправление успешно через router.push()");
+            } else {
+              console.log("❌ router.push() не сработал, пробуем window.location");
+              window.location.href = "/profile";
+            }
+          }, 1000);
+          
+        } catch (redirectError) {
+          console.error("❌ Ошибка при перенаправлении:", redirectError);
+          console.log("🔄 Пробуем альтернативный способ: window.location");
+          window.location.href = "/profile";
+        }
       }
     } catch (err) {
-      console.error("Error sending token:", err);
+      console.error("❌ Error sending token:", err);
       if (onError) {
         onError(err);
       }

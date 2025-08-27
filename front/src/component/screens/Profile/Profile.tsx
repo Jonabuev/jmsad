@@ -29,6 +29,10 @@ const Profile: FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showVerificationRequired, setShowVerificationRequired] = useState(false);
 
+  console.log("🔍 Profile компонент загружен");
+  console.log("📍 Текущий путь:", router.asPath);
+  console.log("📊 Состояние:", { loading, error, profileData: !!profileData });
+
   const handleLogout = () => {
     clearAllTokens();
     router.push("/login");
