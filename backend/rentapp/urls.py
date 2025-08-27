@@ -103,4 +103,4 @@ urlpatterns = [
     path('rental-complaints/create/', createRentalComplaint, name='create_rental_complaint'),
     path("users/search/", search_users_by_iin, name="search_users_by_iin"),
 
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
