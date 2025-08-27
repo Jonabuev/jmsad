@@ -391,9 +391,9 @@ class OCRCheckView(APIView):
                 filename = f'id_document.{ext}'
                 file_content = ContentFile(uploaded_file.read())
                 verification.id_document.save(filename, file_content, save=True)
-                if not created:
-                    verification.verified = True
-                    verification.save()
+              
+                verification.verified = True
+                verification.save()
                 
                 return Response({
                     'success': True,
