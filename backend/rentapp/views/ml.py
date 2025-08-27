@@ -62,20 +62,35 @@ import cv2
 import numpy as np
 from PIL import Image
 import pytesseract
-def preprocess_image_for_ocr(file_bytes):
-    # file_bytes — это bytes, а не UploadedFile
-    image = cv2.imdecode(np.frombuffer(file_bytes, np.uint8), cv2.IMREAD_COLOR)
+
+from pdf2image import convert_from_bytes
+
+def file_to_image(uploaded_file):
+    file_bytes = uploaded_file.read()
     
-    # Переводим в серый
+    if uploaded_file.name.lower().endswith(".pdf"):
+        # Берём первую страницу PDF
+        images = convert_from_bytes(file_bytes)
+        return images[0]  # PIL.Image
+    else:
+        # Это уже картинка (jpg/png)
+        return Image.open(io.BytesIO(file_bytes))
+
+def preprocess_image_for_ocr(pil_image):
+    # Переводим PIL.Image → numpy (RGB → BGR для OpenCV)
+    image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
+    # В серый
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Увеличиваем резкость
     gray = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
-    # Бинаризация (черно-белое)
+    # Бинаризация
     _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     return Image.fromarray(thresh)
+
 
 class OCRCheckView(APIView):
     def post(self, request, *args, **kwargs):
@@ -91,15 +106,22 @@ class OCRCheckView(APIView):
         uploaded_file = request.FILES.get('id_document')
         if not uploaded_file:
             return Response({"error": "Файл не был загружен."}, status=400)
-        file_bytes = uploaded_file.read()
 
-        image = preprocess_image_for_ocr(file_bytes)
 
+        # PDF → картинка (PIL.Image)
+        pil_image = file_to_image(uploaded_file)
+
+        # Предобработка (OpenCV)
+        processed_image = preprocess_image_for_ocr(pil_image)
+
+        # OCR
         extracted_text = pytesseract.image_to_string(
-            image,
+            processed_image,
             lang="kaz+rus+eng",
             config="--psm 6"
         ).lower()
+
+
 
 
 
