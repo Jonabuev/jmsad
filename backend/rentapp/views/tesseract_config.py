@@ -114,6 +114,9 @@ if tesseract_path:
         except:
             print("⚠️ Не удалось получить список языков")
             
+    except ImportError as e:
+        print(f"❌ pytesseract не установлен: {e}")
+        tesseract_path = None
     except Exception as e:
         print(f"❌ Ошибка при настройке pytesseract: {e}")
         tesseract_path = None
@@ -138,13 +141,37 @@ else:
     print(f"⚠️ Используем Tesseract из PATH: {tesseract_path}")
 
 # Настройка pytesseract
-import pytesseract
-pytesseract.pytesseract.tesseract_cmd = tesseract_path
-
-# Проверяем доступность Tesseract
 try:
     import pytesseract
-    version = pytesseract.get_tesseract_version()
-    print(f"✅ Tesseract версия: {version}")
-except Exception as e:
-    print(f"❌ Ошибка при проверке Tesseract: {str(e)}") 
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
+    
+    # Проверяем доступность Tesseract
+    try:
+        version = pytesseract.get_tesseract_version()
+        print(f"✅ Tesseract версия: {version}")
+    except Exception as e:
+        print(f"❌ Ошибка при проверке Tesseract: {str(e)}")
+except ImportError as e:
+    print(f"❌ pytesseract не установлен: {str(e)}")
+    print("📦 Установите pytesseract: pip install pytesseract")
+    # Создаем заглушку для pytesseract
+    class MockPytesseract:
+        def image_to_string(self, *args, **kwargs):
+            return "OCR недоступен - pytesseract не установлен"
+        def get_tesseract_version(self):
+            return "N/A"
+        def get_languages(self):
+            return []
+    pytesseract = MockPytesseract()
+
+# Обеспечиваем, что pytesseract всегда доступен в модуле
+if 'pytesseract' not in locals():
+    print("⚠️ Создаем заглушку pytesseract")
+    class MockPytesseract:
+        def image_to_string(self, *args, **kwargs):
+            return "OCR недоступен"
+        def get_tesseract_version(self):
+            return "N/A"
+        def get_languages(self):
+            return []
+    pytesseract = MockPytesseract() 
