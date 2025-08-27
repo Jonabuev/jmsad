@@ -58,6 +58,24 @@ class ROCImageAPIView(APIView):
 
 import re
 from datetime import datetime
+import cv2
+import numpy as np
+from PIL import Image
+import pytesseract
+def preprocess_image_for_ocr(file_bytes):
+    # file_bytes — это bytes, а не UploadedFile
+    image = cv2.imdecode(np.frombuffer(file_bytes, np.uint8), cv2.IMREAD_COLOR)
+    
+    # Переводим в серый
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Увеличиваем резкость
+    gray = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+
+    # Бинаризация (черно-белое)
+    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    return Image.fromarray(thresh)
 
 class OCRCheckView(APIView):
     def post(self, request, *args, **kwargs):
@@ -68,21 +86,30 @@ class OCRCheckView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        
+
         uploaded_file = request.FILES.get('id_document')
         if not uploaded_file:
-            return Response({"error": "Файл не был загружен."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Файл не был загружен."}, status=400)
+        file_bytes = uploaded_file.read()
 
-        try:
-            image = convert_file_to_image(uploaded_file)
-        except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        image = preprocess_image_for_ocr(file_bytes)
+
+        extracted_text = pytesseract.image_to_string(
+            image,
+            lang="kaz+rus+eng",
+            config="--psm 6"
+        ).lower()
+
+
 
         try:
             # Автоматически заполняем поля имени пользователя
             auto_fill_user_name_fields(request.user)
             
             # Извлекаем текст из изображения
-            extracted_text = extract_text(image).lower()
+            
+           
             print("📄 Extracted text:\n", extracted_text)
             print("📄 Длина извлеченного текста:", len(extracted_text))
             print("📄 Первые 500 символов:", extracted_text[:500])
