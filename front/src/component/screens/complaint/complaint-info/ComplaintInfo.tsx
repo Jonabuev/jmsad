@@ -3,7 +3,9 @@
 import { IComplaint } from "@/component/type/users.interface";
 import { FC, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { useTranslation } from "react-i18next";
 
+  
 const ProtectedPDF = dynamic(() => import("./PdfAsImagesViewer"), { ssr: false });
 
 
@@ -12,7 +14,7 @@ const ProtectedPDF = dynamic(() => import("./PdfAsImagesViewer"), { ssr: false }
 const ProtectedImage: FC<{ src: string }> = ({ src }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fullSrc = getFullUrl(src); // ← здесь
-  
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     const image = new Image();
@@ -130,7 +132,7 @@ const ComplaintInfo: FC<Props> = ({ complaint, t }) => {
         <strong>{t("complaint.reasons")}:</strong>{" "}
         {complaint.reasons.map((r, i) => (
           <span key={r.id}>
-            {r.reason}
+            {t(`search.reason.${r.reason}`)}
             {i !== complaint.reasons.length - 1 ? ", " : ""}
           </span>
         ))}
