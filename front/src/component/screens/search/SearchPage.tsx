@@ -38,13 +38,11 @@ const TenantRegistry: React.FC = () => {
         return;
       }
       const response = await getVerificationStatus();
-      setIsVerified(response.data.is_verified);
-      
-      // Если пользователь не верифицирован, перенаправляем в профиль
-      if (!response.data.is_verified) {
+      setIsVerified(response.data.is_verified ?? response.data.email_confirmed);
+      if (!(response.data.is_verified ?? response.data.email_confirmed)) {
         router.push("/profile?verification_required=true");
-        return;
       }
+
     } catch (error) {
       console.error("Ошибка при проверке статуса верификации:", error);
       router.push("/login");
