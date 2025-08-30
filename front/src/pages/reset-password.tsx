@@ -9,7 +9,7 @@ export default function ChangePasswordPage() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "ru", ["common"])), // Добавили "search" для локализации компонента
+      ...(await serverSideTranslations(locale ?? "ru", ["common"])),
     },
   };
 };

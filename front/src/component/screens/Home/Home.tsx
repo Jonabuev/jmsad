@@ -5,7 +5,7 @@ import CtaSection from "./cta-section/CtaSection";
 
 const HomePage: FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="flex flex-col bg-slate-50">
       <HeroSection />
       <FeaturesSection />
       <CtaSection />

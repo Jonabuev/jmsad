@@ -24,6 +24,7 @@ cycler==0.12.1
 datasets==3.5.0
 
 dill==0.3.8
+opencv-python==4.10.0.84
 Django==5.1.2
 django-allauth==65.7.0
 django-celery-beat==2.8.0

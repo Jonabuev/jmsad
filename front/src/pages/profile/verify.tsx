@@ -3,11 +3,7 @@ import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function VerifyPage() {
-  return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <VerifyIdentityForm />
-    </div>
-  );
+  return <VerifyIdentityForm />;
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {

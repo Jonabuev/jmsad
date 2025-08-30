@@ -8,8 +8,22 @@
     "contact": "Contact"
   },
   "footer": {
+    "aboutUs": "About Us",
+    "aboutDescription": "ARNO - a platform for a transparent and responsible rental market",
+    "disclaimer": "Information on the site is for reference and is provided in accordance with the current legislation of the Republic of Kazakhstan.",
+    "complaintRules": "Complaint writing rules",
+    "siteRules": "Website usage rules",
     "privacyPolicy": "Privacy Policy",
-    "copyright": "© 2024 All rights reserved"
+    "contacts": "Contacts",
+    "legalAddress": "Our legal address:",
+    "address": "Republic of Kazakhstan, Almaty region, Almaty, Bostandyk district, 050040 Al-Farabi Ave, 71",
+    "phone": "Phone:",
+    "phoneNumber": "8 (700) 000 00 00",
+    "contactUs": "Contact Us",
+    "email": "Email:",
+    "emailAddress": "info@arno.kz",
+    "socialMedia": "We are on social media:",
+    "copyright": "©2025 ARNO.KZ ALL RIGHTS RESERVED"
   },
   "navigation": {
     "registry": "Registry",
@@ -59,6 +73,13 @@
     "pending": "Under review",
     "reviewed": "Reviewed",
     "rejected": "Rejected",
+    "loading": "Loading profile...",
+    "error": {
+      "title": "Loading error",
+      "message": "An error occurred while loading the profile"
+    },
+    "notFound": "Profile not found",
+    "notSpecified": "Not specified",
     "adminComplaints": "Complaints for administrator review",
     "tenant": "Tenant",
     "confirm": "Confirm",
@@ -85,6 +106,26 @@
     "submitError": "Error while submitting",
     "limitError": "You can leave a maximum of 2 comments",
     "selfError": "You cannot comment on yourself"
+  },
+  "userProfile": {
+    "info": "Information",
+    "complaints": "Complaints",
+    "tenant": "Tenant",
+    "warning": {
+      "title": "Be careful!",
+      "message": "This tenant has been repeatedly noticed for non-compliance with contract terms"
+    },
+    "actions": {
+      "addComment": "Add comment",
+      "viewComments": "View all comments"
+    },
+    "adminActions": {
+      "title": "Administrator actions",
+      "removeBan": "Remove ban",
+      "assignViolation": "Assign violation",
+      "cancel": "Cancel",
+      "removeBanError": "Error removing ban"
+    }
   },
   "verify": {
     "identityVerification": "Identity verification"
@@ -199,7 +240,8 @@
     "iin_placeholder": "Enter IIN",
     "bin_placeholder": "Enter BIN",
     "select_citizenship": "Select citizenship",
-    "done": "Done"
+    "done": "Done",
+    "submitting": "Registering..."
   },
   "Scomplaint": {
     "title": "Submit a Complaint",

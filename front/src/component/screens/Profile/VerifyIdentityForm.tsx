@@ -86,30 +86,61 @@ const VerifyIdentityForm: React.FC = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md space-y-4"
-    >
-      <h2 className="text-xl font-bold">{t("verify.identityVerification")}</h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 backdrop-blur-sm">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            {t("verify.identityVerification")}
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Загрузите документ для верификации вашей личности
+          </p>
+        </div>
 
-      <input
-        type="file"
-        accept="image/*,.pdf"
-        onChange={handleFileChange}
-        className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-      />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Выберите документ
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-700 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all duration-200 cursor-pointer"
+              />
+            </div>
+          </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-      >
-        {loading ? "Отправка..." : "Отправить документ"}
-      </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Отправка...
+              </>
+            ) : (
+              "Отправить документ"
+            )}
+          </button>
 
-      {message && <p className="text-green-600">{message}</p>}
-      {error && <p className="text-red-600">{error}</p>}
-    </form>
+          {message && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+              <p className="text-green-600 text-sm text-center font-medium">{message}</p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-600 text-sm text-center font-medium">{error}</p>
+            </div>
+          )}
+        </form>
+      </div>
+    </div>
   );
 };
 

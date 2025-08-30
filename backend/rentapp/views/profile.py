@@ -339,58 +339,73 @@ def user_info(request):
 @permission_classes([IsAuthenticated])
 def verification_status(request):
     """
-    API endpoint для проверки статуса верификации пользователя.
+    API endpoint для проверки статуса подтверждения email пользователя.
     
-    Возвращает информацию о том, верифицирован ли пользователь.
+    Возвращает информацию о том, подтвержден ли email пользователя.
+    - email_confirmed: статус подтверждения email
     
     Permissions:
         - Требуется аутентификация
     """
     user = request.user
-    try:
-        verification = IdentityVerification.objects.get(user=user)
-        is_verified = verification.verified
-    except IdentityVerification.DoesNotExist:
-        is_verified = False
+    print(f"DEBUG: verification_status called for user {user.username}")
+    print(f"DEBUG: user.email_confirmed = {user.email_confirmed}")
     
-    return Response({
-        "is_verified": is_verified,
+    response_data = {
         "email_confirmed": user.email_confirmed,
-    })
+    }
+    print(f"DEBUG: Returning response data: {response_data}")
+    
+    return Response(response_data)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_identity(request):
     """
-    API endpoint для верификации личности пользователя.
+    API endpoint для подтверждения email пользователя.
     
-    Загружает документ для верификации и помечает email как подтвержденный.
-    Отправляет уведомление на email о получении документа.
+    Помечает email как подтвержденный и отправляет уведомление.
+    Для доступа к странице поиска достаточно подтверждения email.
     
     Required fields:
-        - id_document: Файл документа для верификации
+        - id_document: Файл документа для верификации (опционально)
     
     Permissions:
         - Требуется аутентификация
     """
     try:
         id_doc = request.FILES.get('id_document')
+        print(f"DEBUG: verify_identity called for user {request.user.username}")
+        print(f"DEBUG: Before setting email_confirmed: {request.user.email_confirmed}")
+        
         with transaction.atomic():
             request.user.email_confirmed = True
             request.user.save()
+            print(f"DEBUG: After setting email_confirmed: {request.user.email_confirmed}")
             
-            verification = IdentityVerification.objects.create(user=request.user, id_document=id_doc)
+            # Создаем запись о верификации, если документ загружен
+            if id_doc:
+                verification, created = IdentityVerification.objects.get_or_create(
+                    user=request.user,
+                    defaults={'id_document': id_doc, 'verified': True}
+                )
+                if not created:
+                    verification.id_document = id_doc
+                    verification.verified = True
+                    verification.save()
+                print(f"DEBUG: Verification record updated, verified = {verification.verified}")
+            
             send_mail(
-                'Verification request received',
-                'Thank you for submitting your identity document. We will review it shortly.',
+                'Email confirmation successful',
+                'Your email has been confirmed successfully. You can now access the search page.',
                 settings.DEFAULT_FROM_EMAIL,
                 [request.user.email],
                 fail_silently=False,
             )
-            return Response({"message": "Identity verified successfully."}, status=status.HTTP_200_OK)
+            return Response({"message": "Email confirmed successfully."}, status=status.HTTP_200_OK)
     except IntegrityError:
-        return Response({"error": "Error occurred during identity verification."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Error occurred during email confirmation."}, status=status.HTTP_400_BAD_REQUEST)
 
 class TenantRegistryView(generics.ListAPIView):
     """

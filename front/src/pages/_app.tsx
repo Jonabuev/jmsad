@@ -26,13 +26,31 @@ const AppContent = (props: AppProps) => {
     // Проверяем, что мы на клиенте
     if (typeof window === 'undefined') return;
 
-    // Проверяем и очищаем истекшие токены при загрузке приложения
-    checkAndCleanExpiredTokens();
-    
-    const token = getValidAccessToken();
-    if (token) {
-      dispatch(fetchUserProfile());
-    }
+    const initializeAuth = async () => {
+      try {
+        // Проверяем и очищаем истекшие токены при загрузке приложения
+        checkAndCleanExpiredTokens();
+        
+        const token = getValidAccessToken();
+        if (token) {
+          console.log('Valid token found, restoring user profile...');
+          await dispatch(fetchUserProfile());
+        } else {
+          console.log('No valid token found');
+        }
+      } catch (error) {
+        console.error('Error during auth initialization:', error);
+      }
+    };
+
+    // Добавляем небольшую задержку для стабилизации состояния
+    const timeoutId = setTimeout(() => {
+      initializeAuth();
+    }, 50);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [dispatch]);
 
   return (
@@ -42,7 +60,7 @@ const AppContent = (props: AppProps) => {
       </Head>
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 flex flex-col">
           <props.Component {...props.pageProps} />
         </main>
         <Footer />

@@ -1,7 +1,7 @@
 # Используем Python 3.12.6
 FROM python:3.12.6-slim
 
-# Устанавливаем системные зависимости включая Tesseract OCR
+# Устанавливаем системные зависимости включая Tesseract OCR и OpenCV
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -15,6 +15,12 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr-kaz \
     libtesseract-dev \
     poppler-utils \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Tesseract и языковые пакеты

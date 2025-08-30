@@ -4,7 +4,7 @@ import FaqQuestionsSection from "./questions-section/FaqQuestionsSection";
 
 const FAQ: FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="flex flex-col bg-slate-50">
       <FaqHeroSection />
       <FaqQuestionsSection />
     </div>

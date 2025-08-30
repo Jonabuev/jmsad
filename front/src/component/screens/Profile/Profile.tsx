@@ -77,6 +77,8 @@ const Profile: FC = () => {
       
       // Проверяем параметр verification_required
       if (params.get("verification_required") === "true") {
+        // Не показываем предупреждение, если пользователь уже верифицирован
+        // Это будет проверено позже в render, когда profileData будет доступен
         setShowVerificationRequired(true);
         // Удаляем параметр из URL
         params.delete("verification_required");
@@ -86,7 +88,7 @@ const Profile: FC = () => {
         window.history.replaceState({}, "", newUrl);
       }
     }
-  }, [router]);
+  }, [router, profileData]);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -108,6 +110,11 @@ const Profile: FC = () => {
         if (response.data) {
           setProfileData(response.data);
           console.log(response.data);
+          
+          // Если пользователь верифицирован, скрываем предупреждение о верификации
+          if (response.data.user.email_confirmed) {
+            setShowVerificationRequired(false);
+          }
         } else {
           console.error("Empty response data");
           setError("Не удалось загрузить данные профиля.");
@@ -128,6 +135,13 @@ const Profile: FC = () => {
     fetchProfileData();
   }, [router]);
 
+  // Автоматически скрываем предупреждение о верификации, если пользователь уже верифицирован
+  useEffect(() => {
+    if (profileData?.user?.email_confirmed) {
+      setShowVerificationRequired(false);
+    }
+  }, [profileData]);
+
   if (loading) return <div>Загрузка...</div>;
   if (error)
     return <div className="text-center mt-10 text-red-500">{error}</div>;
@@ -135,8 +149,8 @@ const Profile: FC = () => {
     return <div className="text-center mt-10">Профиль не найден.</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-10 bg-gray-50 min-h-screen">
-      <div className="w-[90%] max-w-[1900px] bg-white rounded-[10px] shadow-md p-5 my-5 min-h-screen flex flex-col">
+    <div className="flex flex-col items-center justify-center px-4 py-10 bg-gray-50">
+      <div className="w-[90%] max-w-[1900px] bg-white rounded-[10px] shadow-md p-5 my-5 flex flex-col">
         <div className="flex items-center justify-between flex-wrap gap-6 p-6 border-b border-gray-200 bg-white rounded-lg shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-28 h-28 relative rounded-full overflow-hidden shadow">
@@ -182,7 +196,7 @@ const Profile: FC = () => {
              </div>
            </div>
          )}
-                 {showVerificationRequired && (
+                 {showVerificationRequired && !profileData?.user?.email_confirmed && (
            <div className="mb-6 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 text-yellow-800 rounded-xl shadow-sm">
              <div className="flex items-start justify-between">
                <div className="flex-1">

@@ -38,6 +38,18 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       clearAllTokens();
     },
+    setAuthenticated: (state, action: PayloadAction<boolean>) => {
+      state.isAuthenticated = action.payload;
+    },
+    setProfile: (state, action: PayloadAction<IProfileData>) => {
+      state.profile = action.payload;
+      state.isAuthenticated = true;
+      state.loading = false;
+      state.error = null;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -49,6 +61,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.profile = action.payload;
         state.isAuthenticated = true;
+        state.error = null;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
@@ -59,5 +72,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setAuthenticated, setProfile, clearError } = authSlice.actions;
 export default authSlice.reducer;
