@@ -15,13 +15,13 @@ check_status() {
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
     echo ""
     echo "📋 Проверка логов..."
-    docker-compose -f $COMPOSE_FILE logs --tail=10
+    docker compose -f $COMPOSE_FILE logs --tail=10
 }
 
 # Функция для запуска
 start_app() {
     echo "🚀 Запуск приложения..."
-    docker-compose -f $COMPOSE_FILE up -d
+    docker compose -f $COMPOSE_FILE --env-file .env up -d
     echo "✅ Приложение запущено!"
     check_status
 }
@@ -29,7 +29,7 @@ start_app() {
 # Функция для остановки
 stop_app() {
     echo "🛑 Остановка приложения..."
-    docker-compose -f $COMPOSE_FILE down
+    docker compose -f $COMPOSE_FILE down
     echo "✅ Приложение остановлено!"
 }
 
@@ -44,14 +44,14 @@ restart_app() {
 # Функция для просмотра логов
 show_logs() {
     echo "📋 Логи приложения (Ctrl+C для выхода)..."
-    docker-compose -f $COMPOSE_FILE logs -f
+    docker compose -f $COMPOSE_FILE logs -f
 }
 
 # Функция для обновления
 update_app() {
-    echo "📦 Обновление приложения..."
-    docker-compose -f $COMPOSE_FILE pull
-    docker-compose -f $COMPOSE_FILE up -d --build
+    echo "📦 Обновление приложение..."
+    docker compose -f $COMPOSE_FILE pull
+    docker compose -f $COMPOSE_FILE --env-file .env up -d --build
     echo "✅ Приложение обновлено!"
 }
 
