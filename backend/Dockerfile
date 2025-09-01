@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libmariadb-dev \
     pkg-config \
     wget \
+    curl \
     tesseract-ocr \
     tesseract-ocr-rus \
     tesseract-ocr-eng \
