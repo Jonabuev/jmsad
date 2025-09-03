@@ -55,6 +55,24 @@ update_app() {
     echo "✅ Приложение обновлено!"
 }
 
+# Функция для пересборки frontend
+rebuild_frontend() {
+    echo "🔨 Пересборка frontend контейнера..."
+    docker compose -f $COMPOSE_FILE stop frontend
+    docker compose -f $COMPOSE_FILE build --no-cache frontend
+    docker compose -f $COMPOSE_FILE --env-file .env up -d frontend
+    echo "✅ Frontend пересобран и запущен!"
+    check_status
+}
+
+# Функция для перезапуска frontend
+restart_frontend() {
+    echo "🔄 Перезапуск frontend контейнера..."
+    docker compose -f $COMPOSE_FILE restart frontend
+    echo "✅ Frontend перезапущен!"
+    check_status
+}
+
 # Функция для очистки
 cleanup() {
     echo "🧹 Очистка неиспользуемых ресурсов..."
@@ -110,6 +128,12 @@ case "${1:-help}" in
     update)
         update_app
         ;;
+    rebuild-frontend)
+        rebuild_frontend
+        ;;
+    restart-frontend)
+        restart_frontend
+        ;;
     cleanup)
         cleanup
         ;;
@@ -124,17 +148,19 @@ case "${1:-help}" in
         ;;
     help|*)
         echo "📋 Доступные команды:"
-        echo "  start     - Запустить приложение"
-        echo "  stop      - Остановить приложение"
-        echo "  restart   - Перезапустить приложение"
-        echo "  status    - Показать статус"
-        echo "  logs      - Показать логи"
-        echo "  update    - Обновить приложение"
-        echo "  cleanup   - Очистить неиспользуемые ресурсы"
-        echo "  monitor   - Мониторинг ресурсов"
-        echo "  backup    - Создать backup базы данных"
-        echo "  restore   - Восстановить базу данных"
-        echo "  help      - Показать эту справку"
+        echo "  start           - Запустить приложение"
+        echo "  stop            - Остановить приложение"
+        echo "  restart         - Перезапустить приложение"
+        echo "  status          - Показать статус"
+        echo "  logs            - Показать логи"
+        echo "  update          - Обновить приложение"
+        echo "  rebuild-frontend - Пересобрать frontend контейнер"
+        echo "  restart-frontend - Перезапустить frontend контейнер"
+        echo "  cleanup         - Очистить неиспользуемые ресурсы"
+        echo "  monitor         - Мониторинг ресурсов"
+        echo "  backup          - Создать backup базы данных"
+        echo "  restore         - Восстановить базу данных"
+        echo "  help            - Показать эту справку"
         echo ""
         echo "Примеры использования:"
         echo "  $0 start"
