@@ -268,3 +268,257 @@ sudo systemctl restart docker
 - ✅ Постепенно добавлять новые возможности
 
 Удачи в разработке! 🚀
+
+---
+
+## 🌐 Настройка домена arno.kz
+
+После успешного деплоя на VPS (api.arno.kz), следующий этап - настройка основного домена arno.kz для работы с вашим сайтом.
+
+### Шаг 1: Настройка DNS записей
+
+1. **Войдите в панель управления доменом arno.kz**
+   - Обычно это делается через регистратора домена или DNS провайдера
+
+2. **Настройте A-записи:**
+   ```
+   Тип: A
+   Имя: @ (или оставить пустым)
+   Значение: IP_АДРЕС_VPS (где развернут api.arno.kz)
+   TTL: 3600 (или минимальное значение)
+   
+   Тип: A  
+   Имя: www
+   Значение: IP_АДРЕС_VPS
+   TTL: 3600
+   ```
+
+3. **Проверьте настройки DNS:**
+   ```bash
+   # Проверка A-записи
+   nslookup arno.kz
+   nslookup www.arno.kz
+   
+   # Или используйте онлайн сервисы:
+   # https://dnschecker.org/
+   # https://whatsmydns.net/
+   ```
+
+### Шаг 2: Обновление конфигурации Nginx
+
+1. **Подключитесь к VPS:**
+   ```bash
+   ssh username@api.arno.kz
+   cd ~/jmsad
+   ```
+
+2. **Отредактируйте nginx.conf:**
+   ```bash
+   nano nginx.conf
+   ```
+
+3. **Обновите server_name в конфигурации:**
+   ```nginx
+   server {
+       listen 80;
+       server_name arno.kz www.arno.kz api.arno.kz;
+       
+       # Остальная конфигурация остается без изменений
+       location / {
+           proxy_pass http://frontend:3000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+       
+       location /api/ {
+           proxy_pass http://backend:8000/;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+   }
+   ```
+
+4. **Перезапустите Nginx:**
+   ```bash
+   ./vps-management.sh restart
+   ```
+
+### Шаг 3: Настройка SSL сертификата (HTTPS)
+
+1. **Установите Certbot:**
+   ```bash
+   sudo apt update
+   sudo apt install certbot python3-certbot-nginx -y
+   ```
+
+2. **Получите SSL сертификат:**
+   ```bash
+   sudo certbot --nginx -d arno.kz -d www.arno.kz -d api.arno.kz
+   ```
+
+3. **Проверьте автоматическое обновление:**
+   ```bash
+   sudo certbot renew --dry-run
+   ```
+
+### Шаг 4: Обновление переменных окружения
+
+1. **Отредактируйте env.vps:**
+   ```bash
+   nano env.vps
+   ```
+
+2. **Обновите доменные настройки:**
+   ```env
+   # Основной домен
+   DOMAIN=arno.kz
+   API_DOMAIN=api.arno.kz
+   
+   # CORS настройки
+   CORS_ALLOWED_ORIGINS=https://arno.kz,https://www.arno.kz,https://api.arno.kz
+   
+   # Frontend настройки
+   NEXT_PUBLIC_API_URL=https://api.arno.kz/api
+   NEXT_PUBLIC_DOMAIN=arno.kz
+   ```
+
+3. **Пересоберите и перезапустите приложение:**
+   ```bash
+   ./vps-management.sh restart
+   ```
+
+### Шаг 5: Настройка Django для продакшена
+
+1. **Обновите settings.py в backend:**
+   ```python
+   # Добавьте в ALLOWED_HOSTS
+   ALLOWED_HOSTS = [
+       'arno.kz',
+       'www.arno.kz', 
+       'api.arno.kz',
+       'YOUR_VPS_IP'
+   ]
+   
+   # Настройки для HTTPS
+   SECURE_SSL_REDIRECT = True
+   SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+   SESSION_COOKIE_SECURE = True
+   CSRF_COOKIE_SECURE = True
+   ```
+
+2. **Пересоберите backend:**
+   ```bash
+   docker-compose -f docker-compose.vps.yml build backend
+   ./vps-management.sh restart
+   ```
+
+### Шаг 6: Проверка работы
+
+1. **Проверьте доступность сайта:**
+   ```bash
+   # HTTP (должен перенаправлять на HTTPS)
+   curl -I http://arno.kz
+   
+   # HTTPS
+   curl -I https://arno.kz
+   
+   # API
+   curl -I https://api.arno.kz/api/
+   ```
+
+2. **Проверьте в браузере:**
+   - https://arno.kz - основной сайт
+   - https://www.arno.kz - с www
+   - https://api.arno.kz/api/ - API
+
+### Шаг 7: Настройка мониторинга
+
+1. **Добавьте мониторинг домена:**
+   ```bash
+   # Создайте скрипт проверки
+   cat > ~/jmsad/check-domain.sh << 'EOF'
+   #!/bin/bash
+   echo "Проверка домена arno.kz..."
+   curl -s -o /dev/null -w "%{http_code}" https://arno.kz
+   echo ""
+   echo "Проверка API..."
+   curl -s -o /dev/null -w "%{http_code}" https://api.arno.kz/api/
+   echo ""
+   EOF
+   
+   chmod +x ~/jmsad/check-domain.sh
+   ```
+
+2. **Добавьте в crontab для регулярной проверки:**
+   ```bash
+   crontab -e
+   # Добавьте строку:
+   */5 * * * * /home/username/jmsad/check-domain.sh >> /home/username/jmsad/domain-check.log
+   ```
+
+### Шаг 8: Настройка резервного копирования
+
+1. **Обновите скрипт backup для включения SSL сертификатов:**
+   ```bash
+   # В vps-management.sh добавьте в функцию backup:
+   echo "Backing up SSL certificates..."
+   sudo cp -r /etc/letsencrypt ~/jmsad/backups/ssl-$(date +%Y%m%d_%H%M%S)
+   ```
+
+### Шаг 9: Финальная проверка
+
+1. **Полная проверка всех компонентов:**
+   ```bash
+   ./vps-management.sh status
+   ./check-domain.sh
+   
+   # Проверка SSL
+   openssl s_client -connect arno.kz:443 -servername arno.kz
+   ```
+
+2. **Проверьте производительность:**
+   ```bash
+   # Нагрузочное тестирование
+   ab -n 100 -c 10 https://arno.kz/
+   ```
+
+## 🎯 Результат
+
+После выполнения всех этапов у вас будет:
+
+- ✅ Домен arno.kz работает с HTTPS
+- ✅ Автоматическое перенаправление с HTTP на HTTPS  
+- ✅ Поддержка www и без www версий
+- ✅ API доступно по api.arno.kz
+- ✅ SSL сертификат с автообновлением
+- ✅ Мониторинг доступности
+- ✅ Резервное копирование включая SSL
+
+## 🚨 Возможные проблемы и решения
+
+### DNS не обновился
+```bash
+# Очистите DNS кэш
+sudo systemctl flush-dns
+# Или подождите до 24 часов для полного обновления
+```
+
+### SSL сертификат не получен
+```bash
+# Проверьте, что домен доступен по HTTP
+curl http://arno.kz
+# Убедитесь, что порт 80 открыт
+sudo ufw allow 80/tcp
+```
+
+### CORS ошибки
+```bash
+# Проверьте настройки CORS в Django
+# Убедитесь, что все домены добавлены в CORS_ALLOWED_ORIGINS
+```
+
+Теперь ваш сайт полностью готов к работе на домене arno.kz! 🎉

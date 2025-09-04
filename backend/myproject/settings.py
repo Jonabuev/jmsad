@@ -36,9 +36,19 @@ else:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend', 'frontend']
+# Hosts, включая боевые домены
+ALLOWED_HOSTS = [
+    'arno.kz',
+    'www.arno.kz',
+    'api.arno.kz',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    'backend',
+    'frontend',
+]
 
 
 # Application definition
@@ -78,15 +88,26 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     
 ]
+
+# CORS/CSRF для прод-доменов и разработки
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://frontend:3000",
-    "http://0.0.0.0:3000",
+    'https://arno.kz',
+    'https://www.arno.kz',
+    'https://api.arno.kz',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://frontend:3000',
+    'http://0.0.0.0:3000',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://arno.kz',
+    'https://www.arno.kz',
+    'https://api.arno.kz',
 ]
 
 # Разрешаем загрузку изображений
-CORS_ALLOW_ALL_ORIGINS = True  # Временно для отладки
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -273,6 +294,11 @@ DEFAULT_FROM_EMAIL = 'arno.help.service@gmail.com'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Прод безопасность (за прокси/Nginx с HTTPS)
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
