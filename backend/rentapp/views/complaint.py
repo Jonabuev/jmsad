@@ -310,26 +310,55 @@ def update_complaint_status(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def complaint_reasons(request):
-    user = request.user  # Получаем аутентифицированного пользователя
-    role = user.role  # Предполагаем, что role — поле модели CustomUser
+    """
+    API endpoint для получения причин жалоб в зависимости от роли пользователя.
+    Автоматически возвращает дефолтные причины для соответствующего типа.
+    """
+    user = request.user
+    role = user.role
+
+    # Убеждаемся, что дефолтные причины существуют
+    ComplaintReason.ensure_default_reasons_exist()
 
     if role == "tenant":
-        # Используем кэширование для причин жалоб
-        reasons = ComplaintCache.get_complaint_reasons("landlord")
+        # Арендатор может жаловаться на арендодателя
+        reasons = ComplaintReason.get_default_reasons_for_type("landlord")
     elif role == "landlord":
-        # Используем кэширование для причин жалоб
-        reasons = ComplaintCache.get_complaint_reasons("tenant")
+        # Арендодатель может жаловаться на арендатора
+        reasons = ComplaintReason.get_default_reasons_for_type("tenant")
     else:
         return Response({"error": "Invalid role"}, status=400)
 
-    return Response(reasons)
+    serializer = ComplaintReasonSerializer(reasons, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def all_complaint_reasons(request):
-    # Возвращаем все причины жалоб без фильтрации
+    """
+    API endpoint для получения всех причин жалоб.
+    Полезно для админ-панели или общего просмотра.
+    """
+    # Убеждаемся, что дефолтные причины существуют
+    ComplaintReason.ensure_default_reasons_exist()
+    
     reasons = ComplaintReason.objects.all()
+    serializer = ComplaintReasonSerializer(reasons, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def default_complaint_reasons(request):
+    """
+    API endpoint для получения только дефолтных причин жалоб.
+    Возвращает причины, отсортированные по типу и порядку.
+    """
+    # Убеждаемся, что дефолтные причины существуют
+    ComplaintReason.ensure_default_reasons_exist()
+    
+    reasons = ComplaintReason.objects.filter(is_default=True)
     serializer = ComplaintReasonSerializer(reasons, many=True)
     return Response(serializer.data)
 

@@ -128,7 +128,7 @@ const RegisterForm: FC = () => {
         await dispatch(fetchUserProfile());
         
         console.log("🚀 Перенаправляем на профиль...");
-        router.push(response.data.profile_url || "/profile");
+        router.push("/profile");
         
         alert(t("registration.successful_registration"));
       }

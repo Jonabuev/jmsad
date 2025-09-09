@@ -1,10 +1,13 @@
-# signals.py
-from django.contrib.auth.signals import user_logged_in
+from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from django.utils import timezone
+from django.apps import apps
 
-@receiver(user_logged_in)
-def reset_verification_if_expired(sender, request, user, **kwargs):
-    if user.passport_expiry and user.passport_expiry < timezone.now().date():
-        user.email_confirmed = False
-        user.save(update_fields=["email_confirmed"])
+
+@receiver(post_migrate)
+def create_default_complaint_reasons(sender, **kwargs):
+    """
+    Автоматически создает дефолтные причины жалоб после миграций
+    """
+    if sender.name == 'rentapp':
+        ComplaintReason = apps.get_model('rentapp', 'ComplaintReason')
+        ComplaintReason.ensure_default_reasons_exist()

@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Image from "next/image";
+import { apiUrl } from "@/utils/url";
 
 interface Prediction {
   index: number;
@@ -22,7 +23,7 @@ const TenantsTable: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/analitics/") // Make sure this URL is correct in your urls.py
+      .get(apiUrl("/analitics/"))
       .then((res) => {
         const data = res.data;
         setPredictions(data);
@@ -107,7 +108,7 @@ const TenantsTable: React.FC = () => {
           ))}
         </tbody>
       </table>
-      <Image src="http://127.0.0.1:8000/api/roc-curve/" alt="ROC" />
+      <Image src={apiUrl("/roc-curve/")} alt="ROC" />
     </div>
   );
 };

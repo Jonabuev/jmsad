@@ -178,6 +178,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         if password1 != password2:
             raise serializers.ValidationError("Пароли не совпадают.")
+        
+        # Валидация ИИН
+        identifier = attrs.get('identifier')
+        if identifier:
+            if not identifier.isdigit() or len(identifier) != 12:
+                raise serializers.ValidationError("ИИН должен содержать ровно 12 цифр.")
+        
         return attrs
 
     def create(self, validated_data):
@@ -268,7 +275,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class ComplaintReasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplaintReason
-        fields = ['id', 'reason', 'type']
+        fields = ['id', 'reason', 'type', 'is_default', 'order']
 
 
 class ComplaintImageSerializer(serializers.ModelSerializer):

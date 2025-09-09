@@ -11,6 +11,7 @@ from rentapp.forms import CustomUserCreationForm
 from rentapp.models import PasswordChangeRequest, CustomUser
 from rentapp.serializers import RequestPasswordChangeSerializer, ConfirmPasswordChangeSerializer
 from rentapp.utils import generate_code, send_confirmation_code
+from rentapp.notifications import create_notification
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import requests
@@ -54,6 +55,18 @@ def register(request):
         access_token = str(refresh.access_token)
 
         profile_url = f"http://localhost:3000/profile/"
+
+        # Создаем уведомление о регистрации (в базе)
+        try:
+            create_notification(
+                user=user,
+                notification_type='complaint_received',  # используем существующий тип как общий
+                title='Добро пожаловать!',
+                message='Ваш аккаунт успешно зарегистрирован.'
+            )
+        except Exception as e:
+            # Не блокируем регистрацию из-за уведомлений
+            print('Ошибка создания уведомления при регистрации:', e)
 
         return Response({
             "message": "Пользователь успешно зарегистрирован",

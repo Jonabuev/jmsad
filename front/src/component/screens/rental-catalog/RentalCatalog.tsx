@@ -7,6 +7,7 @@ import LoadingIndicator from "./loading/LoadingIndicator";
 import RentalMap from "./rental-map/RentalMap";
 import { useState, useEffect } from "react";
 import { IHouse } from "@/component/type/properties.interface";
+import { apiUrl, mediaUrl } from "@/utils/url";
 
 export default function RentalCatalog() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export default function RentalCatalog() {
     }
     axios
       .post(
-        "http://127.0.0.1:8000/api/rent-house/",
+        apiUrl("/rent-house/"),
         {
           house_id: houseId,
           start_date: startDate,
@@ -84,7 +85,7 @@ export default function RentalCatalog() {
             {selectedHouse.images?.length > 0 && (
               <>
                 <img
-                  src={`http://127.0.0.1:8000${selectedHouse.images[mainImgIdx]}`}
+                  src={mediaUrl(selectedHouse.images[mainImgIdx])}
                   alt="Фото"
                   className="w-full h-40 object-cover rounded mb-2"
                 />
@@ -93,7 +94,7 @@ export default function RentalCatalog() {
                     {selectedHouse.images.map((img, idx) => (
                       <img
                         key={idx}
-                        src={`http://127.0.0.1:8000${img}`}
+                        src={mediaUrl(img)}
                         alt="Фото"
                         className={`w-16 h-12 object-cover rounded cursor-pointer border ${mainImgIdx === idx ? 'border-blue-500' : 'border-gray-200'}`}
                         onClick={() => setMainImgIdx(idx)}

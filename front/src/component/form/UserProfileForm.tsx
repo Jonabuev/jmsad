@@ -48,6 +48,10 @@ const UserProfileForm = () => {
         username: profileData.username || "",
         phone_number: profileData.phone_number || "",
         email: profileData.email || "",
+        identifier: profileData.identifier || "",
+        document_type: profileData.document_type || "",
+        passport_expiry: profileData.passport_expiry || "",
+        visa_num: profileData.user?.visa_number || "",
       });
     }
   }, [profileData, reset]);
@@ -65,7 +69,7 @@ const UserProfileForm = () => {
       formPayload.append("avatar", data.avatar[0]);
     }
 
-    if (data.document_type) formPayload.append("doc_type", data.document_type);
+     if (data.document_type) formPayload.append("document_type", data.document_type);
 
     if (data.passport_expiry) formPayload.append("passport_expiry", data.passport_expiry);
 
@@ -127,10 +131,16 @@ const UserProfileForm = () => {
             </label>
             <input
               type="text"
-              {...register("identifier")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-100 cursor-not-allowed"
-              disabled
+              {...register("identifier", {
+                pattern: {
+                  value: /^\d{12}$/,
+                  message: "ИИН должен содержать ровно 12 цифр"
+                }
+              })}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+              placeholder="Введите 12-значный ИИН (необязательно)"
             />
+            {errors.identifier && <p className="text-red-500 text-sm mt-2 font-medium">{errors.identifier.message}</p>}
           </div>
 
           <div>
@@ -165,15 +175,15 @@ const UserProfileForm = () => {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               {t("editProfile.documentType")}:
             </label>
-            <select
-              {...register("document_type")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
-            >
-              <option value="">{t("editProfile.selectDocumentType")}</option>
-              <option value="id">{t("editProfile.docType.id")}</option>
-              <option value="passport">{t("editProfile.docType.passport")}</option>
-              <option value="visa">{t("editProfile.docType.visa")}</option>
-            </select>
+             <select
+               {...register("document_type")}
+               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+             >
+               <option value="">{t("editProfile.selectDocumentType")}</option>
+               <option value="id_card">{t("editProfile.docType.id")}</option>
+               <option value="passport_kz">{t("editProfile.docType.passport")}</option>
+               <option value="visa">{t("editProfile.docType.visa")}</option>
+             </select>
           </div>
 
           <div>

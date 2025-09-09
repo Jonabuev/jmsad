@@ -170,7 +170,8 @@ export const autoRefreshToken = async (): Promise<boolean> => {
   if (isTokenExpiringSoon(accessToken, 5)) {
     try {
       console.log('Автоматическое обновление access token...');
-      const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+      const { apiUrl } = await import('./url');
+      const response = await fetch(apiUrl('/token/refresh/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

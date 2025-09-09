@@ -1,6 +1,7 @@
 import { IHouse } from "@/component/type/properties.interface";
 // import YandexMap from "@/component/map/YandexMap";
 import dynamic from "next/dynamic";
+import { mediaUrl } from "@/utils/url";
 
 import { useEffect } from "react";
 import { useTranslation } from "next-i18next";
@@ -55,7 +56,7 @@ export default function RentalMap({ rentals, onRentClick, onSelectHouse }: Props
                 ${rental.description ? `<div style="margin: 8px 0; font-size: 12px; color: #374151;">${rental.description.substring(0, 100)}${rental.description.length > 100 ? '...' : ''}</div>` : ''}
                 ${rental.images && rental.images.length > 0 ? `
                   <div style="margin: 8px 0;">
-                    <img src="http://127.0.0.1:8000${rental.images[0]}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;" alt="Фото апартамента" />
+                    <img src="${mediaUrl(rental.images[0])}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;" alt="Фото апартамента" />
                     ${rental.images.length > 1 ? `<div style="font-size: 10px; color: #6b7280; text-align: center; margin-top: 4px;">+${rental.images.length - 1} фото</div>` : ''}
                   </div>
                 ` : ''}

@@ -3,6 +3,7 @@
 import { IComplaint } from "@/component/type/users.interface";
 import { FC, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { mediaUrl } from "@/utils/url";
 import { useTranslation } from "react-i18next";
 
   
@@ -13,7 +14,7 @@ const ProtectedPDF = dynamic(() => import("./PdfAsImagesViewer"), { ssr: false }
 // Компонент для защищённого показа изображения
 const ProtectedImage: FC<{ src: string }> = ({ src }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fullSrc = getFullUrl(src); // ← здесь
+  const fullSrc = mediaUrl(src);
   const { t } = useTranslation("common");
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const EvidenceViewer: FC<{ url: string }> = ({ url }) => {
   }
 
   if (isPDFFile(url)) {
-    return <ProtectedPDF pdfUrl={getFullUrl(url)} />;
+    return <ProtectedPDF pdfUrl={mediaUrl(url)} />;
   }
 
   return (
@@ -71,18 +72,7 @@ const EvidenceViewer: FC<{ url: string }> = ({ url }) => {
 
 
 
-const getFullUrl = (url: string): string => {
-  // если это уже абсолютный URL
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-
-  // если начинается с / — оставить
-  if (url.startsWith("/")) {
-    return `http://127.0.0.1:8000${url}`;
-  }
-
-  // иначе добавить слэш
-  return `http://127.0.0.1:8000/${url}`;
-};
+// удалено: локальная реализация getFullUrl заменена на mediaUrl
 
 
 
@@ -151,7 +141,7 @@ const ComplaintInfo: FC<Props> = ({ complaint, t }) => {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
             {complaint.images.map((img, i) => (
               <div key={i} className="rounded shadow-md bg-gray-100 p-1">
-                <ProtectedImage src={getFullUrl(img)} />
+                <ProtectedImage src={mediaUrl(img)} />
               </div>
             ))}
           </div>

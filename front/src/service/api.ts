@@ -2,7 +2,9 @@ import axios from "axios";
 import Router from "next/router";
 import { getValidAccessToken, getValidRefreshToken, clearAllTokens, saveTokens } from "@/utils/tokenUtils";
 
-const API_URL = "http://127.0.0.1:8000/api";
+// Determine API base URL from env with local fallback
+const baseFromEnv = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+const API_URL = `${baseFromEnv.replace(/\/$/, "")}/api`;
 
 const api = axios.create({
   baseURL: API_URL,
@@ -81,14 +83,20 @@ api.interceptors.response.use(
         } catch (refreshError) {
           processQueue(refreshError, null);
           clearAllTokens();
-          Router.push("/login");
+          // Не перенаправляем на логин, если мы на главной странице
+          if (Router.pathname !== '/') {
+            Router.push("/login");
+          }
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
         }
       } else {
         clearAllTokens();
-        Router.push("/login");
+        // Не перенаправляем на логин, если мы на главной странице
+        if (Router.pathname !== '/') {
+          Router.push("/login");
+        }
         isRefreshing = false;
         return Promise.reject(error);
       }

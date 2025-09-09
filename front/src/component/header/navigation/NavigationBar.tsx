@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/component/store/store";
 import { logout } from "@/component/store/auth/authSlice";
+import { mediaUrl } from "@/utils/url";
 
 const NavigationBar: React.FC = () => {
   const { profile: user, isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -151,14 +152,14 @@ const NavigationBar: React.FC = () => {
         {isAuthenticated && user ? (
           <div className="relative" ref={dropdownRef}>
             <Image
-              src={user.user.avatar ? `http://127.0.0.1:8000${user.user.avatar}` : "http://127.0.0.1:8000/media/avatars/def.jpg"}
+              src={user.user.avatar ? mediaUrl(user.user.avatar) : mediaUrl("/media/avatars/def.jpg")}
               alt="Аватар"
               width={32}
               height={32}
               className="w-8 h-8 rounded-full object-cover object-center cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all duration-200"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "http://127.0.0.1:8000/media/avatars/def.jpg";
+                (e.target as HTMLImageElement).src = mediaUrl("/media/avatars/def.jpg");
               }}
             />
 

@@ -14,7 +14,7 @@ from .views.rental import (
     FavoriteListCreateView
 )
 from .views.complaint import (
-    createRentalComplaint, dispute_complaintFinal, get_complaint_by_uuid, search_users_by_iin, submit_complaint, dispute_complaint, update_complaint, update_complaint_status,
+    createRentalComplaint, default_complaint_reasons, dispute_complaintFinal, get_complaint_by_uuid, search_users_by_iin, submit_complaint, dispute_complaint, update_complaint, update_complaint_status,
     update_complaint_status1, complaint_reasons, all_complaint_reasons, ComplaintReasonListTenant,
     ComplaintReasonListLandlord, ComplaintDetailByUUIDView, AddCommentAPIView, SupportComplaintAPIView,
     house_locations, CreateComplaintAPIView)
@@ -44,6 +44,7 @@ urlpatterns = [
     path('complaints/submit/', submit_complaint, name='submit_complaint'),
     path('house-locations/', house_locations, name='house-locations'),
     path('complaint-reasons/', complaint_reasons, name='complaint_reasons'),
+    path('default-complaint-reasons/', default_complaint_reasons, name='default_complaint_reasons'),
     path('tenant-registry/', TenantRegistryView.as_view(), name='tenant_registry'),
     path('user/profile/<str:username>/', PublicUserProfileView.as_view(), name='public_user_profile'),
     path('tenant-registry1/', TenantRegistryView1.as_view(), name='tenant_registry1'),

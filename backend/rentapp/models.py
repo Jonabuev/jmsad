@@ -599,9 +599,64 @@ class ComplaintReason(models.Model):
 
     reason = models.CharField(max_length=255, unique=True)
     type = models.CharField(max_length=20, choices=REASON_TYPE_CHOICES, default='')
+    is_default = models.BooleanField(default=False, help_text="Является ли причина дефолтной")
+    order = models.PositiveIntegerField(default=0, help_text="Порядок отображения")
+
+    class Meta:
+        ordering = ['type', 'order', 'reason']
+        verbose_name = "Причина жалобы"
+        verbose_name_plural = "Причины жалоб"
 
     def __str__(self):
-        return f"{self.reason} ({self.type})"
+        return f"{self.reason} ({self.get_type_display()})"
+    
+    @classmethod
+    def get_default_reasons_for_type(cls, reason_type):
+        """Получить дефолтные причины для определенного типа"""
+        return cls.objects.filter(type=reason_type, is_default=True).order_by('order')
+    
+    @classmethod
+    def ensure_default_reasons_exist(cls):
+        """Убедиться, что дефолтные причины существуют"""
+        # Причины для жалоб на арендодателей (от арендаторов)
+        landlord_reasons = [
+            "Отсутствие ремонта помещения",
+            "Повышение арендной платы без уведомления", 
+            "Нарушение условий договора",
+            "Игнорирование заявок на устранение неисправностей",
+            "Отказ от предоставления документов на жилье"
+        ]
+        
+        # Причины для жалоб на арендаторов (от арендодателей)
+        tenant_reasons = [
+            "Просрочка платежей",
+            "Порча имущества",
+            "Нарушение условий договора",
+            "Жалобы от соседей / нарушение порядка",
+            "Самовольное выселение или отказ освободить помещение"
+        ]
+        
+        # Создаем причины для арендодателей
+        for i, reason_text in enumerate(landlord_reasons):
+            cls.objects.get_or_create(
+                reason=reason_text,
+                defaults={
+                    'type': 'landlord',
+                    'is_default': True,
+                    'order': i
+                }
+            )
+        
+        # Создаем причины для арендаторов
+        for i, reason_text in enumerate(tenant_reasons):
+            cls.objects.get_or_create(
+                reason=reason_text,
+                defaults={
+                    'type': 'tenant',
+                    'is_default': True,
+                    'order': i
+                }
+            )
     
 import uuid
 from django.db import models

@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/component/store/store";
 import { useApi } from "@/component/hooks/useApi";
 import { removeBan } from "@/api/userApi";
+import { apiUrl, mediaUrl } from "@/utils/url";
 import ViolationForm from "@/component/form/ViolationForm"; // Подключаем наш компонент
 
 const tabs = [
@@ -33,7 +34,7 @@ const PublicUserProfile: FC = () => {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/comments/?target_user=${username}`);
+      const res = await fetch(apiUrl(`/comments/?target_user=${username}`));
       const data = await res.json();
       setComments(data);
     } catch (err) {
@@ -58,7 +59,7 @@ const PublicUserProfile: FC = () => {
 
     try {
       // перед отправкой загружаем актуальные комментарии
-      const resCheck = await fetch(`http://127.0.0.1:8000/api/comments/?target_user=${profileData.username}`, {
+      const resCheck = await fetch(apiUrl(`/comments/?target_user=${profileData.username}`), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
         },
@@ -79,7 +80,7 @@ const PublicUserProfile: FC = () => {
       // теперь можно постить
       const token = localStorage.getItem("access_token");
 
-      const res = await fetch(`http://127.0.0.1:8000/api/comments/`, {
+      const res = await fetch(apiUrl(`/comments/`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +141,7 @@ const PublicUserProfile: FC = () => {
         setPublicProfileLoading(true);
         setError(null);
 
-        const res = await fetch(`http://127.0.0.1:8000/api/user/profile/${username}/`, {
+        const res = await fetch(apiUrl(`/user/profile/${username}/`), {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
@@ -183,43 +184,128 @@ const PublicUserProfile: FC = () => {
   if (!profileData) return <div className="text-center mt-10">{t("profile.profileNotFound")}</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-10 bg-gray-50 min-h-screen">
-      <div className="w-[90%] max-w-[1900px] bg-white rounded-[10px] shadow-md p-5 my-5 min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-6 p-6 border-b border-gray-200 bg-white rounded-lg shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="w-28 h-28 relative rounded-full overflow-hidden shadow">
-              <Image
-                src={`http://127.0.0.1:8000${profileData.avatar || "/media/avatars/def.jpg"}`}
-                alt="Avatar"
-                fill
-                className="object-cover"
-              />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Profile Info */}
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20">
+                  <Image
+                    src={mediaUrl(profileData.avatar || "/media/avatars/def.jpg")}
+                    alt="Avatar"
+                    width={128}
+                    height={128}
+                    className="object-cover w-full h-full"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = mediaUrl("/media/avatars/def.jpg");
+                    }}
+                  />
+                </div>
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold mb-2">
+                  {profileData.anonymous_name || profileData.username}
+                </h1>
+                {profileData.anonymous_name && (
+                  <p className="text-xl text-blue-100 mb-2">@{profileData.username}</p>
+                )}
+                <div className="flex flex-wrap items-center gap-6 text-blue-100">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    <span>{profileData.email}</span>
+                    {profileData.email_confirmed && (
+                      <span className="bg-green-500/20 text-green-200 px-2 py-1 rounded-full text-xs font-medium">
+                        ✓ {t("profile.confirmed")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                    <span>{profileData.phone_number || t("profile.noPhone")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <span>{profileData.identifier || t("profile.noIIN")}</span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 mt-3">
+                  <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                    {profileData.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                {profileData.anonymous_name || profileData.username}
-              </h1>
-              {profileData.anonymous_name && (
-                <p className="text-sm text-gray-500 mt-1">@{profileData.username}</p>
-              )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => setShowAddComment(true)}
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 border border-white/30 hover:border-white/50 flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                {t("profile.addComment")}
+              </button>
+              <button
+                onClick={() => setShowComments(!showComments)}
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 border border-white/30 hover:border-white/50 flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                {showComments ? t("profile.hideComments") : t("profile.showComments")}
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Tabs */}
-        <div>
-          <div className="flex justify-center gap-8 border-b mb-6">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+
+          {/* Tabs */}
+          <div className="flex flex-wrap gap-2 p-2 bg-gray-50">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`py-2 px-4 font-medium ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
                   activeTab === tab.key
-                    ? "border-b-2 border-blue-600 text-blue-600"
-                    : "text-gray-500 hover:text-blue-600"
+                    ? "bg-white text-blue-600 shadow-md border border-blue-200"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-white/50"
                 }`}
               >
+                {tab.key === "info" && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                {tab.key === "complaints" && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                )}
                 {t(tab.label)}
               </button>
             ))}
@@ -268,29 +354,99 @@ const PublicUserProfile: FC = () => {
 
           {/* Info tab */}
           {activeTab === "info" && (
-            <div className="flex flex-wrap gap-5 mt-5">
-              <div className="bg-white p-6 rounded-2xl shadow-lg flex-1 min-w-[300px] space-y-4">
-                <h2 className="font-semibold text-lg text-gray-800 border-b pb-2">
-                  {t("profile.generalInfo")}
-                </h2>
-                <p className="text-gray-700"><strong>{t("profile.iin")}:</strong> {profileData.identifier}</p>
-                <p className="text-gray-700"><strong>{t("profile.role")}:</strong> {profileData.role === "landlord" ? "Арендодатель" : "Арендатор"}</p>
-                {/* <p className="text-gray-700"><strong>{t("profile.rating")}:</strong> {profileData.rating}</p> */}
-                <p className="text-gray-700"><strong>{t("profile.phone")}:</strong> {profileData.phone_number}</p>
-                <p className="text-gray-700 flex items-center">
-                  <strong>{t("profile.email")}:</strong> {profileData.email}
-                  {/* {profileData.email_confirmed ? (
-                    <span className="ml-2 text-green-600 font-semibold bg-green-100 px-2 py-1 rounded-md">
-                      {t("profile.verified")}
-                    </span>
-                  ) : (
-                    <Link href="/profile/verify">
-                      <button className="ml-3 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-                        {t("profile.notverify")}
-                      </button>
-                    </Link>
-                  )} */}
-                </p>
+            <div className="p-6">
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("profile.accountInfo")}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">{t("profile.username")}</p>
+                        <p className="font-semibold text-gray-800">{profileData.username}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">{t("profile.role")}</p>
+                        <p className="font-semibold text-gray-800">
+                          {profileData.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">{t("profile.iin")}</p>
+                        <p className="font-semibold text-gray-800">{profileData.identifier || t("profile.noIIN")}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">{t("profile.email")}</p>
+                        <p className="font-semibold text-gray-800">{profileData.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">{t("profile.phone")}</p>
+                        <p className="font-semibold text-gray-800">{profileData.phone_number || t("profile.noPhone")}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">{t("profile.verificationStatus")}</p>
+                        <p className="font-semibold text-gray-800">
+                          {profileData.email_confirmed ? t("profile.confirmed") : t("profile.notConfirmed")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -337,130 +493,273 @@ const PublicUserProfile: FC = () => {
 
           {/* Complaints tab */}
           {activeTab === "complaints" && (
-            <div className="mt-5 p-4 rounded-lg shadow bg-white">
-              <h2 className="font-semibold mb-2 text-gray-700">{t("profile.complaints")}</h2>
-              {reviewedComplaints.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border text-sm">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="border px-4 py-2">{t("profile.description")}</th>
-                        <th className="border px-4 py-2">{t("profile.status")}</th>
-                        <th className="border px-4 py-2">{t("profile.date")}</th>
-                        <th className="border px-4 py-2">{t("profile.details")}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reviewedComplaints.map((complaint: IComplaint) => (
-                        <tr key={complaint.id} className="text-center">
-                          <td className="border px-4 py-2">{complaint.description}</td>
-                          <td className="border px-4 py-2">{t(`profile.${complaint.status}`)}</td>
-                          <td className="border px-4 py-2">
-                            {new Date(complaint.created_at).toLocaleString("ru-RU", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </td>
-                          <td>
-                            <Link
-                              href={`/complaints/${complaint.uuid}`}
-                              className="text-blue-600 underline hover:text-blue-800"
-                            >
-                              {t("profile.details")}
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-gray-500">{t("profile.noComplaints")}</p>
-              )}
-
-            </div>
-          )}
-        </div>
-        {/* Комментарии */}
-        <div className="mt-8 border-t pt-4">
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => setShowAddComment(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
-            >
-              {t("profile.addComment")}
-            </button>
-            <button
-              onClick={() => setShowComments(!showComments)}
-              className="px-4 py-2 bg-gray-600 text-white rounded shadow hover:bg-gray-700"
-            >
-              {showComments ? t("profile.toggleComments") : t("profile.showComments")}
-            </button>
-          </div>
-
-          {/* Модалка добавления комментария */}
-          {showAddComment && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-                <h2 className="text-lg font-bold mb-3">{t("profile.newComment")}</h2>
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="w-full border rounded p-2 mb-2"
-                  rows={4}
-                  placeholder={t("profile.newComment")}
-                />
-                {errorMessage && (
-                  <p className="text-red-500 text-sm mb-2">{errorMessage}</p>
+            <div className="p-6">
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("profile.complaints")}</h2>
+                
+                {reviewedComplaints.length > 0 ? (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              {t("profile.description")}
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              {t("profile.status")}
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              {t("profile.date")}
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              {t("profile.actions")}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {reviewedComplaints.map((complaint: IComplaint) => (
+                            <tr key={complaint.id} className="hover:bg-gray-50 transition-colors duration-150">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+                                  {complaint.description}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                  complaint.status === "reviewed" 
+                                    ? "bg-green-100 text-green-800" 
+                                    : complaint.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}>
+                                  {t(`profile.${complaint.status}`)}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {new Date(complaint.created_at).toLocaleString("ru-RU", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <Link
+                                  href={`/complaints/${complaint.uuid}`}
+                                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                  {t("profile.viewDetails")}
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{t("profile.noComplaints")}</h3>
+                    <p className="text-gray-500">{t("profile.noComplaintsDescription")}</p>
+                  </div>
                 )}
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setShowAddComment(false)}
-                    className="px-3 py-1 border rounded"
-                  >
-                    {t("profile.cancel")}
-                  </button>
-                  <button
-                    onClick={handleAddComment}
-                    disabled={isSubmitting}
-                    className={`px-3 py-1 rounded text-white ${
-                      isSubmitting
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    }`}
-                  >
-                    {isSubmitting ? t("profile.sending") : t("profile.send")}
-                  </button>
-                </div>
               </div>
             </div>
           )}
-
-
-          {/* Список комментариев */}
-          {showComments && (
-            <div className="mt-4 max-h-500 overflow-y-auto border rounded-lg p-3 bg-gray-50">
-              {comments.length > 0 ? (
-                comments.map((c) => (
-                  <div key={c.id} className="mb-3 p-2 bg-white rounded shadow-sm">
-                    <p className="font-semibold text-sm text-gray-700">{c.author_name}</p>
-                    <p className="text-gray-800">{c.text}</p>
-                    <p className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">{t("profile.noComments")}</p>
-              )}
-              
-            </div>
-          )}
         </div>
+          {/* Comments Section */}
+          <div className="mt-8">
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("profile.comments")}</h2>
+              
+              <div className="flex flex-wrap justify-center gap-4 mb-6">
+                <button
+                  onClick={() => setShowAddComment(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 font-semibold"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  {t("profile.addComment")}
+                </button>
+                <button
+                  onClick={() => setShowComments(!showComments)}
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg shadow-md transition-all duration-200 font-semibold ${
+                    showComments 
+                      ? "bg-gray-600 text-white hover:bg-gray-700" 
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  {showComments ? t("profile.hideComments") : t("profile.showComments")}
+                </button>
+              </div>
 
+              {/* Modal for adding comment */}
+              {showAddComment && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm">
+                  <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden border border-gray-100">
+                    {/* Header */}
+                    <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
+                      <div className="absolute inset-0 bg-black/10"></div>
+                      <div className="relative p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                            </div>
+                            <div>
+                              <h2 className="text-2xl font-bold">{t("profile.newComment")}</h2>
+                              <p className="text-blue-100 text-sm">Оставьте отзыв о пользователе</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setShowAddComment(false)}
+                            className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
+                          >
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="p-6">
+                      <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                          {t("profile.commentText")}
+                        </label>
+                        <textarea
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          className="w-full border-2 border-gray-200 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 text-gray-700 placeholder-gray-400"
+                          rows={5}
+                          placeholder={t("profile.commentPlaceholder")}
+                        />
+                        <div className="mt-2 text-xs text-gray-500">
+                          {newComment.length}/500 {t("profile.characters")}
+                        </div>
+                      </div>
+                      
+                      {errorMessage && (
+                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0">
+                              <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            <p className="text-red-700 text-sm font-medium">{errorMessage}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Action Buttons */}
+                      <div className="flex justify-end gap-4">
+                        <button
+                          onClick={() => setShowAddComment(false)}
+                          className="px-6 py-3 text-gray-600 border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-semibold"
+                        >
+                          {t("profile.cancel")}
+                        </button>
+                        <button
+                          onClick={handleAddComment}
+                          disabled={isSubmitting || !newComment.trim()}
+                          className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md ${
+                            isSubmitting || !newComment.trim()
+                              ? "bg-gray-400 cursor-not-allowed text-white"
+                              : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl"
+                          }`}
+                        >
+                          {isSubmitting ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              {t("profile.sending")}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                              </svg>
+                              {t("profile.send")}
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
+              {/* Comments List */}
+              {showComments && (
+                <div className="mt-6">
+                  {comments.length > 0 ? (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                      <div className="max-h-96 overflow-y-auto">
+                        <div className="space-y-4 p-6">
+                          {comments.map((c) => (
+                            <div key={c.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                              <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                  {c.author_name?.charAt(0)?.toUpperCase() || 'U'}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-semibold text-gray-800">{c.author_name}</h4>
+                                    <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                                      {new Date(c.created_at).toLocaleDateString("ru-RU", {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                  </div>
+                                  <p className="text-gray-700 leading-relaxed">{c.text}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t("profile.noComments")}</h3>
+                      <p className="text-gray-500">{t("profile.noCommentsDescription")}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
   );
 };
 
