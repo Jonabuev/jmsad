@@ -25,8 +25,9 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   className = "",
   children
 }) => {
-  const [clientId, setClientId] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const initialClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+  const [clientId, setClientId] = useState<string>(initialClientId);
+  const [loading, setLoading] = useState(false);
   const [showGoogleLogin, setShowGoogleLogin] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -50,21 +51,14 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     );
   }
 
+  // Client ID теперь берём из переменной окружения NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  // Дополнительно оставляем возможность динамически обновить, если потребуется
   useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const response = await fetch('/api/config');
-        const data = await response.json();
-        setClientId(data.googleClientId || "");
-      } catch (error) {
-        console.error("Error fetching config:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchConfig();
-  }, []);
+    if (!clientId && typeof process !== 'undefined') {
+      const fromEnv = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+      if (fromEnv) setClientId(fromEnv);
+    }
+  }, [clientId]);
   
   const handleLoginSuccess = async (response: CredentialResponse) => {
     console.log("🔐 Google Login Success:", response);
