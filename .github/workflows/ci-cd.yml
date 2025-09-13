@@ -1,0 +1,219 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16.9-alpine
+        env:
+          POSTGRES_DB: jmsad_test_db
+          POSTGRES_USER: jmsad_test_user
+          POSTGRES_PASSWORD: jmsad_test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: front/package-lock.json
+
+    - name: Install Python dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r req.txt
+
+    - name: Install Node.js dependencies
+      run: |
+        cd front
+        npm ci
+
+    - name: Run backend tests
+      env:
+        SECRET_KEY: test-secret-key
+        DEBUG: True
+        DB_NAME: jmsad_test_db
+        DB_USER: jmsad_test_user
+        DB_PASSWORD: jmsad_test_password
+        DB_HOST: localhost
+        DB_PORT: 5432
+      run: |
+        cd backend
+        python manage.py test --settings=myproject.test_settings
+
+    - name: Run frontend tests
+      run: |
+        cd front
+        npm test -- --coverage --watchAll=false
+
+    - name: Upload backend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: backend/coverage.xml
+        flags: backend
+
+    - name: Upload frontend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: front/coverage/lcov.info
+        flags: frontend
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/jmsad-backend:latest
+          ${{ secrets.DOCKER_USERNAME }}/jmsad-backend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./front
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/jmsad-frontend:latest
+          ${{ secrets.DOCKER_USERNAME }}/jmsad-frontend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy-staging:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to staging
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /opt/jmsad
+          git pull origin develop
+          docker-compose -f docker-compose.staging.yml down
+          docker-compose -f docker-compose.staging.yml pull
+          docker-compose -f docker-compose.staging.yml up -d
+          docker-compose -f docker-compose.staging.yml exec -T backend_staging python manage.py migrate
+          docker-compose -f docker-compose.staging.yml exec -T backend_staging python manage.py collectstatic --noinput
+
+    - name: Run staging tests
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /opt/jmsad
+          docker-compose -f docker-compose.staging.yml exec -T backend_staging python manage.py test --settings=myproject.staging_settings
+
+    - name: Health check staging
+      run: |
+        sleep 30
+        curl -f http://${{ secrets.STAGING_HOST }}:8001/health/ || exit 1
+        curl -f http://${{ secrets.STAGING_HOST }}:3001/ || exit 1
+
+  deploy-production:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Create backup
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USERNAME }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        script: |
+          cd /opt/jmsad
+          mkdir -p backups/$(date +%Y%m%d_%H%M%S)
+          docker-compose -f docker-compose.prod.yml exec -T postgres_prod pg_dump -U jmsad_user -d jmsad_db > backups/$(date +%Y%m%d_%H%M%S)/database_backup.sql
+
+    - name: Deploy to production
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USERNAME }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        script: |
+          cd /opt/jmsad
+          git pull origin main
+          docker-compose -f docker-compose.prod.yml down
+          docker-compose -f docker-compose.prod.yml pull
+          docker-compose -f docker-compose.prod.yml up -d
+          docker-compose -f docker-compose.prod.yml exec -T backend_prod python manage.py migrate
+          docker-compose -f docker-compose.prod.yml exec -T backend_prod python manage.py collectstatic --noinput
+
+    - name: Health check production
+      run: |
+        sleep 60
+        curl -f https://arno.kz/ || exit 1
+        curl -f https://api.arno.kz/health/ || exit 1
+
+    - name: Notify deployment
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow

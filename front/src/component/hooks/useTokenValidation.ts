@@ -18,7 +18,7 @@ export const useTokenValidation = () => {
       if (!token) {
         // Если нет валидного токена, перенаправляем на логин
         // Но только если мы не на публичных страницах
-        const publicPages = ['/', '/login', '/register', '/faq', '/about'];
+        const publicPages = ['/', '/login', '/register', '/faq', '/about', '/reset-password'];
         const protectedPages = ['/search', '/profile'];
         
         if (!publicPages.includes(router.pathname) && !protectedPages.includes(router.pathname)) {
@@ -49,7 +49,7 @@ export const useTokenValidation = () => {
       if (!currentToken) {
         // Если токен стал невалидным, перенаправляем на логин
         // Но только если мы не на публичных страницах
-        const publicPages = ['/', '/login', '/register', '/faq', '/about'];
+        const publicPages = ['/', '/login', '/register', '/faq', '/about', '/reset-password'];
         const protectedPages = ['/search', '/profile'];
         
         if (!publicPages.includes(router.pathname) && !protectedPages.includes(router.pathname)) {

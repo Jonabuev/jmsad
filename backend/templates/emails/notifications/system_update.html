@@ -1,0 +1,271 @@
+{% extends 'emails/notifications/base.html' %}
+
+{% block extra_styles %}
+<style>
+    .system-banner {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .system-icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+    
+    .update-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .update-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+    
+    .features-section {
+        background-color: #faf5ff;
+        border: 2px solid #e9d5ff;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 12px;
+    }
+    
+    .features-title {
+        color: #7c2d12;
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .feature-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+        font-size: 16px;
+    }
+    
+    .feature-content {
+        flex: 1;
+    }
+    
+    .feature-name {
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 5px;
+        font-size: 16px;
+    }
+    
+    .feature-description {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .timeline-section {
+        background-color: #f0f9ff;
+        border-left: 4px solid #0ea5e9;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .timeline-title {
+        color: #0c4a6e;
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+    
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        color: #075985;
+    }
+    
+    .timeline-dot {
+        width: 12px;
+        height: 12px;
+        background-color: #0ea5e9;
+        border-radius: 50%;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+    
+    .timeline-text {
+        font-size: 14px;
+    }
+    
+    .impact-notice {
+        background-color: #fef3c7;
+        border: 2px solid #f59e0b;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 12px;
+    }
+    
+    .impact-title {
+        color: #92400e;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .impact-icon {
+        margin-right: 8px;
+        font-size: 18px;
+    }
+    
+    .impact-text {
+        color: #a16207;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .version-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 15px 0;
+    }
+    
+    @media (max-width: 600px) {
+        .feature-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notification-icon">🆕</div>
+
+<div class="priority-indicator priority-{{ priority }}">
+    {{ priority_display }}
+</div>
+
+<div class="system-banner">
+    <div class="system-icon">🚀</div>
+    <div class="update-title">Обновление системы ARNO</div>
+    <div class="update-subtitle">Мы постоянно улучшаем наш сервис для вас</div>
+</div>
+
+<div class="version-badge">
+    Версия {{ version_number }}
+</div>
+
+<h1 class="notification-title">{{ title }}</h1>
+<p class="notification-message">{{ message }}</p>
+
+{% if new_features %}
+<div class="features-section">
+    <div class="features-title">✨ Новые возможности</div>
+    
+    {% for feature in new_features %}
+    <div class="feature-item">
+        <div class="feature-icon">{{ feature.icon }}</div>
+        <div class="feature-content">
+            <div class="feature-name">{{ feature.name }}</div>
+            <div class="feature-description">{{ feature.description }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if update_timeline %}
+<div class="timeline-section">
+    <div class="timeline-title">📅 График обновления</div>
+    
+    {% for item in update_timeline %}
+    <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-text">{{ item }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if maintenance_impact %}
+<div class="impact-notice">
+    <div class="impact-title">
+        <span class="impact-icon">⚠️</span>
+        Влияние на работу сервиса
+    </div>
+    <div class="impact-text">{{ maintenance_impact }}</div>
+</div>
+{% endif %}
+
+<div class="notification-metadata">
+    <div class="metadata-item">
+        <span class="metadata-label">Версия:</span>
+        <span class="metadata-value">{{ version_number }}</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Дата обновления:</span>
+        <span class="metadata-value">{{ update_date }}</span>
+    </div>
+    {% if maintenance_window %}
+    <div class="metadata-item">
+        <span class="metadata-label">Техническое обслуживание:</span>
+        <span class="metadata-value">{{ maintenance_window }}</span>
+    </div>
+    {% endif %}
+    {% if downtime_expected %}
+    <div class="metadata-item">
+        <span class="metadata-label">Ожидаемый простой:</span>
+        <span class="metadata-value">{{ downtime_expected }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ changelog_url }}" class="action-button">
+        Подробнее об обновлении
+    </a>
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background-color: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">
+    <h3 style="color: #065f46; margin-bottom: 10px; font-size: 16px;">💡 Полезная информация</h3>
+    <p style="color: #047857; font-size: 14px; margin: 0;">
+        Если у вас возникнут вопросы по новым функциям или возникнут проблемы, 
+        обратитесь в нашу службу поддержки.
+    </p>
+</div>
+{% endblock %}

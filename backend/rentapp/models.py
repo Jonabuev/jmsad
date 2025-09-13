@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from allauth.account.signals import user_signed_up
 from django.core.validators import RegexValidator
 from django.dispatch import receiver
+from django.db.models.signals import post_save
 import random
 from PIL import Image
 import os
@@ -342,6 +343,7 @@ class CustomUser(AbstractUser):
     avatar = models.ImageField(upload_to=user_avatar_upload_path, blank=True, null=True, default='avatars/def.jpg')
     r_date = models.DateTimeField(null=True)
     anonymous_name = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    is_banned = models.BooleanField(default=False, help_text="Whether the user is banned")
 
     def generate_confirmation_code(self):
         self.confirmation_code = str(random.randint(100000, 999999))
@@ -598,6 +600,8 @@ class ComplaintReason(models.Model):
     ]
 
     reason = models.CharField(max_length=255, unique=True)
+    reason_kz = models.CharField(max_length=255, blank=True, null=True, verbose_name="Причина (KZ)")
+    reason_en = models.CharField(max_length=255, blank=True, null=True, verbose_name="Причина (EN)")
     type = models.CharField(max_length=20, choices=REASON_TYPE_CHOICES, default='')
     is_default = models.BooleanField(default=False, help_text="Является ли причина дефолтной")
     order = models.PositiveIntegerField(default=0, help_text="Порядок отображения")
@@ -852,27 +856,179 @@ class ChatMessage(models.Model):
 
 class Notification(models.Model):
     NOTIFICATION_TYPES = (
+        # Жалобы
         ('complaint_received', 'Получена жалоба'),
         ('complaint_status_updated', 'Обновлен статус жалобы'),
         ('complaint_supported', 'Жалоба поддержана'),
         ('complaint_commented', 'Новый комментарий к жалобе'),
+        
+        # Аренда
         ('rental_confirmed', 'Аренда подтверждена'),
         ('rental_rejected', 'Аренда отклонена'),
+        ('rental_request_received', 'Получена заявка на аренду'),
+        ('rental_starting_soon', 'Аренда скоро начнется'),
+        ('rental_ending_soon', 'Аренда скоро закончится'),
+        
+        # Пользователи
+        ('user_verified', 'Аккаунт верифицирован'),
+        ('user_banned', 'Аккаунт заблокирован'),
+        ('user_unbanned', 'Аккаунт разблокирован'),
+        ('profile_updated', 'Профиль обновлен'),
+        
+        # Системные
+        ('system_maintenance', 'Техническое обслуживание'),
+        ('system_update', 'Обновление системы'),
+        ('security_alert', 'Предупреждение безопасности'),
+        
+        # Новые возможности
+        ('new_feature', 'Новая функция'),
+        ('promotion', 'Акция'),
+        ('reminder', 'Напоминание'),
+    )
+
+    PRIORITY_CHOICES = (
+        ('low', 'Низкий'),
+        ('normal', 'Обычный'),
+        ('high', 'Высокий'),
+        ('urgent', 'Срочный'),
     )
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
     type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES, default='complaint_received')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')
     title = models.CharField(max_length=255, default='Уведомление')
     message = models.TextField()
+    
+    # Связанные объекты
     related_complaint = models.ForeignKey('RentalComplaint', on_delete=models.CASCADE, null=True, blank=True)
+    related_rental = models.ForeignKey('Rental', on_delete=models.CASCADE, null=True, blank=True)
+    related_house = models.ForeignKey('House', on_delete=models.CASCADE, null=True, blank=True)
+    
+    # Статус и настройки
     is_read = models.BooleanField(default=False)
+    is_email_sent = models.BooleanField(default=False)
+    is_sms_sent = models.BooleanField(default=False)
+    is_push_sent = models.BooleanField(default=False)
+    
+    # Метаданные
+    metadata = models.JSONField(default=dict, blank=True)
+    action_url = models.URLField(null=True, blank=True, help_text="Ссылка для действия")
+    expires_at = models.DateTimeField(null=True, blank=True, help_text="Время истечения уведомления")
+    
     created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['type', 'created_at']),
+            models.Index(fields=['priority', 'created_at']),
+        ]
 
     def __str__(self):
         return f'{self.type} - {self.user.username}'
+
+    def mark_as_read(self):
+        """Отметить уведомление как прочитанное"""
+        if not self.is_read:
+            self.is_read = True
+            self.read_at = timezone.now()
+            self.save()
+
+    def is_expired(self):
+        """Проверить, истекло ли уведомление"""
+        if self.expires_at:
+            return timezone.now() > self.expires_at
+        return False
+
+
+class NotificationSettings(models.Model):
+    """Настройки уведомлений пользователя"""
+    
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='notification_settings')
+    
+    # Email уведомления
+    email_enabled = models.BooleanField(default=True, verbose_name="Email уведомления включены")
+    email_complaints = models.BooleanField(default=True, verbose_name="Email о жалобах")
+    email_rentals = models.BooleanField(default=True, verbose_name="Email об аренде")
+    email_system = models.BooleanField(default=True, verbose_name="Email системные")
+    email_promotions = models.BooleanField(default=False, verbose_name="Email промо")
+    
+    # Push уведомления
+    push_enabled = models.BooleanField(default=True, verbose_name="Push уведомления включены")
+    push_complaints = models.BooleanField(default=True, verbose_name="Push о жалобах")
+    push_rentals = models.BooleanField(default=True, verbose_name="Push об аренде")
+    push_system = models.BooleanField(default=True, verbose_name="Push системные")
+    push_promotions = models.BooleanField(default=False, verbose_name="Push промо")
+    
+    # SMS уведомления
+    sms_enabled = models.BooleanField(default=False, verbose_name="SMS уведомления включены")
+    sms_urgent_only = models.BooleanField(default=True, verbose_name="SMS только срочные")
+    phone_number = models.CharField(max_length=20, blank=True, verbose_name="Номер телефона")
+    
+    # Время уведомлений
+    quiet_hours_start = models.TimeField(default='22:00', verbose_name="Начало тихих часов")
+    quiet_hours_end = models.TimeField(default='08:00', verbose_name="Конец тихих часов")
+    timezone = models.CharField(max_length=50, default='Asia/Almaty', verbose_name="Часовой пояс")
+    
+    # Частота уведомлений
+    digest_frequency = models.CharField(
+        max_length=20,
+        choices=[
+            ('none', 'Не отправлять'),
+            ('daily', 'Ежедневно'),
+            ('weekly', 'Еженедельно'),
+        ],
+        default='none',
+        verbose_name="Частота дайджеста"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Настройки уведомлений"
+        verbose_name_plural = "Настройки уведомлений"
+
+    def __str__(self):
+        return f"Настройки уведомлений - {self.user.username}"
+
+    def should_send_notification(self, notification_type, priority='normal'):
+        """Проверить, нужно ли отправлять уведомление"""
+        # Проверяем время (тихие часы)
+        from datetime import datetime, time
+        now = datetime.now().time()
+        
+        # Преобразуем строки времени в объекты time, если они еще не преобразованы
+        start_time = self.quiet_hours_start
+        end_time = self.quiet_hours_end
+        
+        if isinstance(start_time, str):
+            start_time = datetime.strptime(start_time, '%H:%M').time()
+        if isinstance(end_time, str):
+            end_time = datetime.strptime(end_time, '%H:%M').time()
+        
+        if start_time <= end_time:
+            # Обычные часы (например, 22:00 - 08:00)
+            if start_time <= now <= end_time:
+                return False
+        else:
+            # Переход через полночь (например, 22:00 - 08:00)
+            if now >= start_time or now <= end_time:
+                return False
+        
+        # Проверяем настройки по типу уведомления
+        if notification_type.startswith('complaint'):
+            return self.email_complaints if notification_type.endswith('_email') else self.push_complaints
+        elif notification_type.startswith('rental'):
+            return self.email_rentals if notification_type.endswith('_email') else self.push_rentals
+        elif notification_type in ['system_maintenance', 'system_update', 'security_alert']:
+            return self.email_system if notification_type.endswith('_email') else self.push_system
+        elif notification_type in ['new_feature', 'promotion']:
+            return self.email_promotions if notification_type.endswith('_email') else self.push_promotions
+        
+        return True
 
 
 
@@ -915,6 +1071,18 @@ class RentalComplaint(models.Model):
 
     # Флаг судебная жалоба или нет
     is_court_case = models.BooleanField(default=False)
+    
+    # Поля для модерации
+    admin_comment = models.TextField(blank=True, null=True, help_text="Комментарий администратора")
+    moderated_by = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='moderated_complaints',
+        help_text="Администратор, который модерировал жалобу"
+    )
+    moderated_at = models.DateTimeField(null=True, blank=True, help_text="Дата модерации")
 
     def save(self, *args, **kwargs):
         if not self.id and self.evidence:
@@ -1056,3 +1224,183 @@ class UserComment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author} on {self.target_user}"
+
+
+class FAQ(models.Model):
+    CATEGORY_CHOICES = [
+        ('general', 'Общие вопросы'),
+        ('rental', 'Аренда'),
+        ('complaints', 'Жалобы'),
+        ('verification', 'Верификация'),
+        ('payments', 'Платежи'),
+    ]
+    
+    USER_TYPE_CHOICES = [
+        ('both', 'Для всех'),
+        ('tenants', 'Арендаторам'),
+        ('landlords', 'Арендодателям'),
+    ]
+    
+    # Основные поля (русский - основной язык)
+    question_ru = models.TextField(verbose_name="Вопрос (RU)")
+    answer_ru = models.TextField(verbose_name="Ответ (RU)")
+    
+    # Ручные переводы
+    question_kz = models.TextField(blank=True, null=True, verbose_name="Вопрос (KZ)")
+    answer_kz = models.TextField(blank=True, null=True, verbose_name="Ответ (KZ)")
+    question_en = models.TextField(blank=True, null=True, verbose_name="Вопрос (EN)")
+    answer_en = models.TextField(blank=True, null=True, verbose_name="Ответ (EN)")
+    
+    # Метаданные
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general')
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='both')
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+    
+    # Системные поля
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    
+    class Meta:
+        ordering = ['user_type', 'category', 'order', 'question_ru']
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQ"
+    
+    def __str__(self):
+        return f"{self.question_ru[:50]}..."
+
+
+class ActivityLog(models.Model):
+    """Модель для логирования активности в системе"""
+    
+    ACTION_TYPES = [
+        ('user_register', 'Регистрация пользователя'),
+        ('user_login', 'Вход в систему'),
+        ('user_logout', 'Выход из системы'),
+        ('user_ban', 'Блокировка пользователя'),
+        ('user_unban', 'Разблокировка пользователя'),
+        ('user_verify', 'Верификация пользователя'),
+        ('user_make_admin', 'Назначение администратора'),
+        ('user_remove_admin', 'Снятие прав администратора'),
+        ('complaint_create', 'Создание жалобы'),
+        ('complaint_moderate', 'Модерация жалобы'),
+        ('complaint_resolve', 'Разрешение жалобы'),
+        ('faq_create', 'Создание FAQ'),
+        ('faq_update', 'Обновление FAQ'),
+        ('faq_delete', 'Удаление FAQ'),
+        ('complaint_reason_create', 'Создание причины жалобы'),
+        ('complaint_reason_update', 'Обновление причины жалобы'),
+        ('complaint_reason_delete', 'Удаление причины жалобы'),
+        ('rental_create', 'Создание аренды'),
+        ('rental_confirm', 'Подтверждение аренды'),
+        ('rental_reject', 'Отклонение аренды'),
+        ('comment_create', 'Создание комментария'),
+        ('system_error', 'Системная ошибка'),
+    ]
+    
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Пользователь")
+    action_type = models.CharField(max_length=50, choices=ACTION_TYPES, verbose_name="Тип действия")
+    action_description = models.TextField(verbose_name="Описание действия")
+    target_object_type = models.CharField(max_length=50, null=True, blank=True, verbose_name="Тип объекта")
+    target_object_id = models.IntegerField(null=True, blank=True, verbose_name="ID объекта")
+    ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name="IP адрес")
+    user_agent = models.TextField(null=True, blank=True, verbose_name="User Agent")
+    metadata = models.JSONField(default=dict, blank=True, verbose_name="Метаданные")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Лог активности"
+        verbose_name_plural = "Логи активности"
+        indexes = [
+            models.Index(fields=['action_type']),
+            models.Index(fields=['user']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['target_object_type', 'target_object_id']),
+        ]
+    
+    def __str__(self):
+        user_info = f"{self.user.username}" if self.user else "Система"
+        return f"{user_info} - {self.get_action_type_display()} ({self.created_at.strftime('%d.%m.%Y %H:%M')})"
+
+
+# ==================== СИГНАЛЫ ====================
+
+@receiver(post_save, sender=CustomUser)
+def create_notification_settings(sender, instance, created, **kwargs):
+    """
+    Автоматически создает настройки уведомлений для нового пользователя
+    """
+    if created:
+        try:
+            NotificationSettings.objects.get_or_create(
+                user=instance,
+                defaults={
+                    'email_enabled': True,
+                    'email_complaints': True,
+                    'email_rentals': True,
+                    'email_system': True,
+                    'email_promotions': False,
+                    'push_enabled': True,
+                    'push_complaints': True,
+                    'push_rentals': True,
+                    'push_system': True,
+                    'push_promotions': False,
+                    'sms_enabled': False,
+                    'sms_urgent_only': True,
+                    'quiet_hours_start': '22:00',
+                    'quiet_hours_end': '08:00',
+                    'timezone': 'Asia/Almaty',
+                    'digest_frequency': 'none'
+                }
+            )
+        except Exception as e:
+            print(f"Ошибка создания настроек уведомлений для пользователя {instance.username}: {e}")
+
+
+@receiver(post_save, sender=CustomUser)
+def save_user_profile(sender, instance, **kwargs):
+    """
+    Сохраняет профиль пользователя
+    """
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+
+
+# ==================== FCM TOKENS ====================
+
+class FCMToken(models.Model):
+    """
+    Модель для хранения FCM токенов пользователей для push уведомлений
+    """
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='fcm_tokens')
+    token = models.CharField(max_length=500, unique=True, verbose_name="FCM токен")
+    device_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('web', 'Веб-браузер'),
+            ('android', 'Android'),
+            ('ios', 'iOS'),
+            ('desktop', 'Desktop приложение'),
+        ],
+        default='web',
+        verbose_name="Тип устройства"
+    )
+    device_info = models.JSONField(default=dict, blank=True, verbose_name="Информация об устройстве")
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+    last_used = models.DateTimeField(auto_now=True, verbose_name="Последнее использование")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    
+    class Meta:
+        ordering = ['-last_used']
+        verbose_name = "FCM токен"
+        verbose_name_plural = "FCM токены"
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['device_type']),
+            models.Index(fields=['last_used']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_device_type_display()} ({self.token[:20]}...)"

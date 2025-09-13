@@ -1,0 +1,382 @@
+{% extends 'emails/notifications/base.html' %}
+
+{% block extra_styles %}
+<style>
+    .promotion-banner {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .promotion-banner:before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(255,255,255,0.1) 10px,
+            rgba(255,255,255,0.1) 20px
+        );
+        animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(100%) translateY(100%); }
+    }
+    
+    .promotion-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .promotion-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .promotion-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .offer-highlight {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 25px 0;
+        position: relative;
+    }
+    
+    .offer-badge {
+        display: inline-block;
+        background-color: #fbbf24;
+        color: #92400e;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+    }
+    
+    .offer-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .offer-description {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+    
+    .discount-section {
+        background-color: #fef2f2;
+        border: 2px solid #fecaca;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .discount-amount {
+        font-size: 48px;
+        font-weight: bold;
+        color: #dc2626;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .discount-text {
+        font-size: 18px;
+        color: #991b1b;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .discount-conditions {
+        font-size: 14px;
+        color: #7f1d1d;
+        line-height: 1.5;
+    }
+    
+    .features-section {
+        background-color: #fef3c7;
+        border: 2px solid #fbbf24;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 12px;
+    }
+    
+    .features-title {
+        color: #92400e;
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .feature-item {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .feature-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 16px;
+        color: white;
+    }
+    
+    .feature-name {
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    
+    .feature-description {
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    .countdown-section {
+        background-color: #1f2937;
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 25px 0;
+    }
+    
+    .countdown-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #fbbf24;
+    }
+    
+    .countdown-timer {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .countdown-item {
+        background-color: #374151;
+        padding: 15px;
+        border-radius: 8px;
+        min-width: 60px;
+    }
+    
+    .countdown-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fbbf24;
+    }
+    
+    .countdown-label {
+        font-size: 12px;
+        color: #9ca3af;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+    
+    .terms-section {
+        background-color: #f8fafc;
+        border-left: 4px solid #6b7280;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .terms-title {
+        color: #374151;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    
+    .terms-text {
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 600px) {
+        .countdown-timer {
+            gap: 10px;
+        }
+        
+        .countdown-item {
+            min-width: 50px;
+            padding: 10px;
+        }
+        
+        .countdown-number {
+            font-size: 20px;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notification-icon">🎉</div>
+
+<div class="priority-indicator priority-{{ priority }}">
+    {{ priority_display }}
+</div>
+
+<div class="promotion-banner">
+    <div class="promotion-icon">🎊</div>
+    <div class="promotion-title">Специальное предложение!</div>
+    <div class="promotion-subtitle">Ограниченное время</div>
+</div>
+
+<div class="offer-highlight">
+    <div class="offer-badge">Акция</div>
+    <div class="offer-title">{{ promotion_title }}</div>
+    <div class="offer-description">{{ promotion_description }}</div>
+</div>
+
+<div class="discount-section">
+    <div class="discount-amount">{{ discount_amount }}%</div>
+    <div class="discount-text">скидка на первый месяц аренды</div>
+    <div class="discount-conditions">
+        При подаче заявки до {{ promotion_end_date }}
+    </div>
+</div>
+
+<div class="countdown-section">
+    <div class="countdown-title">⏰ До окончания акции осталось:</div>
+    <div class="countdown-timer">
+        <div class="countdown-item">
+            <div class="countdown-number">{{ days_left }}</div>
+            <div class="countdown-label">дней</div>
+        </div>
+        <div class="countdown-item">
+            <div class="countdown-number">{{ hours_left }}</div>
+            <div class="countdown-label">часов</div>
+        </div>
+        <div class="countdown-item">
+            <div class="countdown-number">{{ minutes_left }}</div>
+            <div class="countdown-label">минут</div>
+        </div>
+    </div>
+    <div style="font-size: 14px; color: #9ca3af;">
+        Не упустите возможность сэкономить!
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="features-title">🎁 Что вы получите:</div>
+    
+    <div class="features-grid">
+        <div class="feature-item">
+            <div class="feature-icon">💰</div>
+            <div class="feature-name">Скидка {{ discount_amount }}%</div>
+            <div class="feature-description">На первый месяц аренды</div>
+        </div>
+        
+        <div class="feature-item">
+            <div class="feature-icon">⭐</div>
+            <div class="feature-name">Приоритет</div>
+            <div class="feature-description">Ваши заявки рассматриваются первыми</div>
+        </div>
+        
+        <div class="feature-item">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-name">Персональный подбор</div>
+            <div class="feature-description">Помощь в выборе жилья</div>
+        </div>
+        
+        <div class="feature-item">
+            <div class="feature-icon">📞</div>
+            <div class="feature-name">Поддержка 24/7</div>
+            <div class="feature-description">Круглосуточная помощь</div>
+        </div>
+    </div>
+</div>
+
+<h1 class="notification-title">{{ title }}</h1>
+<p class="notification-message">{{ message }}</p>
+
+<div class="terms-section">
+    <div class="terms-title">📋 Условия акции:</div>
+    <div class="terms-text">
+        {{ terms_and_conditions }}
+    </div>
+</div>
+
+<div class="notification-metadata">
+    <div class="metadata-item">
+        <span class="metadata-label">Период действия:</span>
+        <span class="metadata-value">{{ promotion_start_date }} - {{ promotion_end_date }}</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Размер скидки:</span>
+        <span class="metadata-value">{{ discount_amount }}%</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Код промо:</span>
+        <span class="metadata-value">{{ promo_code }}</span>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ promotion_url }}" class="action-button">
+        Воспользоваться предложением
+    </a>
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;">
+    <h3 style="color: #991b1b; margin-bottom: 10px; font-size: 16px;">🔥 Не упустите!</h3>
+    <p style="color: #7f1d1d; font-size: 14px; margin: 0;">
+        Это предложение действует ограниченное время. Подайте заявку прямо сейчас 
+        и сэкономьте на аренде недвижимости!
+    </p>
+</div>
+{% endblock %}

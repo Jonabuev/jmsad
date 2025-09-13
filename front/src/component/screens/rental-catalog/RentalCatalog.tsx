@@ -79,14 +79,14 @@ export default function RentalCatalog() {
               className="mb-4 text-blue-600 font-semibold"
               onClick={() => setSelectedHouse(null)}
             >
-              ← Назад к фильтрам
+              ← {t("rentalCatalog.backToFilters")}
             </button>
             {/* Галерея изображений */}
             {selectedHouse.images?.length > 0 && (
               <>
                 <img
                   src={mediaUrl(selectedHouse.images[mainImgIdx])}
-                  alt="Фото"
+                  alt={t("rentalCatalog.photo")}
                   className="w-full h-40 object-cover rounded mb-2"
                 />
                 {selectedHouse.images.length > 1 && (
@@ -95,7 +95,7 @@ export default function RentalCatalog() {
                       <img
                         key={idx}
                         src={mediaUrl(img)}
-                        alt="Фото"
+                        alt={t("rentalCatalog.photo")}
                         className={`w-16 h-12 object-cover rounded cursor-pointer border ${mainImgIdx === idx ? 'border-blue-500' : 'border-gray-200'}`}
                         onClick={() => setMainImgIdx(idx)}
                       />
@@ -107,11 +107,11 @@ export default function RentalCatalog() {
             <div className="font-bold text-lg mb-1">{selectedHouse.address}</div>
             <div className="text-green-600 font-semibold mb-1">{selectedHouse.price} ₸/мес</div>
             <div className="text-sm text-gray-700 mb-1">
-              {selectedHouse.area ? <>Площадь: {selectedHouse.area} м²<br /></> : null}
-              {selectedHouse.floor ? <>Этаж: {selectedHouse.floor}{selectedHouse.total_floors ? `/${selectedHouse.total_floors}` : ''}<br /></> : null}
-              {selectedHouse.num_of_rooms ? <>Комнат: {selectedHouse.num_of_rooms}<br /></> : null}
-              {selectedHouse.is_furnished ? <>✓ Меблировка<br /></> : null}
-              {selectedHouse.has_balcony ? <>✓ Балкон<br /></> : null}
+              {selectedHouse.area ? <>{t("rentalCatalog.area")}: {selectedHouse.area} м²<br /></> : null}
+              {selectedHouse.floor ? <>{t("rentalCatalog.floor")}: {selectedHouse.floor}{selectedHouse.total_floors ? `/${selectedHouse.total_floors}` : ''}<br /></> : null}
+              {selectedHouse.num_of_rooms ? <>{t("rentalCatalog.rooms")}: {selectedHouse.num_of_rooms}<br /></> : null}
+              {selectedHouse.is_furnished ? <>✓ {t("rentalCatalog.furnished")}<br /></> : null}
+              {selectedHouse.has_balcony ? <>✓ {t("rentalCatalog.balcony")}<br /></> : null}
             </div>
             {selectedHouse.description && (
               <div className="text-xs text-gray-500 mb-2">
@@ -125,22 +125,22 @@ export default function RentalCatalog() {
             <h1 className="text-2xl font-bold mb-4">🏠 {t("rentalCatalog.title")}</h1>
             {/* Фильтры */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">Фильтры</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("rentalCatalog.filters")}</h3>
               <div className="grid grid-cols-1 gap-4">
                 {/* Цена */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Цена (₸)</label>
+                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.price")} (₸)</label>
                   <div className="flex gap-2">
                     <input
                       type="number"
-                      placeholder="От"
+                      placeholder={t("rentalCatalog.from")}
                       value={filters.minPrice}
                       onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
                       className="w-full p-2 border rounded text-sm"
                     />
                     <input
                       type="number"
-                      placeholder="До"
+                      placeholder={t("rentalCatalog.to")}
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
                       className="w-full p-2 border rounded text-sm"
@@ -150,26 +150,26 @@ export default function RentalCatalog() {
 
                 {/* Тип недвижимости */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Тип</label>
+                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.type")}</label>
                   <select
                     value={filters.propertyType}
                     onChange={(e) => setFilters({...filters, propertyType: e.target.value})}
                     className="w-full p-2 border rounded text-sm"
                   >
-                    <option value="">Все типы</option>
-                    <option value="apartment">Квартира</option>
-                    <option value="house">Дом</option>
-                    <option value="room">Комната</option>
+                    <option value="">{t("rentalCatalog.allTypes")}</option>
+                    <option value="apartment">{t("rentalCatalog.apartment")}</option>
+                    <option value="house">{t("rentalCatalog.house")}</option>
+                    <option value="room">{t("rentalCatalog.room")}</option>
                   </select>
                 </div>
 
                 {/* Количество комнат */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Комнаты</label>
+                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.rooms")}</label>
                   <div className="flex gap-2">
                     <input
                       type="number"
-                      placeholder="От"
+                      placeholder={t("rentalCatalog.from")}
                       min="1"
                       max="10"
                       value={filters.minRooms}
@@ -178,7 +178,7 @@ export default function RentalCatalog() {
                     />
                     <input
                       type="number"
-                      placeholder="До"
+                      placeholder={t("rentalCatalog.to")}
                       min="1"
                       max="10"
                       value={filters.maxRooms}
@@ -190,7 +190,7 @@ export default function RentalCatalog() {
 
                 {/* Дополнительные опции */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Опции</label>
+                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.options")}</label>
                   <div className="space-y-2">
                     <label className="flex items-center text-sm">
                       <input
@@ -199,7 +199,7 @@ export default function RentalCatalog() {
                         onChange={(e) => setFilters({...filters, isFurnished: e.target.checked})}
                         className="mr-2"
                       />
-                      Меблировка
+                      {t("rentalCatalog.furnished")}
                     </label>
                     <label className="flex items-center text-sm">
                       <input
@@ -208,7 +208,7 @@ export default function RentalCatalog() {
                         onChange={(e) => setFilters({...filters, hasBalcony: e.target.checked})}
                         className="mr-2"
                       />
-                      Балкон
+                      {t("rentalCatalog.balcony")}
                     </label>
                   </div>
                 </div>
@@ -224,7 +224,7 @@ export default function RentalCatalog() {
               buttonText={t("rentalCatalog.find")}
             />
             <div className="mt-4 text-sm text-gray-600">
-              Найдено: {filteredRentals.length} из {rentals.length} объектов
+              {t("rentalCatalog.found")}: {filteredRentals.length} {t("rentalCatalog.of")} {rentals.length} {t("rentalCatalog.objects")}
             </div>
           </>
         )}

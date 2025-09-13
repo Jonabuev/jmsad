@@ -89,91 +89,152 @@ const ComplaintInfo: FC<Props> = ({ complaint, t }) => {
   }, []);
 
   return (
-    <div className="space-y-4 select-none">
-      <div>
-        <strong>{t("complaint.description")}:</strong> {complaint.description}
+    <div className="space-y-6 select-none">
+      {/* Description Card */}
+      <div className="bg-gray-50 rounded-xl p-6 border-l-4 border-blue-600 transform transition-all duration-300 hover:shadow-lg">
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("complaint.description")}</h3>
+            <p className="text-gray-700 leading-relaxed">{complaint.description}</p>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <strong>{t("complaint.status")}:</strong>{" "}
-        {t(`complaint.${complaint.status}`)}
+      {/* Participants Card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm transform transition-all duration-300 hover:shadow-lg hover:scale-105">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">{t("complaint.complainant")}</h3>
+          </div>
+          <p className="text-gray-700 font-medium">{complaint.complainant?.username}</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm transform transition-all duration-300 hover:shadow-lg hover:scale-105">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">{t("complaint.accused")}</h3>
+          </div>
+          <p className="text-gray-700 font-medium">{complaint.accused?.username}</p>
+        </div>
       </div>
 
-      {/* {<div>
-        <strong>{t("complaint.rating")}:</strong> {complaint.rating}
-      </div>} */}
-
-      <div>
-        <strong>{t("complaint.complainant")}:</strong>{" "}
-        {complaint.complainant?.username}
+      {/* Reasons Card */}
+      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">{t("complaint.reasons")}</h3>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {complaint.reasons.map((r) => (
+            <span key={r.id} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+              {t(`search.reason.${r.reason}`)}
+            </span>
+          ))}
+        </div>
       </div>
 
-      <div>
-        <strong>{t("complaint.accused")}:</strong>{" "}
-        {complaint.accused?.username}
-      </div>
-
-      {/* <div>
-        <strong>{t("complaint.property")}:</strong>{" "}
-        {complaint.property?.city}, {complaint.property?.address}
-      </div> */}
-
-      <div>
-        <strong>{t("complaint.reasons")}:</strong>{" "}
-        {complaint.reasons.map((r, i) => (
-          <span key={r.id}>
-            {t(`search.reason.${r.reason}`)}
-            {i !== complaint.reasons.length - 1 ? ", " : ""}
-          </span>
-        ))}
-      </div>
-
+      {/* Court Decision */}
       {complaint.court_decision_score && (
-        <div>
-          <strong>{t("complaint.courtDecision")}:</strong>{" "}
-          {complaint.court_decision_score}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">{t("complaint.courtDecision")}</h3>
+          </div>
+          <p className="text-gray-700 font-medium">{complaint.court_decision_score}</p>
         </div>
       )}
 
+      {/* Images */}
       {complaint.images?.length > 0 && (
-        <div>
-          <strong>{t("complaint.attachedImages")}:</strong>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">{t("complaint.attachedImages")}</h3>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {complaint.images.map((img, i) => (
-              <div key={i} className="rounded shadow-md bg-gray-100 p-1">
+              <div key={i} className="rounded-lg shadow-md bg-gray-100 p-2 hover:shadow-lg transition-shadow duration-300">
                 <ProtectedImage src={mediaUrl(img)} />
               </div>
             ))}
           </div>
         </div>
       )}
+
+      {/* Evidence */}
       {complaint.evidence && (
-        <div>
-          <strong>{t("complaint.evidence")}:</strong>
-          <EvidenceViewer url={complaint.evidence} /> {/* ✅ Только здесь! */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">{t("complaint.evidence")}</h3>
+          </div>
+          <div className="rounded-lg shadow-md bg-gray-100 p-2">
+            <EvidenceViewer url={complaint.evidence} />
+          </div>
         </div>
       )}
 
-
+      {/* Disputes */}
       {complaint.disputes.length > 0 && (
-        <div>
-          <strong>{t("complaint.disputeHistory")}:</strong>
-          <ul className="mt-2 list-disc ml-5 space-y-2">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">{t("complaint.disputeHistory")}</h3>
+          </div>
+          <div className="space-y-4">
             {complaint.disputes.map((d) => (
-              <li key={d.id}>
-                <div>
-                  <span className="font-semibold">{d.user.username}</span>:{" "}
-                  {d.explanation}
-                  <br />
+              <div key={d.id} className="bg-gray-50 rounded-lg p-4 border-l-4 border-pink-500">
+                <div className="flex items-start justify-between mb-2">
+                  <span className="font-semibold text-gray-900">{d.user.username}</span>
                   <span className="text-sm text-gray-500">
                     {new Date(d.created_at).toLocaleString()}
                   </span>
                 </div>
-
-                {d.evidence && <EvidenceViewer url={d.evidence} />}
-              </li>
+                <p className="text-gray-700 mb-3">{d.explanation}</p>
+                {d.evidence && (
+                  <div className="rounded-lg shadow-sm bg-white p-2">
+                    <EvidenceViewer url={d.evidence} />
+                  </div>
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>

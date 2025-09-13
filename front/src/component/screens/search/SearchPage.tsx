@@ -173,7 +173,7 @@ const TenantRegistry: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto p-8 bg-white shadow-lg rounded-2xl mt-8">
         <div className="flex justify-center items-center h-40">
-          <div className="text-xl text-gray-600 font-medium">{t("common.loading")}</div>
+          <div className="text-xl text-gray-600 font-medium">{t("loading")}</div>
         </div>
       </div>
     );

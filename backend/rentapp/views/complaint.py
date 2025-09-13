@@ -134,6 +134,26 @@ def submit_complaint(request):
         if 'reason' in request.data:
             complaint.reasons.set(request.data.getlist('reason'))
 
+        # Логируем подачу жалобы
+        try:
+            from rentapp.utils import log_activity
+            log_activity(
+                action_type='complaint_create',
+                description=f'Подана жалоба: {complainant.username} против {accused.username}. Описание: {complaint.description[:100]}...',
+                user=complainant,
+                target_object=complaint,
+                request=request,
+                metadata={
+                    'complaint_id': complaint.id,
+                    'complainant_id': complainant.id,
+                    'accused_id': accused.id,
+                    'complainant_username': complainant.username,
+                    'accused_username': accused.username
+                }
+            )
+        except Exception as e:
+            print('Ошибка логирования подачи жалобы:', e)
+
         return Response({
             "message": "Жалоба успешно создана",
             "id": complaint.id
@@ -435,6 +455,24 @@ class AddCommentAPIView(APIView):
             user=request.user,
             text=comment_text
         )
+
+        # Логируем создание комментария
+        try:
+            from rentapp.utils import log_activity
+            log_activity(
+                action_type='comment_create',
+                description=f'Добавлен комментарий к жалобе #{complaint.id}. Текст: {comment_text[:100]}...',
+                user=request.user,
+                target_object=comment,
+                request=request,
+                metadata={
+                    'comment_id': comment.id,
+                    'complaint_id': complaint.id,
+                    'comment_text': comment_text[:200]  # Ограничиваем длину для лога
+                }
+            )
+        except Exception as e:
+            print('Ошибка логирования создания комментария:', e)
 
         send_complaint_comment_notification(complaint, comment)
 

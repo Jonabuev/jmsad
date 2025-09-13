@@ -157,7 +157,7 @@ class RentalService:
         return {"message": "Аренда отклонена"}
     
     @staticmethod
-    def update_rental_status(rental_id: int, new_status: str, landlord) -> dict:
+    def update_rental_status(rental_id: int, new_status: str, landlord, request=None) -> dict:
         """
         Обновляет статус аренды.
         
@@ -188,6 +188,31 @@ class RentalService:
             
         rental.status = new_status
         rental.save()
+        
+        # Логируем изменение статуса аренды
+        if request:
+            try:
+                from rentapp.utils import log_activity
+                action_type = 'rental_confirm' if new_status == 'active' else 'rental_reject'
+                description = f'Статус аренды изменен на "{new_status}". Дом: {rental.house.address}, Арендатор: {rental.tenant.username if rental.tenant else "не назначен"}'
+                
+                log_activity(
+                    action_type=action_type,
+                    description=description,
+                    user=landlord,
+                    target_object=rental,
+                    request=request,
+                    metadata={
+                        'rental_id': rental.id,
+                        'house_id': rental.house.id,
+                        'tenant_id': rental.tenant.id if rental.tenant else None,
+                        'old_status': 'pending',  # Предполагаем, что статус был pending
+                        'new_status': new_status,
+                        'landlord_id': landlord.id
+                    }
+                )
+            except Exception as e:
+                print('Ошибка логирования изменения статуса аренды:', e)
         
         return {"status": rental.status}
     

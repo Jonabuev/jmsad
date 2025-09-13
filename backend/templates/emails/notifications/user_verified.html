@@ -1,0 +1,305 @@
+{% extends 'emails/notifications/base.html' %}
+
+{% block extra_styles %}
+<style>
+    .verification-banner {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .verification-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    
+    .verification-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .verification-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+    
+    .benefits-section {
+        background-color: #f0fdf4;
+        border: 2px solid #bbf7d0;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 12px;
+    }
+    
+    .benefits-title {
+        color: #065f46;
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .benefit-item {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .benefit-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 20px;
+    }
+    
+    .benefit-name {
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+    
+    .benefit-description {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .profile-card {
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 32px;
+        color: white;
+    }
+    
+    .profile-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 5px;
+    }
+    
+    .profile-role {
+        color: #10b981;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .verification-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 10px 0;
+    }
+    
+    .next-actions {
+        background-color: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .actions-title {
+        color: #1e40af;
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+    
+    .actions-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .actions-list li {
+        padding: 8px 0;
+        color: #1e40af;
+        position: relative;
+        padding-left: 25px;
+    }
+    
+    .actions-list li:before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: #3b82f6;
+        font-weight: bold;
+    }
+    
+    .welcome-message {
+        background-color: #fef3c7;
+        border: 2px solid #f59e0b;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .welcome-title {
+        color: #92400e;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+    
+    .welcome-text {
+        color: #a16207;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 600px) {
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notification-icon">✅</div>
+
+<div class="priority-indicator priority-{{ priority }}">
+    {{ priority_display }}
+</div>
+
+<div class="verification-banner">
+    <div class="verification-icon">🎉</div>
+    <div class="verification-title">Поздравляем!</div>
+    <div class="verification-subtitle">Ваш аккаунт успешно верифицирован</div>
+</div>
+
+<div class="verification-badge">
+    ✅ Верифицированный пользователь
+</div>
+
+<h1 class="notification-title">Аккаунт верифицирован</h1>
+<p class="notification-message">
+    Отлично! Ваш аккаунт прошел верификацию и теперь вы можете пользоваться 
+    всеми возможностями платформы ARNO.
+</p>
+
+<div class="profile-card">
+    <div class="profile-avatar">{{ user_initial }}</div>
+    <div class="profile-name">{{ user_name }}</div>
+    <div class="profile-role">{{ user_role_display }}</div>
+    <div class="verification-badge">Верифицирован</div>
+</div>
+
+<div class="benefits-section">
+    <div class="benefits-title">🚀 Теперь вам доступно:</div>
+    
+    <div class="benefits-grid">
+        <div class="benefit-item">
+            <div class="benefit-icon">🏠</div>
+            <div class="benefit-name">Подача заявок</div>
+            <div class="benefit-description">
+                Подавайте заявки на аренду недвижимости
+            </div>
+        </div>
+        
+        <div class="benefit-item">
+            <div class="benefit-icon">⭐</div>
+            <div class="benefit-name">Приоритет</div>
+            <div class="benefit-description">
+                Ваши заявки рассматриваются в первую очередь
+            </div>
+        </div>
+        
+        <div class="benefit-item">
+            <div class="benefit-icon">💬</div>
+            <div class="benefit-name">Общение</div>
+            <div class="benefit-description">
+                Прямое общение с арендодателями
+            </div>
+        </div>
+        
+        <div class="benefit-item">
+            <div class="benefit-icon">📊</div>
+            <div class="benefit-name">Аналитика</div>
+            <div class="benefit-description">
+                Доступ к детальной статистике
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="next-actions">
+    <div class="actions-title">📋 Рекомендуемые действия:</div>
+    <ul class="actions-list">
+        <li>Заполните профиль для лучшего опыта</li>
+        <li>Настройте уведомления</li>
+        <li>Просмотрите доступные объекты</li>
+        <li>Подайте первую заявку на аренду</li>
+    </ul>
+</div>
+
+<div class="welcome-message">
+    <div class="welcome-title">🎊 Добро пожаловать в ARNO!</div>
+    <div class="welcome-text">
+        Мы рады приветствовать вас в нашем сообществе. 
+        Наша команда всегда готова помочь вам найти идеальное жилье.
+    </div>
+</div>
+
+<div class="notification-metadata">
+    <div class="metadata-item">
+        <span class="metadata-label">Дата верификации:</span>
+        <span class="metadata-value">{{ verification_date }}</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Тип аккаунта:</span>
+        <span class="metadata-value">{{ user_role_display }}</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Статус:</span>
+        <span class="metadata-value" style="color: #10b981;">Активен</span>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ profile_url }}" class="action-button">
+        Перейти в профиль
+    </a>
+</div>
+{% endblock %}

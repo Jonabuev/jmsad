@@ -1,6 +1,6 @@
 import random
 from django.core.mail import send_mail
-from .models import CustomUser
+from .models import CustomUser, ActivityLog
 
 def generate_code():
     return str(random.randint(100000, 999999))
@@ -87,3 +87,49 @@ def assign_anonymous_names_to_existing_users():
         user.save()
     
     return users_without_anonymous_names.count()
+
+
+def get_client_ip(request):
+    """Получение IP адреса клиента"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+def log_activity(action_type, description, user=None, target_object=None, 
+                request=None, metadata=None):
+    """
+    Утилита для записи активности в систему
+    
+    Args:
+        action_type (str): Тип действия из ACTION_TYPES
+        description (str): Описание действия
+        user (CustomUser, optional): Пользователь, совершивший действие
+        target_object (Model, optional): Объект, над которым совершено действие
+        request (HttpRequest, optional): HTTP запрос для получения IP и User-Agent
+        metadata (dict, optional): Дополнительные метаданные
+    
+    Returns:
+        ActivityLog: Созданная запись лога
+    """
+    try:
+        activity = ActivityLog.objects.create(
+            user=user,
+            action_type=action_type,
+            action_description=description,
+            target_object_type=target_object.__class__.__name__.lower() if target_object else None,
+            target_object_id=target_object.id if target_object else None,
+            ip_address=get_client_ip(request) if request else None,
+            user_agent=request.META.get('HTTP_USER_AGENT', '') if request else '',
+            metadata=metadata or {}
+        )
+        return activity
+    except Exception as e:
+        # Логируем ошибку, но не прерываем выполнение основного кода
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Ошибка при записи лога активности: {e}")
+        return None

@@ -1,0 +1,150 @@
+{% extends 'emails/notifications/base.html' %}
+
+{% block extra_styles %}
+<style>
+    .complaint-details {
+        background-color: #fef2f2;
+        border-left: 4px solid #ef4444;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .complaint-id {
+        font-size: 18px;
+        font-weight: bold;
+        color: #dc2626;
+        margin-bottom: 10px;
+    }
+    
+    .complaint-description {
+        color: #7f1d1d;
+        line-height: 1.6;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 10px;
+    }
+    
+    .status-new {
+        background-color: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .complaint-actions {
+        margin-top: 25px;
+        text-align: center;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.2s;
+    }
+    
+    .btn-secondary {
+        background-color: #f3f4f6;
+        color: #374151;
+        padding: 12px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.2s;
+    }
+    
+    .btn-primary:hover, .btn-secondary:hover {
+        transform: translateY(-1px);
+    }
+    
+    @media (max-width: 600px) {
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            max-width: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notification-icon">📋</div>
+
+<div class="priority-indicator priority-{{ priority }}">
+    {{ priority_display }}
+</div>
+
+<h1 class="notification-title">Получена новая жалоба</h1>
+<p class="notification-message">
+    Вам поступила новая жалоба, которая требует вашего внимания. 
+    Пожалуйста, рассмотрите её в кратчайшие сроки.
+</p>
+
+<div class="complaint-details">
+    <div class="complaint-id">Жалоба #{{ complaint_id }}</div>
+    <div class="complaint-description">
+        {{ complaint_description|truncatewords:30 }}
+    </div>
+    <div class="status-badge status-new">Новая жалоба</div>
+</div>
+
+<div class="notification-metadata">
+    <div class="metadata-item">
+        <span class="metadata-label">Тип жалобы:</span>
+        <span class="metadata-value">{{ complaint_type }}</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Заявитель:</span>
+        <span class="metadata-value">{{ complainant_name }}</span>
+    </div>
+    <div class="metadata-item">
+        <span class="metadata-label">Дата подачи:</span>
+        <span class="metadata-value">{{ complaint_date }}</span>
+    </div>
+    {% if property_address %}
+    <div class="metadata-item">
+        <span class="metadata-label">Адрес объекта:</span>
+        <span class="metadata-value">{{ property_address }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<div class="complaint-actions">
+    <div class="action-buttons">
+        <a href="{{ complaint_url }}" class="btn-primary">
+            Просмотреть жалобу
+        </a>
+        <a href="{{ complaints_dashboard_url }}" class="btn-secondary">
+            Все жалобы
+        </a>
+    </div>
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background-color: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+    <h3 style="color: #0c4a6e; margin-bottom: 10px; font-size: 16px;">💡 Важная информация</h3>
+    <p style="color: #075985; font-size: 14px; margin: 0;">
+        Согласно правилам платформы, жалобы должны быть рассмотрены в течение 24 часов. 
+        В случае просрочки жалоба будет автоматически эскалирована.
+    </p>
+</div>
+{% endblock %}

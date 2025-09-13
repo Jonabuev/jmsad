@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views.auth import (
     register, login_view, CustomTokenObtainPairView, RequestPasswordResetView,
@@ -20,11 +20,26 @@ from .views.complaint import (
     house_locations, CreateComplaintAPIView)
 from .views.forum import ForumView, get_location_filters
 from .views.chat import ChatThreadListCreateView, ChatMessageListCreateView
-from .views.notification import NotificationListView, NotificationMarkAsReadView
 from .views.ml import (
     RecommendTenantsAPIView, ROCImageAPIView, OCRCheckView, evaluate_reliability
 )
 from .views.manual_verification import ManualVerificationView, PendingVerificationsView
+from .views.admin_views import (
+    AdminUserListView, AdminUserDetailView, ban_user, unban_user, 
+    make_admin, remove_admin, verify_user_document, admin_dashboard_stats,
+    AdminComplaintListView, complaint_statistics, moderate_complaint, complaint_history,
+    FAQListView, FAQDetailView, ComplaintReasonListView, ComplaintReasonDetailView,
+    AdminActivityLogListView, get_public_faq, get_public_complaint_reasons
+)
+from .views.notification import (
+    NotificationListView, NotificationDetailView, NotificationMarkAsReadView,
+    NotificationMarkAllAsReadView, NotificationUnreadCountView, NotificationSettingsView,
+    NotificationDeleteView, NotificationBulkDeleteView
+)
+from .views.fcm_views import (
+    FCMTokenListCreateView, FCMTokenDetailView, register_fcm_token,
+    unregister_fcm_token, test_push_notification, fcm_token_stats
+)
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -103,5 +118,56 @@ urlpatterns = [
     path("complaints/<uuid:uuid>/dispute/", dispute_complaintFinal, name='dispute-complaint'),
     path('rental-complaints/create/', createRentalComplaint, name='create_rental_complaint'),
     path("users/search/", search_users_by_iin, name="search_users_by_iin"),
+    
+    # Admin API endpoints
+    path('admin/dashboard/stats/', admin_dashboard_stats, name='admin_dashboard_stats'),
+    path('admin/users/', AdminUserListView.as_view(), name='admin_users_list'),
+    path('admin/users/<int:id>/', AdminUserDetailView.as_view(), name='admin_user_detail'),
+    path('admin/users/<int:user_id>/ban/', ban_user, name='admin_ban_user'),
+    path('admin/users/<int:user_id>/unban/', unban_user, name='admin_unban_user'),
+    path('admin/users/<int:user_id>/make-admin/', make_admin, name='admin_make_admin'),
+    path('admin/users/<int:user_id>/remove-admin/', remove_admin, name='admin_remove_admin'),
+    path('admin/users/<int:user_id>/verify-document/', verify_user_document, name='admin_verify_document'),
+    
+    # Admin Complaint API endpoints
+    path('admin/complaints/', AdminComplaintListView.as_view(), name='admin_complaints_list'),
+    path('admin/complaints/statistics/', complaint_statistics, name='admin_complaints_statistics'),
+    path('admin/complaints/<str:complaint_uuid>/moderate/', moderate_complaint, name='admin_moderate_complaint'),
+    path('admin/complaints/<str:complaint_uuid>/history/', complaint_history, name='admin_complaint_history'),
+    
+    # Admin Settings API endpoints
+    path('admin/settings/faq/', FAQListView.as_view(), name='admin_faq_list'),
+    path('admin/settings/faq/<int:pk>/', FAQDetailView.as_view(), name='admin_faq_detail'),
+    path('admin/settings/complaint-reasons/', ComplaintReasonListView.as_view(), name='admin_complaint_reasons_list'),
+    path('admin/settings/complaint-reasons/<int:pk>/', ComplaintReasonDetailView.as_view(), name='admin_complaint_reasons_detail'),
+    
+    # Admin Activity Logs API endpoints
+    path('admin/logs/activity/', AdminActivityLogListView.as_view(), name='admin_activity_logs'),
+    
+    # Public API endpoints
+    path('faq/', get_public_faq, name='public_faq'),
+    path('complaint-reasons/', get_public_complaint_reasons, name='public_complaint_reasons'),
+    
+    # Уведомления
+    path('notifications/', include([
+        path('', NotificationListView.as_view(), name='notification-list'),
+        path('unread-count/', NotificationUnreadCountView.as_view(), name='notification-unread-count'),
+        path('mark-all-read/', NotificationMarkAllAsReadView.as_view(), name='notification-mark-all-read'),
+        path('bulk-delete/', NotificationBulkDeleteView.as_view(), name='notification-bulk-delete'),
+        path('settings/', NotificationSettingsView.as_view(), name='notification-settings'),
+        path('<int:pk>/', NotificationDetailView.as_view(), name='notification-detail'),
+        path('<int:pk>/read/', NotificationMarkAsReadView.as_view(), name='notification-mark-read'),
+        path('<int:pk>/delete/', NotificationDeleteView.as_view(), name='notification-delete'),
+    ])),
+    
+    # FCM (Push Notifications) API endpoints
+    path('fcm/', include([
+        path('tokens/', FCMTokenListCreateView.as_view(), name='fcm-token-list'),
+        path('tokens/<int:pk>/', FCMTokenDetailView.as_view(), name='fcm-token-detail'),
+        path('register/', register_fcm_token, name='fcm-register-token'),
+        path('unregister/<str:token>/', unregister_fcm_token, name='fcm-unregister-token'),
+        path('test/', test_push_notification, name='fcm-test-push'),
+        path('stats/', fcm_token_stats, name='fcm-token-stats'),
+    ])),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

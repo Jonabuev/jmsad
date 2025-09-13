@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/component/store/store";
 import { logout } from "@/component/store/auth/authSlice";
 import { mediaUrl } from "@/utils/url";
+import { NotificationBell } from "@/component/notifications";
 
 const NavigationBar: React.FC = () => {
   const { profile: user, isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -148,6 +149,11 @@ const NavigationBar: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Уведомления */}
+        {isAuthenticated && user && (
+          <NotificationBell className="relative" />
+        )}
 
         {isAuthenticated && user ? (
           <div className="relative" ref={dropdownRef}>

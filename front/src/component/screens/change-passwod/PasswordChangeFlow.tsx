@@ -1,7 +1,8 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { requestPasswordChange, confirmPasswordChange, changePassword } from "@/api/passwordApi";
+import { fetchUserProfile } from "@/api/userApi";
 
 type Step = "requestCode" | "verifyCode" | "newPassword" | "success";
 
@@ -12,6 +13,24 @@ const PasswordChangeFlow: FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  // Получаем email пользователя при загрузке компонента
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+          const response = await fetchUserProfile();
+          setUserEmail(response.data.user.email || "");
+        }
+      } catch (error) {
+        console.error("Ошибка при получении email пользователя:", error);
+      }
+    };
+    
+    fetchUserEmail();
+  }, []);
 
   const handleRequestCode = async () => {
     setError("");
@@ -55,10 +74,10 @@ const PasswordChangeFlow: FC = () => {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 backdrop-blur-sm">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Изменение пароля
+            {t("password.change.title")}
           </h2>
           <p className="text-gray-600 text-sm">
-            Обновите пароль для вашего аккаунта
+            {t("password.change.description")}
           </p>
         </div>
 
@@ -70,9 +89,15 @@ const PasswordChangeFlow: FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-4">
                 {t("password.change.description")}
               </p>
+              {userEmail && (
+                <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-gray-600 mb-1">{t("password.change.emailLabel")}</p>
+                  <p className="text-sm font-medium text-gray-900">{userEmail}</p>
+                </div>
+              )}
             </div>
             <button
               onClick={handleRequestCode}

@@ -85,7 +85,36 @@ class RentalListCreateView(generics.ListCreateAPIView):
         ).all()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        rental = serializer.save(user=self.request.user)
+        
+        # Логируем создание аренды
+        try:
+            from rentapp.utils import log_activity
+            log_activity(
+                action_type='rental_create',
+                description=f'Создана новая аренда: {rental.house.address} для пользователя {rental.tenant.username if rental.tenant else "не назначен"}',
+                user=self.request.user,
+                target_object=rental,
+                request=self.request,
+                metadata={
+                    'rental_id': rental.id,
+                    'house_id': rental.house.id,
+                    'tenant_id': rental.tenant.id if rental.tenant else None,
+                    'start_date': str(rental.start_date) if rental.start_date else None,
+                    'end_date': str(rental.end_date) if rental.end_date else None,
+                    'status': rental.status
+                }
+            )
+        except Exception as e:
+            print('Ошибка логирования создания аренды:', e)
+        
+        # Отправляем уведомление арендодателю о новой заявке
+        if rental.tenant and rental.house.owner:
+            try:
+                from rentapp.notifications import send_rental_request_notification
+                send_rental_request_notification(rental)
+            except Exception as e:
+                print('Ошибка отправки уведомления о заявке на аренду:', e)
 
 
 class RentalDetailView(APIView):
@@ -102,7 +131,7 @@ class RentalDetailView(APIView):
 
     def put(self, request, pk):
         try:
-            result = RentalService.update_rental_status(pk, request.data.get('status'), request.user)
+            result = RentalService.update_rental_status(pk, request.data.get('status'), request.user, request)
             return Response(result)
         except RentAppException as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)

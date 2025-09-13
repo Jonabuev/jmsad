@@ -4,39 +4,49 @@ import { useTranslation } from "next-i18next";
 import FeatureCard from "./feature-card/FeatureCard";
 
 const FeaturesSection: FC = () => {
-  const { t } = useTranslation(); // Using the translation hook
+  const { t } = useTranslation();
 
   return (
     <section
       id="features"
-      className="py-16 px-4 sm:px-8 md:px-12 lg:px-16 bg-slate-100"
+      className="py-20 px-4 sm:px-8 md:px-12 lg:px-16 bg-gradient-to-br from-gray-50 to-gray-100"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
-        <FeatureCard
-          imageSrc="/home/rental.jpeg"
-          title={t("features.registry")}
-          description={t("features.registry_description")}
-          link="/search"
-        />
-        <FeatureCard
-          imageSrc="/home/forum.jpeg"
-          title={t("features.forum")}
-          description={t("features.forum_description")}
-          link="/forum"
-        />
-        <FeatureCard
-          imageSrc="/home/analytics.png"
-          title={t("features.analytics")}
-          description={t("features.analytics_description")}
-          link="/analitics"
-        />
-        <FeatureCard
-          imageSrc="/home/helps.jpeg"
-          title={t("features.help")}
-          description={t("features.help_description")}
-          link="https://t.me/Helper_serg_bot"
-          isExternal
-        />
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 animate-pulse">
+            Наши услуги
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Выберите нужную вам услугу для работы с нашей платформой
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="transform transition-all duration-700 hover:scale-105">
+          <FeatureCard
+            imageSrc="url('/home/reaster.png')"
+            title={t("features.registry")}
+            description={t("features.registry_description")}
+            link="/search"
+          />
+        </div>
+        <div className="transform transition-all duration-700 hover:scale-105 delay-100">
+          <FeatureCard
+            imageSrc="url('/home/maps.png')"
+            title={t("features.maps")}
+            description={t("features.maps_description")}
+            link="/rental-catalog"
+          />
+        </div>
+        <div className="transform transition-all duration-700 hover:scale-105 delay-200">
+          <FeatureCard
+            imageSrc="url('/home/help.png')"
+            title={t("features.help")}
+            description={t("features.help_description")}
+            link="/faq"
+          />
+        </div>
+        </div>
       </div>
     </section>
   );

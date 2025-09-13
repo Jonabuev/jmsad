@@ -1,9 +1,13 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { useTranslation } from "next-i18next";
 
-const FaqHeroSection: FC = () => {
+interface FaqHeroSectionProps {
+  activeTab: 'tenants' | 'landlords';
+  onTabChange: (tab: 'tenants' | 'landlords') => void;
+}
+
+const FaqHeroSection: FC<FaqHeroSectionProps> = ({ activeTab, onTabChange }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'tenants' | 'landlords'>('tenants');
 
   return (
     <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gradient-to-br from-slate-50 to-blue-50">
@@ -24,7 +28,7 @@ const FaqHeroSection: FC = () => {
             {/* Tabs */}
             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3 sm:gap-4 mb-6 sm:mb-8">
               <button
-                onClick={() => setActiveTab('tenants')}
+                onClick={() => onTabChange('tenants')}
                 className={`px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all duration-300 shadow-md text-sm sm:text-base touch-manipulation ${
                   activeTab === 'tenants'
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transform scale-105'
@@ -34,7 +38,7 @@ const FaqHeroSection: FC = () => {
                 {t("faq.hero.tenants_tab")}
               </button>
               <button
-                onClick={() => setActiveTab('landlords')}
+                onClick={() => onTabChange('landlords')}
                 className={`px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all duration-300 shadow-md text-sm sm:text-base touch-manipulation ${
                   activeTab === 'landlords'
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transform scale-105'

@@ -132,6 +132,8 @@ export interface IProfileData {
   passport_expiry: string;
   anonymous_name : string;
   is_banned: boolean;
+  is_superuser: boolean;
+  is_staff: boolean;
 }
 
 export interface IPublicProfileData {

@@ -3,15 +3,15 @@ import { FC } from "react";
 import { useTranslation } from "next-i18next";
 
 const CtaSection: FC = () => {
-  const { t } = useTranslation(); // Using the translation hook
+  const { t } = useTranslation();
 
   return (
     <section
       id="cta"
-      className="py-20 px-4 sm:px-8 md:px-12 lg:px-16 bg-white text-center"
+      className="py-20 px-4 sm:px-8 md:px-12 lg:px-16 bg-gray-50 text-center"
     >
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-indigo-900 mb-10 leading-tight">
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-10 leading-tight">
           {t("cta.register_message_part1")}
           <br />
           {t("cta.register_message_part2")}
@@ -19,11 +19,11 @@ const CtaSection: FC = () => {
 
         <Link
           href="/register"
-          className="inline-block py-4 px-10 text-lg bg-blue-400 text-white rounded-full cursor-pointer no-underline transition duration-300 hover:bg-blue-600 hover:scale-105 mb-8"
+          className="inline-block py-4 px-10 text-lg bg-blue-600 text-white rounded-xl cursor-pointer no-underline transition duration-300 hover:bg-blue-700 hover:scale-105 mb-8 shadow-lg"
         >
           {t("cta.register_button")}
         </Link>
-        <p className="text-base text-gray-800">
+        <p className="text-base text-gray-700">
           {t("cta.already_registered")}
           <Link
             href="/login"

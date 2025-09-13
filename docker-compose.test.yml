@@ -1,0 +1,85 @@
+services:
+  # Тестовая база данных
+  postgres_test:
+    image: postgres:16.9-alpine
+    container_name: jmsad_postgres_test
+    environment:
+      POSTGRES_DB: jmsad_test_db
+      POSTGRES_USER: jmsad_test_user
+      POSTGRES_PASSWORD: jmsad_test_password
+    ports:
+      - "5433:5432"  # Другой порт для тестов
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - jmsad-test-network
+
+  # Тестовый бэкенд
+  backend_test:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jmsad_backend_test
+    ports:
+      - "8001:8000"  # Другой порт для тестов
+    environment:
+      - SECRET_KEY=django-test-secret-key-for-testing-only
+      - DEBUG=True
+      - DB_NAME=jmsad_test_db
+      - DB_USER=jmsad_test_user
+      - DB_PASSWORD=jmsad_test_password
+      - DB_HOST=postgres_test
+      - DB_PORT=5432
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-test_password}
+      - DEFAULT_FROM_EMAIL=test@example.com
+      - DJANGO_SETTINGS_MODULE=myproject.test_settings
+    depends_on:
+      - postgres_test
+    volumes:
+      - ./backend:/app
+      - backend_test_static:/app/staticfiles
+      - backend_test_media:/app/media
+    restart: unless-stopped
+    networks:
+      - jmsad-test-network
+    command: >
+      sh -c "
+        python manage.py migrate --settings=myproject.test_settings &&
+        python manage.py collectstatic --noinput --settings=myproject.test_settings &&
+        python manage.py runserver 0.0.0.0:8000 --settings=myproject.test_settings
+      "
+
+  # Тестовый фронтенд
+  frontend_test:
+    build: 
+      context: ./front
+      dockerfile: Dockerfile.dev
+    container_name: jmsad_frontend_test
+    ports:
+      - "3001:3000"  # Другой порт для тестов
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - NODE_ENV=test
+    depends_on:
+      - backend_test
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    networks:
+      - jmsad-test-network
+
+volumes:
+  postgres_test_data:
+  backend_test_static:
+  backend_test_media:
+
+networks:
+  jmsad-test-network:
+    driver: bridge

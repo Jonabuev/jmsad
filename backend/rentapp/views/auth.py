@@ -67,6 +67,25 @@ def register(request):
         except Exception as e:
             # Не блокируем регистрацию из-за уведомлений
             print('Ошибка создания уведомления при регистрации:', e)
+        
+        # Логируем регистрацию
+        try:
+            from rentapp.utils import log_activity
+            log_activity(
+                action_type='user_register',
+                description=f'Новый пользователь зарегистрирован: {user.username} ({user.email}), роль: {user.get_role_display()}',
+                user=user,
+                target_object=user,
+                request=request,
+                metadata={
+                    'user_id': user.id,
+                    'role': user.role,
+                    'email': user.email,
+                    'username': user.username
+                }
+            )
+        except Exception as e:
+            print('Ошибка логирования регистрации:', e)
 
         return Response({
             "message": "Пользователь успешно зарегистрирован",
@@ -109,9 +128,40 @@ def login_view(request):
     user = authenticate(request, username=username, password=password)
     
     if user is not None:
+        # Проверяем, не заблокирован ли пользователь
+        if user.is_banned:
+            return Response({
+                "error": "Ваш аккаунт заблокирован. Обратитесь к администратору."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Проверяем, активен ли пользователь
+        if not user.is_active:
+            return Response({
+                "error": "Ваш аккаунт деактивирован. Обратитесь к администратору."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         # Пользователь прошел аутентификацию, генерируем токены
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
+
+        # Логируем вход в систему
+        try:
+            from rentapp.utils import log_activity
+            log_activity(
+                action_type='user_login',
+                description=f'Пользователь {user.username} ({user.email}) вошел в систему',
+                user=user,
+                target_object=None,
+                request=request,
+                metadata={
+                    'user_id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'role': user.role
+                }
+            )
+        except Exception as e:
+            print('Ошибка логирования входа:', e)
 
         # Возвращаем успешный ответ с токенами
         profile_url = f"http://localhost:3000/profile/"

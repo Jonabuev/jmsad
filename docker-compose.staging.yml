@@ -1,0 +1,96 @@
+services:
+  # Staging база данных
+  postgres_staging:
+    image: postgres:16.9-alpine
+    container_name: jmsad_postgres_staging
+    environment:
+      POSTGRES_DB: jmsad_staging_db
+      POSTGRES_USER: jmsad_staging_user
+      POSTGRES_PASSWORD: jmsad_staging_password
+    ports:
+      - "5434:5432"  # Другой порт для staging
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - jmsad-staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jmsad_staging_user -d jmsad_staging_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Staging бэкенд
+  backend_staging:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jmsad_backend_staging
+    ports:
+      - "8001:8000"  # Другой порт для staging
+    environment:
+      - SECRET_KEY=${STAGING_SECRET_KEY}
+      - DEBUG=True
+      - DB_NAME=jmsad_staging_db
+      - DB_USER=jmsad_staging_user
+      - DB_PASSWORD=jmsad_staging_password
+      - DB_HOST=postgres_staging
+      - DB_PORT=5432
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+      - DJANGO_SETTINGS_MODULE=myproject.staging_settings
+    depends_on:
+      postgres_staging:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - backend_staging_static:/app/staticfiles
+      - backend_staging_media:/app/media
+    restart: unless-stopped
+    networks:
+      - jmsad-staging-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Staging фронтенд
+  frontend_staging:
+    build: 
+      context: ./front
+      dockerfile: Dockerfile.dev
+    container_name: jmsad_frontend_staging
+    ports:
+      - "3001:3000"  # Другой порт для staging
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - NODE_ENV=staging
+    depends_on:
+      backend_staging:
+        condition: service_healthy
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    networks:
+      - jmsad-staging-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_staging_data:
+  backend_staging_static:
+  backend_staging_media:
+
+networks:
+  jmsad-staging-network:
+    driver: bridge

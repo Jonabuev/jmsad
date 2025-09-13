@@ -21,6 +21,10 @@ COPY --from=deps /app/node_modules ./node_modules
 # Копируем исходный код
 COPY . .
 
+# Добавляем ARG для переменных окружения во время сборки
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Собираем приложение
 RUN npm run build
 

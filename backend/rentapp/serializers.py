@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, IdentityVerification, House, ComplaintReason, Complaint, PasswordChangeRequest, Reputation, Comment
+from .models import ActivityLog, CustomUser, IdentityVerification, House, ComplaintReason, Complaint, Notification, NotificationSettings, PasswordChangeRequest, Reputation, Comment, FAQ, FCMToken
 
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
@@ -409,11 +409,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         fields = ['id', 'thread', 'sender', 'message', 'created_at']
         read_only_fields = ['created_at']
 
-class NotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
-        fields = ['id', 'type', 'title', 'message', 'is_read', 'created_at', 'related_complaint']
-        read_only_fields = ['id', 'created_at']
+
 
 
 from rest_framework import serializers
@@ -479,3 +475,169 @@ class UserCommentSerializer(serializers.ModelSerializer):
         model = UserComment
         fields = ["id", "author", "author_name", "target_user", "text", "created_at"]
         read_only_fields = ["author", "created_at"]
+
+
+# ==================== FAQ SERIALIZERS ====================
+
+class FAQSerializer(serializers.ModelSerializer):
+    created_by_username = serializers.CharField(source='created_by.username', read_only=True)
+    
+    class Meta:
+        model = FAQ
+        fields = [
+            'id', 'question_ru', 'answer_ru', 
+            'question_kz', 'answer_kz', 
+            'question_en', 'answer_en',
+            'category', 'user_type', 'is_active', 'order',
+            'created_at', 'updated_at', 'created_by', 'created_by_username'
+        ]
+        read_only_fields = ['created_at', 'updated_at', 'created_by']
+
+class PublicFAQSerializer(serializers.ModelSerializer):
+    question = serializers.SerializerMethodField()
+    answer = serializers.SerializerMethodField()
+    
+    def get_question(self, obj):
+        locale = self.context.get('locale', 'ru')
+        if locale == 'kz' and obj.question_kz:
+            return obj.question_kz
+        elif locale == 'en' and obj.question_en:
+            return obj.question_en
+        return obj.question_ru
+    
+    def get_answer(self, obj):
+        locale = self.context.get('locale', 'ru')
+        if locale == 'kz' and obj.answer_kz:
+            return obj.answer_kz
+        elif locale == 'en' and obj.answer_en:
+            return obj.answer_en
+        return obj.answer_ru
+    
+    class Meta:
+        model = FAQ
+        fields = ['id', 'question', 'answer', 'category', 'user_type', 'order']
+
+
+# ==================== COMPLAINT REASON SERIALIZERS ====================
+
+class ComplaintReasonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplaintReason
+        fields = [
+            'id', 'reason', 'reason_kz', 'reason_en', 
+            'type', 'is_default', 'order'
+        ]
+
+class PublicComplaintReasonSerializer(serializers.ModelSerializer):
+    reason_text = serializers.SerializerMethodField()
+    
+    def get_reason_text(self, obj):
+        locale = self.context.get('locale', 'ru')
+        if locale == 'kz' and obj.reason_kz:
+            return obj.reason_kz
+        elif locale == 'en' and obj.reason_en:
+            return obj.reason_en
+        return obj.reason
+    
+    class Meta:
+        model = ComplaintReason
+        fields = ['id', 'reason_text', 'type', 'order']
+
+
+class ActivityLogSerializer(serializers.ModelSerializer):
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    action_type_display = serializers.CharField(source='get_action_type_display', read_only=True)
+    
+    class Meta:
+        model = ActivityLog
+        fields = [
+            'id', 'user', 'user_username', 'user_email', 'action_type', 
+            'action_type_display', 'action_description', 'target_object_type',
+            'target_object_id', 'ip_address', 'metadata', 'created_at'
+        ]
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """Сериализатор для уведомлений"""
+    type_display = serializers.CharField(source='get_type_display', read_only=True)
+    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
+    time_ago = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'type', 'type_display', 'priority', 'priority_display',
+            'title', 'message', 'is_read', 'action_url', 'metadata',
+            'created_at', 'read_at', 'time_ago'
+        ]
+    
+    def get_time_ago(self, obj):
+        """Возвращает время в формате "X минут назад" """
+        from django.utils import timezone
+        now = timezone.now()
+        diff = now - obj.created_at
+        
+        if diff.days > 0:
+            return f"{diff.days} дней назад"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} часов назад"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes} минут назад"
+        else:
+            return "Только что"
+
+
+class NotificationSettingsSerializer(serializers.ModelSerializer):
+    """Сериализатор для настроек уведомлений"""
+    
+    class Meta:
+        model = NotificationSettings
+        fields = [
+            'email_enabled', 'email_complaints', 'email_rentals', 
+            'email_system', 'email_promotions',
+            'push_enabled', 'push_complaints', 'push_rentals', 
+            'push_system', 'push_promotions',
+            'sms_enabled', 'sms_urgent_only', 'phone_number',
+            'quiet_hours_start', 'quiet_hours_end', 'timezone',
+            'digest_frequency'
+        ]
+
+
+class FCMTokenSerializer(serializers.ModelSerializer):
+    """Сериализатор для FCM токенов"""
+    
+    class Meta:
+        model = FCMToken
+        fields = [
+            'id', 'token', 'device_type', 'device_info', 
+            'is_active', 'last_used', 'created_at'
+        ]
+        read_only_fields = ['id', 'last_used', 'created_at']
+    
+    def create(self, validated_data):
+        # Если токен уже существует, обновляем его
+        token = validated_data.get('token')
+        user = self.context['request'].user
+        
+        fcm_token, created = FCMToken.objects.get_or_create(
+            token=token,
+            defaults={
+                'user': user,
+                'device_type': validated_data.get('device_type', 'web'),
+                'device_info': validated_data.get('device_info', {}),
+                'is_active': True
+            }
+        )
+        
+        if not created:
+            # Обновляем существующий токен
+            fcm_token.user = user
+            fcm_token.device_type = validated_data.get('device_type', 'web')
+            fcm_token.device_info = validated_data.get('device_info', {})
+            fcm_token.is_active = True
+            fcm_token.save()
+        
+        return fcm_token
