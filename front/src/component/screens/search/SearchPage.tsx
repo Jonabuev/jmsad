@@ -19,6 +19,8 @@ const TenantRegistry: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [activeTab, setActiveTab] = useState<"tenants" | "landlords">("tenants");
   const [searchQuery, setSearchQuery] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [iin, setIin] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [addressQuery, setAddressQuery] = useState("");
@@ -143,6 +145,8 @@ const TenantRegistry: React.FC = () => {
       }
       const params: Record<string, string> = {};
       if (searchQuery) params.search = searchQuery;
+      if(fullName) params.search = fullName;
+      if(iin) params.search = iin;
       if (startDate && endDate) {
         params.start_date = startDate;
         params.end_date = endDate;
@@ -162,12 +166,20 @@ const TenantRegistry: React.FC = () => {
     } catch (error) {
       console.error("Ошибка при загрузке:", error);
     }
-  }, [activeTab, router, searchQuery, startDate, endDate, addressQuery, courtScore, selectedReasons]);
+  }, [activeTab, router, searchQuery, startDate, endDate, addressQuery, courtScore, selectedReasons, iin, fullName]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
-
+  useEffect(() => {
+          setIin("");
+          setFullName("");
+          setStartDate("");
+          setEndDate("");
+          setAddressQuery("");
+          setCourtScore("");
+          setSelectedReasons([]);
+        }, [activeTab]);
   // Показываем загрузку пока проверяем верификацию или восстанавливаем токены
   if (isVerified === null || (!isAuthenticated && localStorage.getItem("access_token"))) {
     return (
@@ -218,6 +230,7 @@ const TenantRegistry: React.FC = () => {
             {t("profile.search.landlords")}
           </button>
         </div>
+        
         {/* Секция поиска и фильтров */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -228,8 +241,8 @@ const TenantRegistry: React.FC = () => {
               <input
                 type="text"
                 placeholder={t("profile.search.fullNamePlaceholder")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
               />
             </div>
@@ -240,8 +253,8 @@ const TenantRegistry: React.FC = () => {
               <input
                 type="text"
                 placeholder={t("profile.search.iinPlaceholder")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={iin}
+                onChange={(e) => setIin(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
               />
             </div>
