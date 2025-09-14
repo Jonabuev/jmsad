@@ -11,6 +11,7 @@ import Footer from "@/component/footer/Footer";
 import { checkAndCleanExpiredTokens, getValidAccessToken } from "@/utils/tokenUtils";
 import { useTokenValidation } from "@/component/hooks/useTokenValidation";
 import { useAutoRefreshToken } from "@/component/hooks/useAutoRefreshToken";
+// Push-уведомления инициализируются через PushNotificationPrompt
 import Head from "next/head";
 
 const AppContent = (props: AppProps) => {
@@ -35,6 +36,9 @@ const AppContent = (props: AppProps) => {
         if (token) {
           console.log('Valid token found, restoring user profile...');
           await dispatch(fetchUserProfile());
+          
+          // Push-уведомления будут инициализированы через PushNotificationPrompt
+          // когда пользователь явно даст разрешение
         } else {
           console.log('No valid token found');
         }
@@ -52,6 +56,8 @@ const AppContent = (props: AppProps) => {
       clearTimeout(timeoutId);
     };
   }, [dispatch]);
+
+  // Слушатель push-уведомлений настраивается в usePushNotifications хуке
 
   return (
     <>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { 
-  initializePushNotifications, 
   getNotificationPermission, 
   isNotificationSupported,
   sendTestPushNotification 
 } from '@/utils/firebase';
+import { usePushNotifications } from '@/component/hooks/usePushNotifications';
 
 interface PushNotificationPromptProps {
   onPermissionGranted?: () => void;
@@ -19,28 +19,29 @@ const PushNotificationPrompt: React.FC<PushNotificationPromptProps> = ({
   showTestButton = false
 }) => {
   const { t } = useTranslation('common');
-  const [isSupported, setIsSupported] = useState(false);
+  const { isSupported, isInitialized, isInitializing, error, initialize } = usePushNotifications();
   const [permission, setPermission] = useState<NotificationPermission>('default');
-  const [isLoading, setIsLoading] = useState(false);
   const [isTestLoading, setIsTestLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
-    const checkSupport = () => {
-      const supported = isNotificationSupported();
-      setIsSupported(supported);
+    if (isSupported) {
+      const currentPermission = getNotificationPermission();
+      setPermission(currentPermission);
       
-      if (supported) {
-        const currentPermission = getNotificationPermission();
-        setPermission(currentPermission);
-        
-        // Показываем prompt только если разрешение не предоставлено
-        setShowPrompt(currentPermission === 'default');
-      }
-    };
+      // Показываем prompt только если разрешение не предоставлено и не инициализировано
+      setShowPrompt(currentPermission === 'default' && !isInitialized);
+    }
+  }, [isSupported, isInitialized]);
 
-    checkSupport();
-  }, []);
+  // Обновляем разрешение при инициализации
+  useEffect(() => {
+    if (isInitialized) {
+      setPermission('granted');
+      setShowPrompt(false);
+      onPermissionGranted?.();
+    }
+  }, [isInitialized, onPermissionGranted]);
 
   const handleRequestPermission = async () => {
     if (!isSupported) {
@@ -48,10 +49,8 @@ const PushNotificationPrompt: React.FC<PushNotificationPromptProps> = ({
       return;
     }
 
-    setIsLoading(true);
-    
     try {
-      const success = await initializePushNotifications();
+      const success = await initialize();
       
       if (success) {
         setPermission('granted');
@@ -65,8 +64,6 @@ const PushNotificationPrompt: React.FC<PushNotificationPromptProps> = ({
       console.error('Ошибка запроса разрешения:', error);
       setPermission('denied');
       onPermissionDenied?.();
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -146,10 +143,10 @@ const PushNotificationPrompt: React.FC<PushNotificationPromptProps> = ({
           <div className="flex gap-2">
             <button
               onClick={handleRequestPermission}
-              disabled={isLoading}
+              disabled={isInitializing}
               className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
             >
-              {isLoading ? t('common.loading') : t('notifications.push_prompt.enable')}
+              {isInitializing ? t('common.loading') : t('notifications.push_prompt.enable')}
             </button>
             
             <button

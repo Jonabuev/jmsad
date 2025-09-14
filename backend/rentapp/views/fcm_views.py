@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from ..models import FCMToken
 from ..serializers import FCMTokenSerializer
-from ..notifications import send_push_notification
+# send_push_notification теперь вызывается через create_notification
 import logging
 
 User = get_user_model()
@@ -128,21 +128,27 @@ def test_push_notification(request):
     Тестовая отправка push уведомления текущему пользователю
     """
     try:
-        # Отправляем тестовое уведомление
-        result = send_push_notification(
+        from ..notifications import create_notification
+        
+        # Создаем тестовое уведомление
+        notification = create_notification(
             user=request.user,
+            notification_type='test',
             title="Тестовое уведомление",
-            body="Это тестовое push уведомление от ARNO",
-            data={
+            message="Это тестовое push уведомление от ARNO",
+            priority='normal',
+            action_url='/notifications',
+            metadata={
                 'type': 'test',
                 'url': '/notifications'
             }
         )
         
-        if result:
+        if notification and notification.is_push_sent:
             return Response({
                 'message': 'Тестовое push уведомление отправлено',
-                'result': result
+                'success': True,
+                'notification_id': notification.id
             }, status=status.HTTP_200_OK)
         else:
             return Response({

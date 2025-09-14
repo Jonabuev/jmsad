@@ -197,7 +197,8 @@ const NotificationsPage: React.FC<NotificationsPageProps> = () => {
                 </button>
               </div>
             </div>
-          </div>
+            </div>
+
 
           {/* Фильтры */}
           {showFilters && (

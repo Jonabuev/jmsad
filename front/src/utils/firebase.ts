@@ -4,12 +4,12 @@ import { FCMToken } from '@/types/notifications';
 
 // Конфигурация Firebase
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "your-api-key",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "your-project-id",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "your-project.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "your-app-id"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyBitOpQrBV4aG5BBcu9xl0GDZOsw8O3XRo",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "arno-notifications-8b98b.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "arno-notifications-8b98b",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "arno-notifications-8b98b.firebasestorage.app",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "206024491425",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:206024491425:web:92356ec317a4f760c24be0"
 };
 
 // Инициализация Firebase
@@ -22,9 +22,12 @@ let messaging: any = null;
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   try {
     messaging = getMessaging(app);
+    console.log('Firebase Messaging initialized successfully');
   } catch (error) {
     console.error('Firebase Messaging initialization error:', error);
   }
+} else {
+  console.warn('Firebase Messaging not supported in this environment');
 }
 
 // Интерфейс для уведомлений
@@ -61,9 +64,16 @@ export const getFCMToken = async (): Promise<string | null> => {
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
+      // Проверяем, что пользователь аутентифицирован
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        console.warn('Пользователь не аутентифицирован, пропускаем получение FCM токена');
+        return null;
+      }
+
       // Получаем токен
       const token = await getToken(messaging, {
-        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || 'your-vapid-key'
+        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || 'BFfjg7eLj5CAejWHtmp-DosMwQ7U_WNaG3VcKTCRtNeAkiGSYUZIloKAO4SAAu8dQPgbK-jqjvtPJwfpkxAcZ7M'
       });
       
       if (token) {
@@ -145,6 +155,28 @@ export const unregisterFCMToken = async (token: string): Promise<boolean> => {
 };
 
 // Функция для прослушивания входящих сообщений
+export const setupMessageListener = (callback: (notification: PushNotificationData) => void): void => {
+  if (!messaging) {
+    console.warn('Firebase Messaging не инициализирован');
+    return;
+  }
+
+  onMessage(messaging, (payload) => {
+    console.log('Получено сообщение:', payload);
+    
+    const notification: PushNotificationData = {
+      title: payload.notification?.title || '',
+      body: payload.notification?.body || '',
+      icon: payload.notification?.icon,
+      badge: (payload.notification as any)?.badge,
+      data: payload.data as any
+    };
+    
+    callback(notification);
+  });
+};
+
+// Функция для прослушивания входящих сообщений (legacy)
 export const onMessageListener = (): Promise<PushNotificationData> => {
   return new Promise((resolve) => {
     if (!messaging) {
@@ -200,7 +232,19 @@ export const initializePushNotifications = async (): Promise<boolean> => {
     return false;
   }
 
+  if (!messaging) {
+    console.warn('Firebase Messaging не инициализирован');
+    return false;
+  }
+
   try {
+    // Проверяем, что пользователь аутентифицирован
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.warn('Пользователь не аутентифицирован, пропускаем инициализацию push уведомлений');
+      return false;
+    }
+
     // Получаем FCM токен
     const token = await getFCMToken();
     
@@ -217,6 +261,16 @@ export const initializePushNotifications = async (): Promise<boolean> => {
     return false;
   } catch (error) {
     console.error('Ошибка инициализации push уведомлений:', error);
+    
+    // Проверяем тип ошибки
+    if (error instanceof Error) {
+      if (error.message.includes('token-subscribe-failed')) {
+        console.warn('Ошибка подписки на FCM токен - возможно, проблема с аутентификацией Firebase');
+      } else if (error.message.includes('permission')) {
+        console.warn('Ошибка разрешений - пользователь не предоставил разрешение на уведомления');
+      }
+    }
+    
     return false;
   }
 };

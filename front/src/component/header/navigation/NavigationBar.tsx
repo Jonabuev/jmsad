@@ -150,6 +150,7 @@ const NavigationBar: React.FC = () => {
           )}
         </div>
 
+
         {/* Уведомления */}
         {isAuthenticated && user && (
           <NotificationBell className="relative" />

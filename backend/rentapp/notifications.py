@@ -343,54 +343,82 @@ def send_push_notification(notification):
 
 def send_fcm_notification(token, title, body, data=None, icon=None):
     """
-    Отправляет push уведомление через Firebase Cloud Messaging
+    Отправляет push уведомление через Firebase Cloud Messaging v1 API
     """
     try:
+        import json
         import requests
         from django.conf import settings
+        from datetime import datetime, timedelta
         
-        # Получаем серверный ключ FCM из настроек
-        fcm_server_key = getattr(settings, 'FCM_SERVER_KEY', None)
-        if not fcm_server_key:
-            logger.error("FCM_SERVER_KEY не настроен в settings.py")
+        # Получаем настройки Firebase из переменных окружения
+        project_id = getattr(settings, 'FCM_PROJECT_ID', None)
+        private_key = getattr(settings, 'FCM_PRIVATE_KEY', None)
+        client_email = getattr(settings, 'FCM_CLIENT_EMAIL', None)
+        
+        # Исправляем формат private key (заменяем \n на реальные переносы строк)
+        if private_key:
+            private_key = private_key.replace('\\n', '\n')
+        
+        if not all([project_id, private_key, client_email]):
+            logger.error("Firebase настройки не найдены в settings.py")
             return False
         
-        # URL для FCM API
-        fcm_url = 'https://fcm.googleapis.com/fcm/send'
+        # Получаем access token
+        access_token = get_firebase_access_token(private_key, client_email)
+        if not access_token:
+            logger.error("Не удалось получить access token для Firebase")
+            return False
+        
+        # URL для FCM v1 API
+        fcm_url = f'https://fcm.googleapis.com/v1/projects/{project_id}/messages:send'
         
         # Заголовки запроса
         headers = {
-            'Authorization': f'key={fcm_server_key}',
+            'Authorization': f'Bearer {access_token}',
             'Content-Type': 'application/json'
         }
         
-        # Данные для отправки
-        payload = {
-            'to': token,
-            'notification': {
-                'title': title,
-                'body': body,
-                'icon': icon or '/static/icons/notification-icon.png',
-                'badge': '/static/icons/badge.png',
-                'sound': 'default',
-                'click_action': data.get('action_url', '') if data else ''
-            },
-            'data': data or {},
-            'priority': 'high',
-            'time_to_live': 86400  # 24 часа
+        # Данные для отправки в формате v1 API
+        message = {
+            'message': {
+                'token': token,
+                'notification': {
+                    'title': title,
+                    'body': body
+                },
+                'data': {str(k): str(v) for k, v in (data or {}).items()},
+                'android': {
+                    'notification': {
+                        'icon': icon or '/static/icons/notification-icon.png',
+                        'sound': 'default'
+                    }
+                },
+            'webpush': {
+                'notification': {
+                    'icon': icon or '/static/icons/notification-icon.png',
+                    'badge': '/static/icons/badge.png',
+                    'actions': [
+                        {
+                            'action': 'open',
+                            'title': 'Открыть'
+                        },
+                        {
+                            'action': 'dismiss',
+                            'title': 'Закрыть'
+                        }
+                    ]
+                }
+            }
+            }
         }
         
         # Отправляем запрос
-        response = requests.post(fcm_url, json=payload, headers=headers, timeout=30)
+        response = requests.post(fcm_url, json=message, headers=headers, timeout=30)
         
         if response.status_code == 200:
-            result = response.json()
-            if result.get('success') == 1:
-                logger.info(f"FCM уведомление успешно отправлено")
-                return True
-            else:
-                logger.error(f"FCM ошибка: {result}")
-                return False
+            logger.info(f"FCM уведомление успешно отправлено через v1 API")
+            return True
         else:
             logger.error(f"FCM HTTP ошибка: {response.status_code} - {response.text}")
             return False
@@ -398,6 +426,49 @@ def send_fcm_notification(token, title, body, data=None, icon=None):
     except Exception as e:
         logger.error(f"Ошибка отправки FCM уведомления: {e}")
         return False
+
+
+def get_firebase_access_token(private_key, client_email):
+    """
+    Получает access token для Firebase Admin SDK
+    """
+    try:
+        import jwt
+        import requests
+        from datetime import datetime, timedelta
+        
+        # Создаем JWT токен
+        now = datetime.utcnow()
+        payload = {
+            'iss': client_email,
+            'scope': 'https://www.googleapis.com/auth/firebase.messaging',
+            'aud': 'https://oauth2.googleapis.com/token',
+            'iat': now,
+            'exp': now + timedelta(hours=1)
+        }
+        
+        # Подписываем JWT
+        token = jwt.encode(payload, private_key, algorithm='RS256')
+        
+        # Обмениваем JWT на access token
+        response = requests.post(
+            'https://oauth2.googleapis.com/token',
+            data={
+                'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion': token
+            },
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
+        
+        if response.status_code == 200:
+            return response.json().get('access_token')
+        else:
+            logger.error(f"Ошибка получения access token: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        logger.error(f"Ошибка создания JWT токена: {e}")
+        return None
 
 
 def send_sms_notification(notification):

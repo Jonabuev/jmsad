@@ -291,6 +291,11 @@ EMAIL_HOST_USER = 'arno.help.service@gmail.com'
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='your_app_password_here')
 DEFAULT_FROM_EMAIL = 'arno.help.service@gmail.com'
 
+# Firebase Cloud Messaging Settings
+FCM_PROJECT_ID = config('FCM_PROJECT_ID', default='')
+FCM_PRIVATE_KEY = config('FCM_PRIVATE_KEY', default='')
+FCM_CLIENT_EMAIL = config('FCM_CLIENT_EMAIL', default='')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

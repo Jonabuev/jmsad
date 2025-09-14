@@ -6,12 +6,12 @@ importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compa
 
 // Инициализация Firebase в Service Worker
 const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
+  apiKey: "AIzaSyBitOpQrBV4aG5BBcu9xl0GDZOsw8O3XRo",
+  authDomain: "arno-notifications-8b98b.firebaseapp.com",
+  projectId: "arno-notifications-8b98b",
+  storageBucket: "arno-notifications-8b98b.firebasestorage.app",
+  messagingSenderId: "206024491425",
+  appId: "1:206024491425:web:92356ec317a4f760c24be0"
 };
 
 firebase.initializeApp(firebaseConfig);
