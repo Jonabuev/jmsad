@@ -285,7 +285,7 @@ const EditComplaintForm: React.FC = () => {
                     onChange={handleChange}
                     required
                     className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[120px] resize-none transition-all duration-200"
-                    placeholder="Опишите детали жалобы..."
+                    placeholder={t("Scomplaint.describeComplaint")}
                   />
                 </div>
               </div>
@@ -355,9 +355,9 @@ const EditComplaintForm: React.FC = () => {
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <p className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium text-blue-600 hover:text-blue-500">Нажмите для загрузки</span> или перетащите файлы сюда
+                    <span className="font-medium text-blue-600 hover:text-blue-500">{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF до 10MB (максимум 10 файлов)</p>
+                  <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadHint")}</p>
                 </label>
               </div>
             </div>
@@ -419,9 +419,9 @@ const EditComplaintForm: React.FC = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <p className="mt-2 text-sm text-gray-600">
-                          <span className="font-medium text-blue-600 hover:text-blue-500">Загрузить документ</span>
+                          <span className="font-medium text-blue-600 hover:text-blue-500">{t("Scomplaint.uploadDocument")}</span>
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, изображения</p>
+                        <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadFormats")}</p>
                       </label>
                     </div>
                   </div>

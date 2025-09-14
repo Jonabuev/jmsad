@@ -156,6 +156,7 @@
       }
     },
     "info": "Info",
+    "leaveFeedback": "Leave feedback about the user",
     "apartments": "Apartments",
     "notverify": "Not Verified",
     "active": "Active",
@@ -262,7 +263,11 @@
     "disputeWrongStatus": "The complaint can only be disputed after it has been reviewed.",
     "disputeLimit": "You have already disputed this complaint 2 times.",
     "loading": "Loading...",
-    "desc": "A complaint has been filed against you. To dispute it, briefly describe the situation you disagree with and attach evidence."
+    "desc": "A complaint has been filed against you. To dispute it, briefly describe the situation you disagree with and attach evidence.",
+    "placeholder": "Describe what you disagree with in this complaint...",
+    "uploadEvidence": "Upload evidence",
+    "uploadEvidenceFormats": "PDF, JPG, JPEG, PNG (optional)",
+    "fileChosen": "✓ File chosen:"
   },
   "complaint": {
     "title": "Complaint",
@@ -272,8 +277,8 @@
     "reviewed": "Reviewed",
     "rejected": "Rejected",
     "pending": "Under review",
-    "complainant": "Landlord",
-    "accused": "Tenant",
+    "complainant": "Complaint Sender",
+    "accused": "Complaint Recipient",
     "property": "Property",
     "reasons": "Reasons",
     "evidence": "Evidence",
@@ -390,7 +395,23 @@
     "invalidIin": "Enter a valid IIN (12 characters)",
     "userNotFound": "User with this IIN was not found",
     "reasonRequired": "At least one complaint reason must be selected",
-    "roleMismatch": "The selected user has a different role than the one chosen in the tab"
+    "roleMismatch": "The selected user has a different role than the one chosen in the tab",
+    "iinTooLong": "IIN cannot exceed 12 characters",
+    "introText": "Submit a complaint against a dishonest tenant or landlord",
+    "selectComplaintType": "Select complaint type",
+    "tenantComplaint": "Complaint against tenant",
+    "tenantComplaintDesc": "Submit a complaint against a dishonest tenant",
+    "landlordComplaint": "Complaint against landlord",
+    "landlordComplaintDesc": "Submit a complaint against a dishonest landlord",
+    "accusedIin": "Accused IIN",
+    "tenant": "Tenant",
+    "landlord": "Landlord",
+    "complaintReasons": "Complaint reasons",
+    "uploadClick": "Click to upload",
+    "uploadOrDrag": "or drag and drop files here",
+    "uploadHint": "PNG, JPG, GIF up to 10MB (max 10 files)",
+    "uploadDocument": "Upload document",
+    "uploadFormats": "PDF, DOC, DOCX, images"
   },
   "editProfile": {
     "fullName": "Full Name",

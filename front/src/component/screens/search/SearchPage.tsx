@@ -321,7 +321,7 @@ const TenantRegistry: React.FC = () => {
           </div>
           {/* Причины жалоб */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">{t("search.complaintReasons")}</h3>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">{t("search.filter_reasons")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {reasons.map((reason) => (
                 <label key={reason.id} className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 cursor-pointer border border-gray-200">
@@ -331,7 +331,7 @@ const TenantRegistry: React.FC = () => {
                     onChange={() => toggleReason(reason.id)}
                     className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-gray-700 font-medium">{reason.reason}</span>
+                  <span className="text-gray-700 font-medium">{getTranslatedReasons(reason.reason)}</span>
                 </label>
               ))}
             </div>
@@ -369,7 +369,7 @@ const TenantRegistry: React.FC = () => {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                      {activeTab === "tenants" ? t("search.tenant") : t("search.landlord")}
+                      {activeTab === "tenants" ? t("search.tenant") : t("search.tenant")}
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                       {t("profile.search.iin")}

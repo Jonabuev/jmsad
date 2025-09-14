@@ -69,7 +69,7 @@ const SubmitComplaintForm: React.FC = () => {
 
     if (name === "accusedIin") {
       if (value.length > 12) {
-        setErrorMessage("ИИН не может быть длиннее 12 символов");
+        setErrorMessage(t("Scomplaint.iinTooLong"));
       } else {
         setErrorMessage("");
       }
@@ -206,7 +206,7 @@ const SubmitComplaintForm: React.FC = () => {
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">{t("Scomplaint.title")}</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Подайте жалобу на недобросовестного арендатора или арендодателя
+              {t("Scomplaint.introText")}
             </p>
           </div>
 
@@ -251,7 +251,7 @@ const SubmitComplaintForm: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Выберите тип жалобы</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.selectComplaintType")}</h3>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -279,8 +279,8 @@ const SubmitComplaintForm: React.FC = () => {
                       )}
                     </div>
                     <div className="text-left">
-                      <div className="font-semibold">Жалоба на арендатора</div>
-                      <div className="text-sm opacity-75">Подать жалобу на недобросовестного арендатора</div>
+                      <div className="font-semibold">{t("Scomplaint.tenantComplaint")}</div>
+                      <div className="text-sm opacity-75">{t("Scomplaint.tenantComplaintDesc")}</div>
                     </div>
                   </div>
                 </button>
@@ -309,8 +309,8 @@ const SubmitComplaintForm: React.FC = () => {
                       )}
                     </div>
                     <div className="text-left">
-                      <div className="font-semibold">Жалоба на арендодателя</div>
-                      <div className="text-sm opacity-75">Подать жалобу на недобросовестного арендодателя</div>
+                      <div className="font-semibold">{t("Scomplaint.landlordComplaint")}</div>
+                      <div className="text-sm opacity-75">{t("Scomplaint.landlordComplaintDesc")}</div>
                     </div>
                   </div>
                 </button>
@@ -326,7 +326,7 @@ const SubmitComplaintForm: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">ИИН обвиняемого</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.accusedIin")}</h3>
               </div>
               
               <div className="relative">
@@ -367,7 +367,7 @@ const SubmitComplaintForm: React.FC = () => {
                               ? 'bg-blue-100 text-blue-800' 
                               : 'bg-purple-100 text-purple-800'
                           }`}>
-                            {u.role === 'tenant' ? 'Арендатор' : 'Арендодатель'}
+                            {u.role === 'tenant' ? t("Scomplaint.tenant") : t("Scomplaint.landlord")}
                           </span>
                         </div>
                       </div>
@@ -411,7 +411,7 @@ const SubmitComplaintForm: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Причины жалобы</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.complaintReasons")}</h3>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -470,9 +470,9 @@ const SubmitComplaintForm: React.FC = () => {
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <p className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium text-indigo-600 hover:text-indigo-500">Нажмите для загрузки</span> или перетащите файлы сюда
+                    <span className="font-medium text-indigo-600 hover:text-indigo-500">{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF до 10MB (максимум 10 файлов)</p>
+                  <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadHint")}</p>
                 </label>
               </div>
             </div>
@@ -515,7 +515,6 @@ const SubmitComplaintForm: React.FC = () => {
                       value={formData.damageCost}
                       onChange={handleChange}
                       className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-                      placeholder="Введите сумму ущерба..."
                     />
                   </div>
 
@@ -541,9 +540,9 @@ const SubmitComplaintForm: React.FC = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <p className="mt-2 text-sm text-gray-600">
-                          <span className="font-medium text-purple-600 hover:text-purple-500">Загрузить документ</span>
+                          <span className="font-medium text-purple-600 hover:text-purple-500">{t("Scomplaint.uploadDocument")}</span>
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, изображения</p>
+                        <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadFormats")}</p>
                       </label>
                     </div>
                   </div>

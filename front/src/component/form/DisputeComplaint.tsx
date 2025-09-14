@@ -164,7 +164,7 @@ export default function DisputeComplaintPage() {
                     onChange={(e) => setExplanation(e.target.value)}
                     required
                     className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-red-500 focus:border-red-500 min-h-[120px] resize-none transition-all duration-200"
-                    placeholder="Опишите, с чем вы не согласны в данной жалобе..."
+                    placeholder={t("dispute.placeholder")}
                     rows={5}
                   />
                 </div>
@@ -198,12 +198,12 @@ export default function DisputeComplaintPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <p className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium text-orange-600 hover:text-orange-500">Загрузить доказательства</span>
+                    <span className="font-medium text-orange-600 hover:text-orange-500">{t("dispute.uploadEvidence")}</span>
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">PDF, JPG, JPEG, PNG (необязательно)</p>
+                  <p className="text-xs text-gray-500 mt-1">{t("dispute.uploadEvidenceFormats")}</p>
                   {evidence && (
                     <p className="text-sm text-green-600 mt-2 font-medium">
-                      ✓ Выбран файл: {evidence.name}
+                      {t("dispute.fileChosen")} {evidence.name}
                     </p>
                   )}
                 </label>

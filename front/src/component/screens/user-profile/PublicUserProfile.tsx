@@ -625,7 +625,7 @@ const PublicUserProfile: FC = () => {
                             </div>
                             <div>
                               <h2 className="text-2xl font-bold">{t("profile.newComment")}</h2>
-                              <p className="text-blue-100 text-sm">Оставьте отзыв о пользователе</p>
+                              <p className="text-blue-100 text-sm">{t("profile.leaveFeedback")}</p>
                             </div>
                           </div>
                           <button
