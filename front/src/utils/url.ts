@@ -1,7 +1,8 @@
 // Централизованные функции формирования URL для API и медиа/статических файлов
 
 const rawBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-const cleanBase = rawBase ? rawBase.replace(/\/$/, "") : "http://127.0.0.1:8000";
+const cleanBase = rawBase.replace(/\/$/, "");
+
 export const apiBaseUrl = `${cleanBase}/api`;
 export const mediaBaseUrl = cleanBase;
 
@@ -23,5 +24,4 @@ export default {
   apiUrl,
   mediaUrl,
 };
-
 

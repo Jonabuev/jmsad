@@ -3,8 +3,9 @@ import Router from "next/router";
 import { getValidAccessToken, getValidRefreshToken, clearAllTokens, saveTokens } from "@/utils/tokenUtils";
 
 // Determine API base URL from env with local fallback
-const baseFromEnv = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-const API_URL = `${baseFromEnv.replace(/\/$/, "")}/api`;
+const baseFromEnv = process.env.NEXT_PUBLIC_API_URL || "https://api.arno.kz";
+const cleanBaseUrl = baseFromEnv ? baseFromEnv.replace(/\/$/, "") : "https://api.armo.kz";
+const API_URL = `${cleanBaseUrl}/api`;
 
 const api = axios.create({
   baseURL: API_URL,

@@ -104,6 +104,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://arno.kz',
     'https://www.arno.kz',
     'https://api.arno.kz',
+    'http://frontend:3000',
 ]
 
 # Разрешаем загрузку изображений
