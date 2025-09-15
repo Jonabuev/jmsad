@@ -44,3 +44,12 @@ Thumbs.db
 # 🚫 Другие потенциально лишние
 *.bak
 *.swp
+
+# === Local/Temp configs ===
+env.vps
+front/.env.production
+front/.env.production.save
+front/src/component/header/navigation/NavigationBar.tsx.save
+nginx.conf.save
+front/src/utils/url.ts.save
+nginx.conf
