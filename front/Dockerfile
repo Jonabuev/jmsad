@@ -1,5 +1,5 @@
 # Многоэтапная сборка для оптимизации размера образа
-FROM node:18-alpine AS deps
+FROM node:20-alpine AS deps
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev --prefer-offline --no-audit
 
 # Builder этап
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -29,7 +29,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 
 # Production этап
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
