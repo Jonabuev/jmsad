@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Устанавливаем зависимости с кэшированием
-RUN npm ci --only=production --prefer-offline --no-audit
+RUN npm ci --omit=dev --prefer-offline --no-audit
 
 # Builder этап
 FROM node:18-alpine AS builder
