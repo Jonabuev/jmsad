@@ -71,6 +71,8 @@ services:
     container_name: jmsad_frontend_vps
     ports:
       - "3000:3000"
+    env_file:
+      - env.vps
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
