@@ -72,7 +72,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - .env.local
+      - front/.env.local
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
