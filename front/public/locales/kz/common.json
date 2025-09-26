@@ -719,6 +719,7 @@
     }
   },
   "admin": {
+    "pdfCheck": "PDF көру",
     "title": "Әкімші панелі",
     "dashboard": "Басқару панелі",
     "dashboardSubtitle": "Жүйе көрінісі және басқару",

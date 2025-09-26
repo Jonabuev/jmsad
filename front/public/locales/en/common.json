@@ -745,6 +745,7 @@
     }
   },
   "admin": {
+    "pdfCheck": "Check PDF",
     "title": "Admin Panel",
     "dashboard": "Dashboard",
     "dashboardSubtitle": "System overview and management",
