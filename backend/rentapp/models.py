@@ -342,6 +342,8 @@ class CustomUser(AbstractUser):
     #rating = models.PositiveSmallIntegerField(default=5)
     avatar = models.ImageField(upload_to=user_avatar_upload_path, blank=True, null=True, default='avatars/def.jpg')
     r_date = models.DateTimeField(null=True)
+    birth_date = models.DateField(null=True, blank=True)
+    is_from_pdf = models.BooleanField(default=False)
     anonymous_name = models.CharField(max_length=100, blank=True, null=True, unique=True)
     is_banned = models.BooleanField(default=False, help_text="Whether the user is banned")
 
@@ -1067,7 +1069,7 @@ class RentalComplaint(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     support_count = models.IntegerField(default=0)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    court_decision_score = models.IntegerField(null=True)
+    court_decision_score = models.CharField(max_length=30, null=True)
 
     # Флаг судебная жалоба или нет
     is_court_case = models.BooleanField(default=False)

@@ -1,4 +1,5 @@
 import re
+import traceback
 import pytesseract
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -139,9 +140,88 @@ class PDFCheckView(APIView):
         text = extract_text_from_pdf(uploaded_file)
 
         result = {
-            "case_numbers": extract_case_number(text),
-            "main_accused": extract_main_accused(text),
-            "birth_date": extract_birth_date(text)
+            "case_numbers": [n.replace("№", "").strip() for n in extract_case_number(text)],
+            "main_accused": extract_main_accused(text),  # список [{fio, after}]
+            "birth_date": extract_birth_date(text) or "",
+            "is_court_case": True,  # всегда true
         }
 
+
         return Response(result, status=200)
+
+
+from datetime import datetime
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from ..models import CustomUser, RentalComplaint, ComplaintReason
+from rentapp.permissions1 import IsAdmin
+from rest_framework.permissions import IsAuthenticated
+
+class CreateUserFromPDFView(APIView): # требуем авторизацию
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request, *args, **kwargs):
+        
+        user = request.user  # здесь будет CustomUser, если вошёл
+        if not isinstance(user, CustomUser):
+            return Response({"error": "User must be authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+        fio = request.data.get("fio")
+        birth_date = request.data.get("birth_date")
+        description = request.data.get("complaint_description")
+        reason_ids = request.data.get("reason_ids", [])
+        court_decision_score = request.data.get("court_decision_score")
+        evidence = request.FILES.get("evidence")
+
+        if not fio or not birth_date:
+            return Response({"error": "fio и birth_date обязательны"}, status=400)
+
+        try:
+            birth_date_dt = datetime.strptime(birth_date, "%d.%m.%Y").date()
+        except ValueError:
+            return Response({"error": "Неверный формат даты, используйте ДД.ММ.ГГГГ"}, status=400)
+
+        # Проверяем, есть ли уже пользователь с таким ФИО и годом рождения
+        accused_user = CustomUser.objects.filter(
+            username=fio,
+            birth_date__year=birth_date_dt.year
+        ).first()
+
+        if not accused_user:
+            accused_user = CustomUser.objects.create(
+                username=fio,
+                birth_date=birth_date_dt,
+                is_from_pdf=True,
+                role="tenant",
+                type_identify="iin",
+            )
+
+        # Создаём жалобу
+        try:
+            complaint = RentalComplaint.objects.create(
+                complainant=request.user,
+                accused=accused_user,
+                description=description or "",
+                status="reviewed",
+                is_court_case=True,
+                court_decision_score=court_decision_score,
+                evidence=evidence,
+            )
+        except Exception as e:
+            print("❌ ERROR creating complaint:", e)
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=500)
+
+        if reason_ids:
+            complaint.reasons.set(ComplaintReason.objects.filter(id__in=reason_ids))
+
+        return Response(
+            {
+                "message": "Пользователь и жалоба созданы/обновлены",
+                "user_id": accused_user.id,
+                "complaint_id": complaint.id,
+            },
+            status=201
+        )

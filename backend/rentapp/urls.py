@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views.read_pdf import PDFCheckView
+from .views.read_pdf import CreateUserFromPDFView, PDFCheckView
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views.auth import (
     register, login_view, CustomTokenObtainPairView, RequestPasswordResetView,
@@ -171,6 +171,7 @@ urlpatterns = [
         path('stats/', fcm_token_stats, name='fcm-token-stats'),
     ])),
     # Read PDF
-    path('pdf/', PDFCheckView.as_view(), name='pdf')
+    path('pdf/', PDFCheckView.as_view(), name='pdf'),
+    path('user_pdf/', CreateUserFromPDFView.as_view(), name='pdf')
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
