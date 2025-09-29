@@ -1,0 +1,118 @@
+.listContainer {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.loadingContainer {
+  padding: 2rem;
+  text-align: center;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+  margin-top: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.errorContainer {
+  padding: 2rem;
+  text-align: center;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.emptyContainer {
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.emptyIconSvg {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto;
+  display: block;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.emptyDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.notificationsList {
+  // Контейнер списка уведомлений
+}
+
+.notificationsDivider {
+  border-top: 1px solid #e5e7eb;
+}
+
+.notificationItem {
+  position: relative;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.checkboxContainer {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  color: #3b82f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.notificationWithCheckbox {
+  padding-left: 3rem;
+}
+
+.notificationContent {
+  // Контент уведомления без отступа
+}

@@ -2,6 +2,7 @@ import { IHouse } from "@/component/type/properties.interface";
 // import YandexMap from "@/component/map/YandexMap";
 import dynamic from "next/dynamic";
 import { mediaUrl } from "@/utils/url";
+import styles from "./RentalMap.module.scss";
 
 import { useEffect } from "react";
 import { useTranslation } from "next-i18next";
@@ -36,7 +37,7 @@ export default function RentalMap({ rentals, onRentClick, onSelectHouse }: Props
   }, [onRentClick, onSelectHouse, rentals]);
 
   return (
-    <div className="w-full h-full">
+    <div className={styles.mapContainer}>
       <YandexMapWithNoSSR
         center={[43.222, 76.8512]}
         zoom={11}

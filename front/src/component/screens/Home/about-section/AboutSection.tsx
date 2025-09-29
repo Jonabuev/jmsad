@@ -1,24 +1,27 @@
 import { FC } from "react";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
+import styles from "./AboutSection.module.scss";
 
 const AboutSection: FC = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 px-4 sm:px-8 md:px-12 lg:px-16 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section className={styles.aboutSection}>
+      <div className={styles.container}>
+        <div className={styles.grid}>
           {/* Logo Section */}
-          <Image src="/home/logo.png" alt="logo" width={420} height={105} />
+          <div className={styles.logoSection}>
+            <Image src="/home/logo.png" alt="logo" width={420} height={105} />
+          </div>
 
           {/* Content Section */}
-          <div className="space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <div className={styles.contentSection}>
+            <h2 className={styles.title}>
               {t("about.title")}
             </h2>
             
-            <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
+            <div className={styles.description}>
               <p>
                 {t("about.description1")}
               </p>

@@ -6,6 +6,7 @@ import { getAdminUsers } from "@/api/adminApi";
 import { IProfileData } from "@/component/type/users.interface";
 import { useAdminNotifications } from "@/component/hooks/useAdminNotifications";
 import AdminNotification from "../AdminNotification";
+import styles from "./UserManagement.module.scss";
 
 interface UserManagementState {
   users: IProfileData[];
@@ -140,33 +141,33 @@ const UserManagement: FC = () => {
 
   if (state.loading && state.users.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("loading")}</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>{t("loading")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className={styles.userManagement}>
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t("admin.users")}</h1>
-            <p className="text-gray-600 mt-1">{t("admin.usersSubtitle")}</p>
+      <div className={styles.headerCard}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerInfo}>
+            <h1 className={styles.headerTitle}>{t("admin.users")}</h1>
+            <p className={styles.headerSubtitle}>{t("admin.usersSubtitle")}</p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-500">
-              {t("admin.totalUsers")}: <span className="font-semibold text-gray-900">{state.totalCount}</span>
+          <div className={styles.headerActions}>
+            <div className={styles.totalUsers}>
+              {t("admin.totalUsers")}: <span className={styles.totalUsersCount}>{state.totalCount}</span>
             </div>
             <button
               onClick={() => fetchUsers(state.currentPage, filters)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              className={styles.refreshButton}
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={styles.refreshIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               {t("admin.refresh")}
@@ -184,12 +185,12 @@ const UserManagement: FC = () => {
 
       {/* Error Message */}
       {state.error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={styles.errorContainer}>
+          <div className={styles.errorContent}>
+            <svg className={styles.errorIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-red-800">{state.error}</p>
+            <p className={styles.errorText}>{state.error}</p>
           </div>
         </div>
       )}

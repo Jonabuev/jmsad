@@ -4,6 +4,7 @@ import StatsCards from "./StatsCards";
 import RecentActivity from "./RecentActivity";
 import QuickActions from "./QuickActions";
 import { getDashboardStats } from "@/api/adminApi";
+import styles from "./AdminDashboard.module.scss";
 
 interface DashboardStats {
   total_users: number;
@@ -47,10 +48,10 @@ const AdminDashboard: FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("loading")}</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>{t("loading")}</p>
         </div>
       </div>
     );
@@ -58,29 +59,29 @@ const AdminDashboard: FC = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <div className="flex items-center">
-          <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={styles.errorContainer}>
+        <div className={styles.errorContent}>
+          <svg className={styles.errorIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-red-800">{error}</p>
+          <p className={styles.errorText}>{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className={styles.dashboard}>
       {/* Welcome section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{t("admin.welcome")}</h1>
-            <p className="text-blue-100 text-lg">{t("admin.welcomeSubtitle")}</p>
+      <div className={styles.welcomeSection}>
+        <div className={styles.welcomeContent}>
+          <div className={styles.welcomeText}>
+            <h1 className={styles.welcomeTitle}>{t("admin.welcome")}</h1>
+            <p className={styles.welcomeSubtitle}>{t("admin.welcomeSubtitle")}</p>
           </div>
-          <div className="hidden md:block">
-            <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+          <div className={styles.welcomeIcon}>
+            <div className={styles.welcomeIconContainer}>
+              <svg className={styles.welcomeIconSvg} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
               </svg>
             </div>
@@ -92,14 +93,14 @@ const AdminDashboard: FC = () => {
       <StatsCards stats={stats} />
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={styles.mainGrid}>
         {/* Recent Activity */}
-        <div className="lg:col-span-2">
+        <div className={styles.recentActivityColumn}>
           <RecentActivity />
         </div>
 
         {/* Quick Actions */}
-        <div>
+        <div className={styles.quickActionsColumn}>
           <QuickActions />
         </div>
       </div>

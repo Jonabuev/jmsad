@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import styles from './ActivityFilters.module.scss';
 
 interface ActivityFiltersProps {
   filters: {
@@ -57,17 +58,17 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className={styles.filtersCard}>
+      <div className={styles.filtersGrid}>
         {/* Тип действия */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>
             {t('admin.activity.filters.action_type')}
           </label>
           <select
             value={filters.action_type}
             onChange={(e) => onFilterChange({ action_type: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={styles.filterSelect}
           >
             <option value="">{t('admin.activity.filters.all_types')}</option>
             {actionTypes.map((type) => (
@@ -79,8 +80,8 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
         </div>
 
         {/* Пользователь */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>
             {t('admin.activity.filters.user')}
           </label>
           <input
@@ -88,19 +89,19 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
             value={filters.user}
             onChange={(e) => onFilterChange({ user: e.target.value })}
             placeholder={t('admin.activity.filters.user_placeholder')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={styles.filterInput}
           />
         </div>
 
         {/* Тип объекта */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>
             {t('admin.activity.filters.target_object_type')}
           </label>
           <select
             value={filters.target_object_type}
             onChange={(e) => onFilterChange({ target_object_type: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={styles.filterSelect}
           >
             <option value="">{t('admin.activity.filters.all_objects')}</option>
             {objectTypes.map((type) => (
@@ -112,42 +113,42 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
         </div>
 
         {/* Дата от */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>
             {t('admin.activity.filters.date_from')}
           </label>
           <input
             type="date"
             value={filters.date_from}
             onChange={(e) => onFilterChange({ date_from: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={styles.filterInput}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+      <div className={styles.filtersGridSecond}>
         {/* Дата до */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>
             {t('admin.activity.filters.date_to')}
           </label>
           <input
             type="date"
             value={filters.date_to}
             onChange={(e) => onFilterChange({ date_to: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={styles.filterInput}
           />
         </div>
 
         {/* Сортировка */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>
             {t('admin.activity.filters.ordering')}
           </label>
           <select
             value={filters.ordering}
             onChange={(e) => onFilterChange({ ordering: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={styles.filterSelect}
           >
             <option value="-created_at">{t('admin.activity.filters.newest_first')}</option>
             <option value="created_at">{t('admin.activity.filters.oldest_first')}</option>
@@ -157,10 +158,10 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
         </div>
 
         {/* Кнопка сброса */}
-        <div className="flex items-end">
+        <div className={styles.resetButtonContainer}>
           <button
             onClick={onReset}
-            className="w-full px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className={styles.resetButton}
           >
             {t('admin.activity.filters.reset')}
           </button>
@@ -168,8 +169,8 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
       </div>
 
       {/* Поиск */}
-      <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className={styles.searchSection}>
+        <label className={styles.searchLabel}>
           {t('admin.activity.filters.search')}
         </label>
         <input
@@ -177,7 +178,7 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
           value={filters.search}
           onChange={(e) => onFilterChange({ search: e.target.value })}
           placeholder={t('admin.activity.filters.search_placeholder')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={styles.searchInput}
         />
       </div>
     </div>

@@ -3,11 +3,14 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import AdminLayout from '@/component/admin/AdminLayout';
 import SettingsOverview from '@/component/admin/settings/SettingsOverview';
+import styles from './AdminSettingsPage.module.scss';
 
 const SettingsPage: React.FC = () => {
   return (
     <AdminLayout>
-      <SettingsOverview />
+      <div className={styles.adminSettingsPage}>
+        <SettingsOverview />
+      </div>
     </AdminLayout>
   );
 };

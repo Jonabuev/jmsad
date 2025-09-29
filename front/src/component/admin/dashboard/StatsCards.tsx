@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
+import styles from "./StatsCards.module.scss";
 
 interface StatsCardsProps {
   stats: {
@@ -74,48 +75,48 @@ const StatsCards: FC<StatsCardsProps> = ({ stats }) => {
   const getColorClasses = (color: string) => {
     switch (color) {
       case "blue":
-        return "bg-blue-50 text-blue-600 border-blue-200";
+        return styles.cardIconBlue;
       case "red":
-        return "bg-red-50 text-red-600 border-red-200";
+        return styles.cardIconRed;
       case "yellow":
-        return "bg-yellow-50 text-yellow-600 border-yellow-200";
+        return styles.cardIconYellow;
       case "purple":
-        return "bg-purple-50 text-purple-600 border-purple-200";
+        return styles.cardIconPurple;
       default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
+        return styles.cardIconGray;
     }
   };
 
   const getChangeColor = (changeType: string) => {
     switch (changeType) {
       case "positive":
-        return "text-green-600";
+        return styles.cardChangePositive;
       case "warning":
-        return "text-yellow-600";
+        return styles.cardChangeWarning;
       case "negative":
-        return "text-red-600";
+        return styles.cardChangeNegative;
       default:
-        return "text-gray-600";
+        return styles.cardChangeNeutral;
     }
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className={styles.statsGrid}>
       {cards.map((card, index) => (
         <Link
           key={index}
           href={card.href}
-          className="group block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:scale-105"
+          className={styles.statCard}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-600 mb-1">{card.title}</p>
-              <p className="text-3xl font-bold text-gray-900 mb-2">{card.value}</p>
-              <p className={`text-sm ${getChangeColor(card.changeType)}`}>
+          <div className={styles.cardContent}>
+            <div className={styles.cardInfo}>
+              <p className={styles.cardTitle}>{card.title}</p>
+              <p className={styles.cardValue}>{card.value}</p>
+              <p className={`${styles.cardChange} ${getChangeColor(card.changeType)}`}>
                 {card.change}
               </p>
             </div>
-            <div className={`p-3 rounded-lg border ${getColorClasses(card.color)} group-hover:scale-110 transition-transform duration-200`}>
+            <div className={`${styles.cardIcon} ${getColorClasses(card.color)}`}>
               {card.icon}
             </div>
           </div>

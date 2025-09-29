@@ -1,0 +1,66 @@
+.partnersSection {
+  padding: 4rem 1rem;
+  background-color: white;
+
+  @media (min-width: 640px) {
+    padding: 4rem 2rem;
+  }
+
+  @media (min-width: 768px) {
+    padding: 4rem 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 4rem 4rem;
+  }
+}
+
+.container {
+  max-width: 72rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 3rem;
+
+  @media (min-width: 768px) {
+    font-size: 2.25rem;
+  }
+}
+
+.partnersGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    gap: 3rem;
+  }
+}
+
+.partnerLogo {
+  width: 5rem;
+  height: 5rem;
+  background-color: #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #d1d5db;
+  }
+}
+
+.partnerText {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}

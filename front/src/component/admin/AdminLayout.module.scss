@@ -1,0 +1,49 @@
+.adminLayout {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.mainContent {
+  padding-left: 16rem;
+  min-height: 100vh;
+
+  @media (max-width: 1024px) {
+    padding-left: 0;
+  }
+}
+
+.main {
+  padding: 1.5rem 0 0;
+}
+
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (min-width: 640px) {
+    padding: 0 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 2rem;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .main {
+    padding: 1rem 0 0;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .adminLayout {
+    background-color: #1f2937;
+  }
+}

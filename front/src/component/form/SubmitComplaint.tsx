@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { fetchComplaintReasons, submitRentalComplaint, searchUsersByIin } from "@/api/complaintsApi";
+import styles from "./SubmitComplaint.module.scss";
 
 interface ComplaintReason {
   id: number;
@@ -194,67 +195,67 @@ const SubmitComplaintForm: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className={styles.submitComplaintForm}>
+      <div className={styles.container}>
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={styles.headerSection}>
+          <div className={styles.headerContent}>
+            <div className={styles.headerIcon}>
+              <svg className={styles.headerIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t("Scomplaint.title")}</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <h2 className={styles.headerTitle}>{t("Scomplaint.title")}</h2>
+            <p className={styles.headerDescription}>
               {t("Scomplaint.introText")}
             </p>
           </div>
 
           {/* Notifications */}
           {successMessage && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg mb-6">
-              <div className="flex items-start">
+            <div className={`${styles.notification} ${styles.notificationSuccess}`}>
+              <div className={styles.notificationContent}>
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className={`${styles.notificationIcon} ${styles.notificationIconSuccess}`} viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm text-green-700 font-medium">{successMessage}</p>
+                <div>
+                  <p className={`${styles.notificationText} ${styles.notificationTextSuccess}`}>{successMessage}</p>
                 </div>
               </div>
             </div>
           )}
 
           {errorMessage && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mb-6">
-              <div className="flex items-start">
+            <div className={`${styles.notification} ${styles.notificationError}`}>
+              <div className={styles.notificationContent}>
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className={`${styles.notificationIcon} ${styles.notificationIconError}`} viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700 font-medium">{errorMessage}</p>
+                <div>
+                  <p className={`${styles.notificationText} ${styles.notificationTextError}`}>{errorMessage}</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className={styles.form}>
             {/* Role Selection */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formSection}>
+              <div className={styles.sectionHeader}>
+                <div className={`${styles.sectionIcon} ${styles.sectionIconBlue}`}>
+                  <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.selectComplaintType")}</h3>
+                <h3 className={styles.sectionTitle}>{t("Scomplaint.selectComplaintType")}</h3>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className={styles.roleSelection}>
                 <button
                   type="button"
                   onClick={() => {
@@ -264,23 +265,23 @@ const SubmitComplaintForm: React.FC = () => {
                     setSuccessMessage("");
                     setIinSuggestions([]);
                   }}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                  className={`${styles.roleButton} ${
                     activeRole === "tenant"
-                      ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                      ? styles.roleButtonActive
+                      : styles.roleButtonInactive
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      activeRole === "tenant" ? "border-blue-500 bg-blue-500" : "border-gray-300"
+                  <div className={styles.roleButtonContent}>
+                    <div className={`${styles.roleRadio} ${
+                      activeRole === "tenant" ? styles.roleRadioActive : styles.roleRadioInactive
                     }`}>
                       {activeRole === "tenant" && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className={styles.roleRadioDot}></div>
                       )}
                     </div>
-                    <div className="text-left">
-                      <div className="font-semibold">{t("Scomplaint.tenantComplaint")}</div>
-                      <div className="text-sm opacity-75">{t("Scomplaint.tenantComplaintDesc")}</div>
+                    <div className={styles.roleText}>
+                      <div className={styles.roleTitle}>{t("Scomplaint.tenantComplaint")}</div>
+                      <div className={styles.roleDescription}>{t("Scomplaint.tenantComplaintDesc")}</div>
                     </div>
                   </div>
                 </button>
@@ -294,23 +295,23 @@ const SubmitComplaintForm: React.FC = () => {
                     setSuccessMessage("");
                     setIinSuggestions([]);
                   }}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                  className={`${styles.roleButton} ${
                     activeRole === "landlord"
-                      ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                      ? styles.roleButtonActive
+                      : styles.roleButtonInactive
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      activeRole === "landlord" ? "border-blue-500 bg-blue-500" : "border-gray-300"
+                  <div className={styles.roleButtonContent}>
+                    <div className={`${styles.roleRadio} ${
+                      activeRole === "landlord" ? styles.roleRadioActive : styles.roleRadioInactive
                     }`}>
                       {activeRole === "landlord" && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className={styles.roleRadioDot}></div>
                       )}
                     </div>
-                    <div className="text-left">
-                      <div className="font-semibold">{t("Scomplaint.landlordComplaint")}</div>
-                      <div className="text-sm opacity-75">{t("Scomplaint.landlordComplaintDesc")}</div>
+                    <div className={styles.roleText}>
+                      <div className={styles.roleTitle}>{t("Scomplaint.landlordComplaint")}</div>
+                      <div className={styles.roleDescription}>{t("Scomplaint.landlordComplaintDesc")}</div>
                     </div>
                   </div>
                 </button>
@@ -319,17 +320,17 @@ const SubmitComplaintForm: React.FC = () => {
 
 
             {/* IIN Field */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formSection}>
+              <div className={styles.sectionHeader}>
+                <div className={`${styles.sectionIcon} ${styles.sectionIconGreen}`}>
+                  <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.accusedIin")}</h3>
+                <h3 className={styles.sectionTitle}>{t("Scomplaint.accusedIin")}</h3>
               </div>
               
-              <div className="relative">
+              <div className={styles.iinField}>
                 <input
                   type="text"
                   name="accusedIin"
@@ -337,17 +338,17 @@ const SubmitComplaintForm: React.FC = () => {
                   maxLength={12}
                   onChange={handleChange}
                   required
-                  className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-lg"
+                  className={styles.iinInput}
                   placeholder={t("Scomplaint.iinplace")}
                 />
                 
                 {/* Suggestions */}
                 {iinSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
+                  <div className={styles.iinSuggestions}>
                     {iinSuggestions.map((u, idx) => (
                       <div
                         key={idx}
-                        className="cursor-pointer px-4 py-3 hover:bg-green-50 border-b border-gray-100 last:border-b-0 transition-colors duration-200"
+                        className={styles.suggestionItem}
                         onClick={() => {
                           setFormData((prev) => ({
                             ...prev,
@@ -357,15 +358,15 @@ const SubmitComplaintForm: React.FC = () => {
                           setIinSuggestions([]);
                         }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-semibold text-gray-900">{u.identifier}</div>
-                            <div className="text-sm text-gray-600">{u.full_name}</div>
+                        <div className={styles.suggestionContent}>
+                          <div className={styles.suggestionInfo}>
+                            <div className={styles.suggestionIin}>{u.identifier}</div>
+                            <div className={styles.suggestionName}>{u.full_name}</div>
                           </div>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          <span className={`${styles.suggestionRole} ${
                             u.role === 'tenant' 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-purple-100 text-purple-800'
+                              ? styles.suggestionRoleTenant
+                              : styles.suggestionRoleLandlord
                           }`}>
                             {u.role === 'tenant' ? t("Scomplaint.tenant") : t("Scomplaint.landlord")}
                           </span>
@@ -378,17 +379,17 @@ const SubmitComplaintForm: React.FC = () => {
             </div>
 
             {/* Description Field */}
-            <div className="bg-gray-50 rounded-xl p-6 border-l-4 border-blue-600">
-              <div className="flex items-start space-x-3 mb-4">
+            <div className={styles.descriptionSection}>
+              <div className={styles.descriptionContent}>
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className={styles.descriptionIcon}>
+                    <svg className={styles.descriptionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <label className="block text-lg font-semibold text-gray-900 mb-2">
+                <div className={styles.descriptionField}>
+                  <label className={styles.descriptionLabel}>
                     {t("Scomplaint.description")}
                   </label>
                   <textarea
@@ -397,35 +398,35 @@ const SubmitComplaintForm: React.FC = () => {
                     value={formData.description}
                     onChange={handleChange}
                     required
-                    className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[120px] resize-none transition-all duration-200"
+                    className={styles.descriptionTextarea}
                   />
                 </div>
               </div>
             </div>
 
             {/* Reasons */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formSection}>
+              <div className={styles.sectionHeader}>
+                <div className={`${styles.sectionIcon} ${styles.sectionIconYellow}`}>
+                  <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.complaintReasons")}</h3>
+                <h3 className={styles.sectionTitle}>{t("Scomplaint.complaintReasons")}</h3>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={styles.reasonsGrid}>
                 {complaintReasons
                   .filter((reason) => reason.type === activeRole)
                   .map((reason) => (
-                    <label key={reason.id} className="flex items-start space-x-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200">
+                    <label key={reason.id} className={styles.reasonItem}>
                       <input
                         type="checkbox"
                         checked={formData.reason.includes(reason.id)}
                         onChange={() => handleReasonChange(reason.id)}
-                        className="mt-1 rounded text-blue-600 focus:ring-blue-500 focus:ring-2"
+                        className={styles.reasonCheckbox}
                       />
-                      <span className="text-sm text-gray-700 leading-relaxed">
+                      <span className={styles.reasonText}>
                         {t(`Scomplaint.reason.${reason.reason}`)}
                       </span>
                     </label>
@@ -434,17 +435,17 @@ const SubmitComplaintForm: React.FC = () => {
             </div>
 
             {/* Photos */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formSection}>
+              <div className={styles.sectionHeader}>
+                <div className={`${styles.sectionIcon} ${styles.sectionIconIndigo}`}>
+                  <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.additionalPhotos")}</h3>
+                <h3 className={styles.sectionTitle}>{t("Scomplaint.additionalPhotos")}</h3>
               </div>
               
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors duration-200">
+              <div className={styles.uploadArea}>
                 <input
                   type="file"
                   accept="image/*"
@@ -462,33 +463,33 @@ const SubmitComplaintForm: React.FC = () => {
                       }));
                     }
                   }}
-                  className="hidden"
+                  className={styles.uploadInput}
                   id="photo-upload"
                 />
-                <label htmlFor="photo-upload" className="cursor-pointer">
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <label htmlFor="photo-upload" className={styles.uploadLabel}>
+                  <svg className={styles.uploadIcon} stroke="currentColor" fill="none" viewBox="0 0 48 48">
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <p className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium text-indigo-600 hover:text-indigo-500">{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
+                  <p className={styles.uploadText}>
+                    <span className={styles.uploadTextLink}>{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadHint")}</p>
+                  <p className={styles.uploadHint}>{t("Scomplaint.uploadHint")}</p>
                 </label>
               </div>
             </div>
 
             {/* Court Case */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formSection}>
+              <div className={styles.sectionHeader}>
+                <div className={`${styles.sectionIcon} ${styles.sectionIconPurple}`}>
+                  <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.isCourtCase")}</h3>
+                <h3 className={styles.sectionTitle}>{t("Scomplaint.isCourtCase")}</h3>
               </div>
               
-              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+              <div className={styles.courtSection}>
                 <input
                   type="checkbox"
                   id="isCourtCase"
@@ -496,17 +497,17 @@ const SubmitComplaintForm: React.FC = () => {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, isCourtCase: e.target.checked }))
                   }
-                  className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 focus:ring-2"
+                  className={styles.courtCheckbox}
                 />
-                <label htmlFor="isCourtCase" className="text-sm font-medium text-gray-700">
+                <label htmlFor="isCourtCase" className={styles.courtLabel}>
                   {t("Scomplaint.isCourtCase")}
                 </label>
               </div>
 
               {formData.isCourtCase && (
-                <div className="mt-6 space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <div className={styles.courtFields}>
+                  <div className={styles.courtField}>
+                    <label className={styles.courtFieldLabel}>
                       {t("Scomplaint.damageCost")}
                     </label>
                     <input
@@ -514,15 +515,15 @@ const SubmitComplaintForm: React.FC = () => {
                       name="damageCost"
                       value={formData.damageCost}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                      className={styles.courtFieldInput}
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <div className={styles.courtField}>
+                    <label className={styles.courtFieldLabel}>
                       {t("Scomplaint.evidence")}
                     </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors duration-200">
+                    <div className={styles.courtUploadArea}>
                       <input
                         type="file"
                         accept=".pdf,.doc,.docx,image/*"
@@ -532,17 +533,17 @@ const SubmitComplaintForm: React.FC = () => {
                             courtDocument: e.target.files ? e.target.files[0] : null,
                           }))
                         }
-                        className="hidden"
+                        className={styles.courtUploadInput}
                         id="court-document-upload"
                       />
-                      <label htmlFor="court-document-upload" className="cursor-pointer">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <label htmlFor="court-document-upload" className={styles.courtUploadLabel}>
+                        <svg className={styles.courtUploadIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <p className="mt-2 text-sm text-gray-600">
-                          <span className="font-medium text-purple-600 hover:text-purple-500">{t("Scomplaint.uploadDocument")}</span>
+                        <p className={styles.courtUploadText}>
+                          <span className={styles.courtUploadTextLink}>{t("Scomplaint.uploadDocument")}</span>
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadFormats")}</p>
+                        <p className={styles.courtUploadHint}>{t("Scomplaint.uploadFormats")}</p>
                       </label>
                     </div>
                   </div>
@@ -551,17 +552,17 @@ const SubmitComplaintForm: React.FC = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div className={styles.formSection}>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                className={`${styles.submitButton} ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className={styles.submitButtonSpinner} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -569,7 +570,7 @@ const SubmitComplaintForm: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={styles.submitButtonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                     {t("Scomplaint.submit")}

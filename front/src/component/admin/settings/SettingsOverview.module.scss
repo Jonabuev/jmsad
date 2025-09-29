@@ -1,0 +1,378 @@
+.settingsOverview {
+  padding: 1.5rem;
+}
+
+.pageHeader {
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.pageDescription {
+  color: #6b7280;
+}
+
+.settingsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.settingsCard {
+  position: relative;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  border-left: 4px solid;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: block;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  &.settingsCardBlue {
+    border-left-color: #3b82f6;
+
+    &:hover {
+      border-left-color: #2563eb;
+    }
+  }
+
+  &.settingsCardGreen {
+    border-left-color: #10b981;
+
+    &:hover {
+      border-left-color: #059669;
+    }
+  }
+}
+
+.cardContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cardIconContainer {
+  flex-shrink: 0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+
+  &.cardIconContainerBlue {
+    background-color: #dbeafe;
+  }
+
+  &.cardIconContainerGreen {
+    background-color: #dcfce7;
+  }
+}
+
+.cardIcon {
+  width: 2rem;
+  height: 2rem;
+
+  &.cardIconBlue {
+    color: #2563eb;
+  }
+
+  &.cardIconGreen {
+    color: #10b981;
+  }
+}
+
+.cardInfo {
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  transition: color 0.2s ease;
+
+  .settingsCard:hover & {
+    color: #374151;
+  }
+}
+
+.cardDescription {
+  color: #6b7280;
+}
+
+.cardArrow {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+
+  .settingsCard:hover & {
+    color: #6b7280;
+  }
+}
+
+.statisticsSection {
+  margin-top: 2rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.statisticsTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.statisticsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.statisticsCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.statisticsCardContent {
+  display: flex;
+  align-items: center;
+}
+
+.statisticsIconContainer {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+
+  &.statisticsIconContainerBlue {
+    background-color: #dbeafe;
+  }
+
+  &.statisticsIconContainerGreen {
+    background-color: #dcfce7;
+  }
+
+  &.statisticsIconContainerPurple {
+    background-color: #e9d5ff;
+  }
+}
+
+.statisticsIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+
+  &.statisticsIconBlue {
+    color: #2563eb;
+  }
+
+  &.statisticsIconGreen {
+    color: #10b981;
+  }
+
+  &.statisticsIconPurple {
+    color: #7c3aed;
+  }
+}
+
+.statisticsInfo {
+  margin-left: 0.75rem;
+}
+
+.statisticsLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.statisticsValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+
+  &.statisticsValueSmall {
+    font-size: 0.875rem;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .settingsOverview {
+    padding: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .cardContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cardArrow {
+    display: none;
+  }
+}
+
+// Focus states for accessibility
+.settingsCard:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .settingsCard {
+    border-width: 2px;
+  }
+
+  .statisticsCard {
+    border: 1px solid #d1d5db;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .settingsCard,
+  .cardTitle,
+  .cardArrow {
+    transition: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .settingsOverview {
+    background-color: #1f2937;
+  }
+
+  .pageTitle {
+    color: #f9fafb;
+  }
+
+  .pageDescription {
+    color: #d1d5db;
+  }
+
+  .settingsCard {
+    background-color: #374151;
+    border-color: #6b7280;
+
+    &.settingsCardBlue {
+      border-left-color: #60a5fa;
+    }
+
+    &.settingsCardGreen {
+      border-left-color: #4ade80;
+    }
+  }
+
+  .cardTitle {
+    color: #f9fafb;
+
+    .settingsCard:hover & {
+      color: #e5e7eb;
+    }
+  }
+
+  .cardDescription {
+    color: #d1d5db;
+  }
+
+  .cardIcon {
+    &.cardIconBlue {
+      color: #60a5fa;
+    }
+
+    &.cardIconGreen {
+      color: #4ade80;
+    }
+  }
+
+  .cardIconContainer {
+    &.cardIconContainerBlue {
+      background-color: #1e3a8a;
+    }
+
+    &.cardIconContainerGreen {
+      background-color: #064e3b;
+    }
+  }
+
+  .cardArrow {
+    color: #6b7280;
+
+    .settingsCard:hover & {
+      color: #d1d5db;
+    }
+  }
+
+  .statisticsSection {
+    background-color: #374151;
+  }
+
+  .statisticsTitle {
+    color: #f9fafb;
+  }
+
+  .statisticsCard {
+    background-color: #4b5563;
+  }
+
+  .statisticsLabel {
+    color: #d1d5db;
+  }
+
+  .statisticsValue {
+    color: #f9fafb;
+  }
+
+  .statisticsIcon {
+    &.statisticsIconBlue {
+      color: #60a5fa;
+    }
+
+    &.statisticsIconGreen {
+      color: #4ade80;
+    }
+
+    &.statisticsIconPurple {
+      color: #a78bfa;
+    }
+  }
+
+  .statisticsIconContainer {
+    &.statisticsIconContainerBlue {
+      background-color: #1e3a8a;
+    }
+
+    &.statisticsIconContainerGreen {
+      background-color: #064e3b;
+    }
+
+    &.statisticsIconContainerPurple {
+      background-color: #581c87;
+    }
+  }
+}

@@ -12,6 +12,7 @@ import { useApi } from "@/component/hooks/useApi";
 import { removeBan } from "@/api/userApi";
 import { apiUrl, mediaUrl } from "@/utils/url";
 import ViolationForm from "@/component/form/ViolationForm"; // Подключаем наш компонент
+import styles from "./PublicUserProfile.module.scss";
 
 const tabs = [
   { key: "info", label: "profile.info" },
@@ -179,74 +180,81 @@ const PublicUserProfile: FC = () => {
   const loading = currentUserLoading || publicProfileLoading;
 
 
-  if (loading) return <div>{t("profile.loading")}</div>;
-  if (error) return <div className="text-center mt-10 text-red-500">{error.message || 'Ошибка'}</div>;
-  if (!profileData) return <div className="text-center mt-10">{t("profile.profileNotFound")}</div>;
+  if (loading) return (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>{t("profile.loading")}</p>
+      </div>
+    </div>
+  );
+  if (error) return <div className={styles.errorContainer}>{error.message || 'Ошибка'}</div>;
+  if (!profileData) return <div className={styles.notFoundContainer}>{t("profile.profileNotFound")}</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className={styles.publicUserProfile}>
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+      <div className={styles.heroSection}>
+        <div className={styles.heroOverlay}></div>
+        <div className={styles.heroContainer}>
+          <div className={styles.heroContent}>
             {/* Profile Info */}
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20">
+            <div className={styles.profileInfo}>
+              <div className={styles.avatarContainer}>
+                <div className={styles.avatar}>
                   <Image
                     src={mediaUrl(profileData.avatar || "/media/avatars/def.jpg")}
                     alt="Avatar"
                     width={128}
                     height={128}
-                    className="object-cover w-full h-full"
+                    className={styles.avatarImage}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = mediaUrl("/media/avatars/def.jpg");
                     }}
                   />
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className={styles.statusIndicator}>
+                  <svg className={styles.statusIcon} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
               </div>
-              <div>
-                <h1 className="text-4xl font-bold mb-2">
+              <div className={styles.userDetails}>
+                <h1 className={styles.userName}>
                   {profileData.anonymous_name || profileData.username}
                 </h1>
                 {profileData.anonymous_name && (
-                  <p className="text-xl text-blue-100 mb-2">@{profileData.username}</p>
+                  <p className={styles.userNameSecondary}>@{profileData.username}</p>
                 )}
-                <div className="flex flex-wrap items-center gap-6 text-blue-100">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <div className={styles.contactInfo}>
+                  <div className={styles.contactItem}>
+                    <svg className={styles.contactIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
                     <span>{profileData.email}</span>
                     {profileData.email_confirmed && (
-                      <span className="bg-green-500/20 text-green-200 px-2 py-1 rounded-full text-xs font-medium">
+                      <span className={styles.confirmedBadge}>
                         ✓ {t("profile.confirmed")}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.contactItem}>
+                    <svg className={styles.contactIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                     </svg>
                     <span>{profileData.phone_number || t("profile.noPhone")}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.contactItem}>
+                    <svg className={styles.contactIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
                     </svg>
                     <span>{profileData.identifier || t("profile.noIIN")}</span>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 mt-3">
-                  <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <div className={styles.userBadges}>
+                  <div className={styles.badge}>
+                    <svg className={styles.badgeIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                     {profileData.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}
@@ -256,21 +264,21 @@ const PublicUserProfile: FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className={styles.actionButtons}>
               <button
                 onClick={() => setShowAddComment(true)}
-                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 border border-white/30 hover:border-white/50 flex items-center gap-2"
+                className={styles.actionButton}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={styles.actionIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 {t("profile.addComment")}
               </button>
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 border border-white/30 hover:border-white/50 flex items-center gap-2"
+                className={styles.actionButton}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={styles.actionIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 {showComments ? t("profile.hideComments") : t("profile.showComments")}
@@ -281,28 +289,28 @@ const PublicUserProfile: FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <div className={styles.mainContent}>
+        <div className={styles.contentCard}>
 
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2 p-2 bg-gray-50">
+          <div className={styles.tabsContainer}>
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                className={`${styles.tabButton} ${
                   activeTab === tab.key
-                    ? "bg-white text-blue-600 shadow-md border border-blue-200"
-                    : "text-gray-600 hover:text-blue-600 hover:bg-white/50"
+                    ? styles.tabButtonActive
+                    : styles.tabButtonInactive
                 }`}
               >
                 {tab.key === "info" && (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={styles.tabIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 )}
                 {tab.key === "complaints" && (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={styles.tabIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                 )}
@@ -313,7 +321,7 @@ const PublicUserProfile: FC = () => {
 
           {/* Violation actions */}
           {!isOwnProfile && currentUserProfile?.user?.is_superuser && (
-            <div className="mt-6">
+            <div className={styles.violationActions}>
               {profileData.is_banned ? (
                 <button
                   onClick={async () => {
@@ -324,14 +332,14 @@ const PublicUserProfile: FC = () => {
                       alert("Ошибка при снятии блокировки");
                     }
                   }}
-                  className="px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700"
+                  className={`${styles.violationButton} ${styles.violationButtonUnban}`}
                 >
                   Снять блокировку
                 </button>
               ) : (
                 <button
                   onClick={() => setShowViolationForm(true)}
-                  className="px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700"
+                  className={`${styles.violationButton} ${styles.violationButtonBan}`}
                 >
                   Назначить нарушение
                 </button>
@@ -341,11 +349,11 @@ const PublicUserProfile: FC = () => {
 
           {/* Violation form (переиспользуем компонент) */}
           {showViolationForm && profileData && (
-            <div className="mt-4 max-w-lg w-full">
+            <div className={styles.violationFormContainer}>
               <ViolationForm targetUserId={profileData.id} />
               <button
                 onClick={() => setShowViolationForm(false)}
-                className="mt-2 px-4 py-2 border rounded"
+                className={styles.violationFormCancel}
               >
                 Отмена
               </button>
@@ -354,93 +362,93 @@ const PublicUserProfile: FC = () => {
 
           {/* Info tab */}
           {activeTab === "info" && (
-            <div className="p-6">
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("profile.accountInfo")}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className={styles.tabContent}>
+              <div className={styles.infoSection}>
+                <h2 className={styles.infoTitle}>{t("profile.accountInfo")}</h2>
+                <div className={styles.infoGrid}>
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={`${styles.infoIcon} ${styles.infoIconBlue}`}>
+                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">{t("profile.username")}</p>
-                        <p className="font-semibold text-gray-800">{profileData.username}</p>
+                        <p className={styles.infoLabel}>{t("profile.username")}</p>
+                        <p className={styles.infoValue}>{profileData.username}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={`${styles.infoIcon} ${styles.infoIconGreen}`}>
+                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">{t("profile.role")}</p>
-                        <p className="font-semibold text-gray-800">
+                        <p className={styles.infoLabel}>{t("profile.role")}</p>
+                        <p className={styles.infoValue}>
                           {profileData.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}
                         </p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={`${styles.infoIcon} ${styles.infoIconOrange}`}>
+                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">{t("profile.iin")}</p>
-                        <p className="font-semibold text-gray-800">{profileData.identifier || t("profile.noIIN")}</p>
+                        <p className={styles.infoLabel}>{t("profile.iin")}</p>
+                        <p className={styles.infoValue}>{profileData.identifier || t("profile.noIIN")}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={`${styles.infoIcon} ${styles.infoIconBlue}`}>
+                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                           <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">{t("profile.email")}</p>
-                        <p className="font-semibold text-gray-800">{profileData.email}</p>
+                        <p className={styles.infoLabel}>{t("profile.email")}</p>
+                        <p className={styles.infoValue}>{profileData.email}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={`${styles.infoIcon} ${styles.infoIconGreen}`}>
+                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">{t("profile.phone")}</p>
-                        <p className="font-semibold text-gray-800">{profileData.phone_number || t("profile.noPhone")}</p>
+                        <p className={styles.infoLabel}>{t("profile.phone")}</p>
+                        <p className={styles.infoValue}>{profileData.phone_number || t("profile.noPhone")}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={`${styles.infoIcon} ${styles.infoIconPurple}`}>
+                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">{t("profile.verificationStatus")}</p>
-                        <p className="font-semibold text-gray-800">
+                        <p className={styles.infoLabel}>{t("profile.verificationStatus")}</p>
+                        <p className={styles.infoValue}>
                           {profileData.email_confirmed ? t("profile.confirmed") : t("profile.notConfirmed")}
                         </p>
                       </div>

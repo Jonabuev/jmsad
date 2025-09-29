@@ -1,0 +1,504 @@
+.disputeComplaint {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (min-width: 640px) {
+    padding: 0 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 2rem;
+  }
+}
+
+.headerSection {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.headerContent {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.headerIcon {
+  width: 4rem;
+  height: 4rem;
+  background-color: #fee2e2;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.headerIconSvg {
+  width: 2rem;
+  height: 2rem;
+  color: #dc2626;
+  fill: none;
+  stroke: currentColor;
+}
+
+.headerTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.warningBox {
+  background-color: #fef2f2;
+  border-left: 4px solid #f87171;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.warningContent {
+  display: flex;
+  align-items: flex-start;
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #f87171;
+  margin-right: 0.75rem;
+}
+
+.warningText {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.message {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid;
+}
+
+.messageSuccess {
+  background-color: #f0fdf4;
+  border-color: #4ade80;
+}
+
+.messageError {
+  background-color: #fef2f2;
+  border-color: #f87171;
+}
+
+.messageContent {
+  display: flex;
+  align-items: flex-start;
+}
+
+.messageIcon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.75rem;
+}
+
+.messageIconSuccess {
+  color: #4ade80;
+}
+
+.messageIconError {
+  color: #f87171;
+}
+
+.messageText {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.messageTextSuccess {
+  color: #16a34a;
+}
+
+.messageTextError {
+  color: #dc2626;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.formCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.formCardExplanation {
+  background-color: #f9fafb;
+  border-left: 4px solid #dc2626;
+}
+
+.formCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.formCardIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.formCardIconRed {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.formCardIconOrange {
+  background-color: #fed7aa;
+  color: #ea580c;
+}
+
+.formCardIconSvg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.formCardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.explanationSection {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.explanationIcon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  background-color: #fee2e2;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.explanationIconSvg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #dc2626;
+  fill: none;
+  stroke: currentColor;
+}
+
+.explanationContent {
+  flex: 1;
+}
+
+.explanationLabel {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.explanationTextarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  min-height: 7.5rem;
+  resize: none;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.evidenceUploadArea {
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #9ca3af;
+  }
+}
+
+.evidenceUploadInput {
+  display: none;
+}
+
+.evidenceUploadLabel {
+  cursor: pointer;
+}
+
+.evidenceUploadIcon {
+  margin: 0 auto;
+  height: 3rem;
+  width: 3rem;
+  color: #9ca3af;
+  fill: none;
+  stroke: currentColor;
+}
+
+.evidenceUploadText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.evidenceUploadTextLink {
+  font-weight: 500;
+  color: #ea580c;
+
+  &:hover {
+    color: #c2410c;
+  }
+}
+
+.evidenceUploadHint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.evidenceFileChosen {
+  font-size: 0.875rem;
+  color: #16a34a;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.submitSection {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.submitButton {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  background-color: #dc2626;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #b91c1c;
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #ef4444;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.submitButtonSpinner {
+  animation: spin 1s linear infinite;
+  margin-left: -0.25rem;
+  margin-right: 0.75rem;
+  height: 1.25rem;
+  width: 1.25rem;
+  color: white;
+}
+
+.submitButtonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .headerSection {
+    padding: 1.5rem;
+  }
+
+  .headerTitle {
+    font-size: 1.5rem;
+  }
+
+  .form {
+    gap: 1.5rem;
+  }
+
+  .formCard {
+    padding: 1rem;
+  }
+
+  .submitButton {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+// Focus states for accessibility
+.submitButton:focus-visible {
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .formCard {
+    border-width: 2px;
+  }
+
+  .evidenceUploadArea {
+    border-width: 3px;
+  }
+
+  .submitButton {
+    border: 2px solid #991b1b;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .evidenceUploadArea,
+  .submitButton {
+    transition: none;
+  }
+
+  .submitButton:hover {
+    transform: none;
+  }
+
+  .submitButtonSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .disputeComplaint {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  }
+
+  .headerSection,
+  .formCard,
+  .submitSection {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .headerTitle,
+  .formCardTitle,
+  .explanationLabel {
+    color: #f9fafb;
+  }
+
+  .explanationTextarea {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+
+    &:focus {
+      background-color: #374151;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .evidenceUploadArea {
+    border-color: #6b7280;
+    background-color: #4b5563;
+
+    &:hover {
+      border-color: #9ca3af;
+    }
+  }
+
+  .evidenceUploadText,
+  .evidenceUploadHint {
+    color: #d1d5db;
+  }
+
+  .warningBox {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+  }
+
+  .warningText {
+    color: #fca5a5;
+  }
+
+  .messageSuccess {
+    background-color: #14532d;
+    border-color: #22c55e;
+  }
+
+  .messageError {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+  }
+}

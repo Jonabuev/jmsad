@@ -1,0 +1,224 @@
+.userManagement {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16rem;
+}
+
+.loadingContent {
+  text-align: center;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin: 0 auto 1rem;
+}
+
+.loadingText {
+  color: #6b7280;
+}
+
+.headerCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.headerTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.headerSubtitle {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.totalUsers {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.totalUsersCount {
+  font-weight: 600;
+  color: #111827;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #1d4ed8;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.refreshIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.errorContainer {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.errorContent {
+  display: flex;
+  align-items: center;
+}
+
+.errorIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #f87171;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.errorText {
+  color: #991b1b;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .headerTitle {
+    font-size: 1.25rem;
+  }
+}
+
+// Focus states for accessibility
+.refreshButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .headerCard {
+    border-width: 2px;
+  }
+
+  .errorContainer {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .refreshButton {
+    transition: none;
+  }
+
+  .loadingSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .headerCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .headerTitle {
+    color: #f9fafb;
+  }
+
+  .headerSubtitle {
+    color: #d1d5db;
+  }
+
+  .totalUsers {
+    color: #d1d5db;
+  }
+
+  .totalUsersCount {
+    color: #f9fafb;
+  }
+
+  .refreshButton {
+    background-color: #1e40af;
+
+    &:hover {
+      background-color: #1e3a8a;
+    }
+  }
+
+  .errorContainer {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+  }
+
+  .errorText {
+    color: #fca5a5;
+  }
+}

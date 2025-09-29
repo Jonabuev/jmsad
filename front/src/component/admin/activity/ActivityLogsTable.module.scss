@@ -1,0 +1,502 @@
+.tableCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.loadingContainer {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.loadingContent {
+  padding: 2rem;
+  text-align: center;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin: 0 auto;
+}
+
+.loadingText {
+  margin-top: 1rem;
+  color: #6b7280;
+}
+
+.emptyContainer {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.emptyContent {
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: #9ca3af;
+  font-size: 3.75rem;
+  margin-bottom: 1rem;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.emptyDescription {
+  color: #6b7280;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tableHead {
+  background-color: #f9fafb;
+}
+
+.tableHeader {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tableBody {
+  background-color: white;
+}
+
+.tableRow {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.tableCell {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.tableCellDescription {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.actionCell {
+  display: flex;
+  align-items: center;
+}
+
+.actionIcon {
+  font-size: 1.125rem;
+  margin-right: 0.5rem;
+}
+
+.actionBadge {
+  display: inline-flex;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.actionBadgeGreen {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.actionBadgeBlue {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.actionBadgeGray {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.actionBadgeRed {
+  background-color: #fecaca;
+  color: #991b1b;
+}
+
+.actionBadgePurple {
+  background-color: #e9d5ff;
+  color: #7c3aed;
+}
+
+.actionBadgeOrange {
+  background-color: #fed7aa;
+  color: #c2410c;
+}
+
+.actionBadgeIndigo {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.actionBadgeYellow {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.actionBadgeCyan {
+  background-color: #cffafe;
+  color: #155e75;
+}
+
+.userCell {
+  white-space: nowrap;
+}
+
+.userName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.userEmail {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.systemText {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.descriptionCell {
+  max-width: 20rem;
+}
+
+.descriptionText {
+  font-size: 0.875rem;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.objectCell {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.objectBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.objectDash {
+  color: #9ca3af;
+}
+
+.ipCell {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.dateCell {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.paginationContainer {
+  background-color: white;
+  padding: 1rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #e5e7eb;
+}
+
+.paginationMobile {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+
+  @media (min-width: 640px) {
+    display: none;
+  }
+}
+
+.paginationDesktop {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (min-width: 640px) {
+    display: flex;
+  }
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.paginationInfoBold {
+  font-weight: 500;
+}
+
+.paginationNav {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  gap: 0;
+}
+
+.paginationButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+  }
+
+  &:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+  }
+
+  &:not(:first-child) {
+    margin-left: -1px;
+  }
+}
+
+.paginationButtonMobile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:first-child) {
+    margin-left: 0.75rem;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .tableCell,
+  .tableCellDescription {
+    padding: 0.75rem 1rem;
+  }
+
+  .tableHeader {
+    padding: 0.5rem 1rem;
+  }
+
+  .descriptionCell {
+    max-width: 12rem;
+  }
+}
+
+// Focus states for accessibility
+.paginationButton:focus-visible,
+.paginationButtonMobile:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .tableCard,
+  .loadingContainer,
+  .emptyContainer {
+    border-width: 2px;
+  }
+
+  .tableHeader {
+    border-bottom-width: 2px;
+  }
+
+  .tableRow {
+    border-bottom-width: 2px;
+  }
+
+  .paginationContainer {
+    border-top-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .tableRow {
+    transition: none;
+  }
+
+  .paginationButton,
+  .paginationButtonMobile {
+    transition: none;
+  }
+
+  .loadingSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .tableCard,
+  .loadingContainer,
+  .emptyContainer {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .tableHead {
+    background-color: #4b5563;
+  }
+
+  .tableHeader {
+    color: #d1d5db;
+  }
+
+  .tableBody {
+    background-color: #374151;
+  }
+
+  .tableRow:hover {
+    background-color: #4b5563;
+  }
+
+  .tableCell,
+  .tableCellDescription {
+    color: #e5e7eb;
+  }
+
+  .userName {
+    color: #f9fafb;
+  }
+
+  .userEmail,
+  .systemText,
+  .objectCell,
+  .ipCell,
+  .dateCell {
+    color: #d1d5db;
+  }
+
+  .descriptionText {
+    color: #f9fafb;
+  }
+
+  .objectBadge {
+    background-color: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .objectDash {
+    color: #6b7280;
+  }
+
+  .paginationContainer {
+    background-color: #374151;
+    border-top-color: #6b7280;
+  }
+
+  .paginationInfo {
+    color: #e5e7eb;
+  }
+
+  .paginationButton,
+  .paginationButtonMobile {
+    background-color: #374151;
+    border-color: #6b7280;
+    color: #e5e7eb;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+  }
+}

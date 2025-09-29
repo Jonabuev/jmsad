@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./RentalDatePicker.module.scss";
 
 interface Props {
   startDate: string;
@@ -18,22 +19,22 @@ export default function RentalDatePicker({
   buttonText,
 }: Props) {
   return (
-    <div className="mb-4 flex gap-4">
+    <div className={styles.datePicker}>
       <input
         type="date"
         value={startDate}
         onChange={(e) => setStartDate(e.target.value)}
-        className="border px-2 py-1 rounded"
+        className={styles.dateInput}
       />
       <input
         type="date"
         value={endDate}
         onChange={(e) => setEndDate(e.target.value)}
-        className="border px-2 py-1 rounded"
+        className={styles.dateInput}
       />
       <button
         onClick={onSearch}
-        className="bg-blue-600 text-white px-4 py-1 rounded"
+        className={styles.searchButton}
       >
         {buttonText}
       </button>

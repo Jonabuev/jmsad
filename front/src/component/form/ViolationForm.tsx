@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { issueViolation } from "@/api/userApi";
+import styles from "./ViolationForm.module.scss";
 
 const reasonsList = [
   "Нарушение договора",
@@ -39,14 +40,15 @@ export default function ViolationForm({ targetUserId }: { targetUserId: number }
   };
 
   return (
-    <div className="border p-4 rounded bg-white">
-      <h3 className="font-bold mb-2">Назначить нарушение</h3>
-      <ul className="space-y-1">
+    <div className={styles.violationForm}>
+      <h3 className={styles.violationFormTitle}>Назначить нарушение</h3>
+      <ul className={styles.violationFormList}>
         {reasonsList.map((reason) => (
-          <li key={reason}>
-            <label className="flex items-center gap-2">
+          <li key={reason} className={styles.violationFormItem}>
+            <label className={styles.violationFormLabel}>
               <input
                 type="checkbox"
+                className={styles.violationFormCheckbox}
                 checked={selectedReasons.includes(reason)}
                 onChange={() => toggleReason(reason)}
               />
@@ -57,11 +59,11 @@ export default function ViolationForm({ targetUserId }: { targetUserId: number }
       </ul>
       <button
         onClick={handleSubmit}
-        className="mt-3 bg-red-600 text-white px-4 py-1 rounded"
+        className={styles.violationFormSubmit}
       >
         Назначить
       </button>
-      {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
+      {message && <p className={styles.violationFormMessage}>{message}</p>}
     </div>
   );
 }

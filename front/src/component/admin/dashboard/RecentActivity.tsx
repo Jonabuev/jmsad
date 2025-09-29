@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { getRecentActivity } from "@/api/adminApi";
+import styles from "./RecentActivity.module.scss";
 
 interface ActivityLog {
   id: number;
@@ -154,13 +155,13 @@ const RecentActivity: FC = () => {
   const getMockStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return styles.activityStatusPending;
       case "completed":
-        return "bg-green-100 text-green-800";
+        return styles.activityStatusCompleted;
       case "resolved":
-        return "bg-blue-100 text-blue-800";
+        return styles.activityStatusResolved;
       default:
-        return "bg-gray-100 text-gray-800";
+        return styles.activityStatusGray;
     }
   };
 
@@ -185,30 +186,30 @@ const RecentActivity: FC = () => {
 
   const getStatusColor = (actionType: string) => {
     if (actionType.includes('ban') || actionType.includes('error')) {
-      return "bg-red-100 text-red-800";
+      return styles.activityStatusPending;
     } else if (actionType.includes('verify') || actionType.includes('confirm') || actionType.includes('approve')) {
-      return "bg-green-100 text-green-800";
+      return styles.activityStatusCompleted;
     } else if (actionType.includes('create') || actionType.includes('register')) {
-      return "bg-blue-100 text-blue-800";
+      return styles.activityStatusResolved;
     } else {
-      return "bg-gray-100 text-gray-800";
+      return styles.activityStatusGray;
     }
   };
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{t("admin.recentActivity")}</h2>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingHeader}>
+          <h2 className={styles.loadingTitle}>{t("admin.recentActivity")}</h2>
         </div>
-        <div className="p-6">
-          <div className="animate-pulse space-y-4">
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSkeleton}>
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div key={i} className={styles.loadingItem}>
+                <div className={styles.loadingIcon}></div>
+                <div className={styles.loadingText}>
+                  <div className={styles.loadingTitleLine}></div>
+                  <div className={styles.loadingDescriptionLine}></div>
                 </div>
               </div>
             ))}
@@ -220,14 +221,12 @@ const RecentActivity: FC = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{t("admin.recentActivity")}</h2>
+      <div className={styles.errorContainer}>
+        <div className={styles.errorHeader}>
+          <h2 className={styles.errorTitle}>{t("admin.recentActivity")}</h2>
         </div>
-        <div className="p-6">
-          <div className="text-center text-gray-500">
-            <p>{error}</p>
-          </div>
+        <div className={styles.errorContent}>
+          <p>{error}</p>
         </div>
       </div>
     );
@@ -236,20 +235,20 @@ const RecentActivity: FC = () => {
   const displayActivities = activities.length > 0 ? activities : mockActivities;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">{t("admin.recentActivity")}</h2>
+    <div className={styles.activityCard}>
+      <div className={styles.activityHeader}>
+        <div className={styles.activityHeaderContent}>
+          <h2 className={styles.activityTitle}>{t("admin.recentActivity")}</h2>
           <Link
             href="/admin/activity"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className={styles.viewAllLink}
           >
             {t("admin.viewAll")}
           </Link>
         </div>
       </div>
       
-      <div className="divide-y divide-gray-200">
+      <div className={styles.activityList}>
         {displayActivities.map((activity) => {
           // Для реальных данных активности
           if ('action_type' in activity) {
@@ -257,29 +256,27 @@ const RecentActivity: FC = () => {
             return (
               <div
                 key={realActivity.id}
-                className="block px-6 py-4 hover:bg-gray-50 transition-colors duration-150"
+                className={styles.activityItem}
               >
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                      {getActivityIcon(realActivity.action_type)}
-                    </div>
+                <div className={styles.activityItemContent}>
+                  <div className={styles.activityIcon}>
+                    {getActivityIcon(realActivity.action_type)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900">
+                  <div className={styles.activityDetails}>
+                    <div className={styles.activityHeaderRow}>
+                      <p className={styles.activityItemTitle}>
                         {t(`admin.activity.actions.${realActivity.action_type}`) || realActivity.action_type_display}
                       </p>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(realActivity.action_type)}`}>
+                      <span className={`${styles.activityStatus} ${getStatusColor(realActivity.action_type)}`}>
                         {realActivity.action_type_display}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{realActivity.action_description}</p>
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs text-gray-500">
+                    <p className={styles.activityDescription}>{realActivity.action_description}</p>
+                    <div className={styles.activityMeta}>
+                      <p className={styles.activityUser}>
                         {realActivity.user_username ? `${realActivity.user_username}` : 'Система'}
                       </p>
-                      <p className="text-xs text-gray-500">{formatTimeAgo(realActivity.created_at)}</p>
+                      <p className={styles.activityTime}>{formatTimeAgo(realActivity.created_at)}</p>
                     </div>
                   </div>
                 </div>
@@ -293,23 +290,21 @@ const RecentActivity: FC = () => {
             <Link
               key={mockActivity.id}
               href={mockActivity.href}
-              className="block px-6 py-4 hover:bg-gray-50 transition-colors duration-150"
+              className={styles.activityItem}
             >
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    {getActivityIcon(mockActivity.type)}
-                  </div>
+              <div className={styles.activityItemContent}>
+                <div className={styles.activityIcon}>
+                  {getActivityIcon(mockActivity.type)}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">{mockActivity.title}</p>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMockStatusColor(mockActivity.status)}`}>
+                <div className={styles.activityDetails}>
+                  <div className={styles.activityHeaderRow}>
+                    <p className={styles.activityItemTitle}>{mockActivity.title}</p>
+                    <span className={`${styles.activityStatus} ${getMockStatusColor(mockActivity.status)}`}>
                       {mockActivity.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{mockActivity.description}</p>
-                  <p className="text-xs text-gray-500 mt-1">{mockActivity.time}</p>
+                  <p className={styles.activityDescription}>{mockActivity.description}</p>
+                  <p className={styles.activityTime}>{mockActivity.time}</p>
                 </div>
               </div>
             </Link>
@@ -317,10 +312,10 @@ const RecentActivity: FC = () => {
         })}
       </div>
       
-      <div className="px-6 py-3 bg-gray-50 rounded-b-xl">
+      <div className={styles.activityFooter}>
         <Link
           href="/admin/activity"
-          className="text-sm text-gray-600 hover:text-gray-800 font-medium"
+          className={styles.activityFooterLink}
         >
           {t("admin.viewAllActivity")} →
         </Link>

@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useFAQ } from "@/hooks/useFAQ";
+import styles from "./FaqQuestionsSection.module.scss";
 
 interface FaqQuestionsSectionProps {
   userType: 'tenants' | 'landlords';
@@ -43,13 +44,13 @@ const FaqQuestionsSection: FC<FaqQuestionsSectionProps> = ({ userType }) => {
 
   if (isLoading) {
     return (
-      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gradient-to-br from-white to-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-indigo-900 mb-8 sm:mb-12">
+      <section className={styles.questionsSection}>
+        <div className={styles.container}>
+          <h2 className={styles.title}>
             {t("faq.questions.title")}
           </h2>
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
           </div>
         </div>
       </section>
@@ -58,14 +59,14 @@ const FaqQuestionsSection: FC<FaqQuestionsSectionProps> = ({ userType }) => {
 
   if (error) {
     return (
-      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gradient-to-br from-white to-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-indigo-900 mb-8 sm:mb-12">
+      <section className={styles.questionsSection}>
+        <div className={styles.container}>
+          <h2 className={styles.title}>
             {t("faq.questions.title")}
           </h2>
-          <div className="text-center text-red-600">
-            <p className="text-lg mb-4">{t("faq.questions.loading_error")}</p>
-            <p className="text-sm">{t("faq.questions.loading_error_description")}</p>
+          <div className={styles.errorContainer}>
+            <p className={styles.errorTitle}>{t("faq.questions.loading_error")}</p>
+            <p className={styles.errorDescription}>{t("faq.questions.loading_error_description")}</p>
           </div>
         </div>
       </section>
@@ -74,14 +75,14 @@ const FaqQuestionsSection: FC<FaqQuestionsSectionProps> = ({ userType }) => {
 
   if (!isLoading && faqItems.length === 0) {
     return (
-      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gradient-to-br from-white to-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-indigo-900 mb-8 sm:mb-12">
+      <section className={styles.questionsSection}>
+        <div className={styles.container}>
+          <h2 className={styles.title}>
             {t("faq.questions.title")}
           </h2>
-          <div className="text-center text-gray-600">
-            <p className="text-lg">{t("faq.questions.no_faq")}</p>
-            <p className="text-sm">{t("faq.questions.no_faq_description")}</p>
+          <div className={styles.emptyContainer}>
+            <p className={styles.emptyTitle}>{t("faq.questions.no_faq")}</p>
+            <p className={styles.emptyDescription}>{t("faq.questions.no_faq_description")}</p>
           </div>
         </div>
       </section>
@@ -89,29 +90,29 @@ const FaqQuestionsSection: FC<FaqQuestionsSectionProps> = ({ userType }) => {
   }
 
   return (
-    <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 bg-gradient-to-br from-white to-slate-50">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-indigo-900 mb-8 sm:mb-12">
+    <section className={styles.questionsSection}>
+      <div className={styles.container}>
+        <h2 className={styles.title}>
           {t("faq.questions.title")}
         </h2>
         
-        <div className="space-y-3 sm:space-y-4">
+        <div className={styles.faqList}>
           {sortedFaqItems.map((item) => (
             <div
               key={item.id}
-              className="bg-white border border-blue-100 rounded-lg sm:rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-blue-200"
+              className={styles.faqItem}
             >
               <button
                 onClick={() => toggleItem(item.id)}
-                className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+                className={styles.faqButton}
               >
-                <span className="text-sm sm:text-base md:text-lg font-semibold text-indigo-900 pr-2 sm:pr-4 leading-relaxed">
+                <span className={styles.faqQuestion}>
                   {item.question}
                 </span>
                 <div className="flex-shrink-0 ml-2 sm:ml-0">
                   <svg
-                    className={`w-5 h-5 sm:w-6 sm:h-6 text-blue-600 transition-transform duration-200 ${
-                      openItems.has(item.id) ? 'rotate-45' : ''
+                    className={`${styles.faqIcon} ${
+                      openItems.has(item.id) ? styles.faqIconOpen : ''
                     }`}
                     fill="none"
                     stroke="currentColor"
@@ -128,8 +129,8 @@ const FaqQuestionsSection: FC<FaqQuestionsSectionProps> = ({ userType }) => {
               </button>
               
               {openItems.has(item.id) && (
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-t border-blue-100">
-                  <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                <div className={styles.faqAnswer}>
+                  <p className={styles.faqAnswerText}>
                     {item.answer}
                   </p>
                 </div>

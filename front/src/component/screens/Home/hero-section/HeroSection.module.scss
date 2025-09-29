@@ -1,0 +1,90 @@
+.heroSection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow-x: hidden;
+  padding-top: 80px;
+  min-height: 70vh;
+}
+
+.backgroundImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  filter: blur(2px);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.content {
+  position: relative;
+  color: white;
+  z-index: 20;
+  padding: 0 20px;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 1.25rem;
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  @media (min-width: 768px) {
+    font-size: 1.875rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 2.5rem;
+  text-transform: uppercase;
+  text-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  line-height: 1.1;
+
+  @media (min-width: 640px) {
+    font-size: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 3.75rem;
+    margin-bottom: 3rem;
+  }
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: #1d4ed8;
+  }
+}

@@ -1,0 +1,69 @@
+.ctaSection {
+  padding: 5rem 1rem;
+  background-color: #f9fafb;
+  text-align: center;
+
+  @media (min-width: 640px) {
+    padding: 5rem 2rem;
+  }
+
+  @media (min-width: 768px) {
+    padding: 5rem 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 5rem 4rem;
+  }
+}
+
+.container {
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2.5rem;
+  line-height: 1.1;
+
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #1d4ed8;
+    transform: scale(1.05);
+  }
+}
+
+.loginText {
+  font-size: 1rem;
+  color: #374151;
+}
+
+.loginLink {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+  margin-left: 0.5rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

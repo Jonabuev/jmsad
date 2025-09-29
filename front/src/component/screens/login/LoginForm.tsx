@@ -8,6 +8,7 @@ import GoogleLoginButton from "@/component/common/GoogleLoginButton";
 import { useTranslation } from "next-i18next";
 import { fetchUserProfile } from "@/component/store/auth/authSlice";
 import { AppDispatch } from "@/component/store/store";
+import styles from "./LoginForm.module.scss";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -89,14 +90,14 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+    <div className={styles.loginForm}>
+      <div className={styles.loginCard}>
         {/* Заголовок */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t("login.title")}</h1>
-          <p className="text-gray-600">
+        <div className={styles.header}>
+          <h1 className={styles.title}>{t("login.title")}</h1>
+          <p className={styles.subtitle}>
             {t("login.noAccount")}{" "}
-            <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/register" className={styles.registerLink}>
               {t("login.register")}
             </Link>
           </p>
@@ -104,7 +105,7 @@ const LoginForm = () => {
 
         {/* Google кнопка */}
         {isClient && (
-          <div className="mb-6">
+          <div className={styles.googleButtonContainer}>
             <GoogleLoginButton 
               onSuccess={async () => {
                 console.log("✅ Google login successful from login form");
@@ -129,22 +130,20 @@ const LoginForm = () => {
 
         {/* Разделитель */}
         {isClient && (
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">{t("registration.or")}</span>
+          <div className={styles.divider}>
+            <div className={styles.dividerLine}></div>
+            <div className={styles.dividerText}>
+              <span>{t("registration.or")}</span>
             </div>
           </div>
         )}
 
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        {error && <p className={styles.errorMessage}>{error}</p>}
         
         {isClient && (
-          <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+          <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="username" className={styles.inputLabel}>
               {t("login.username")}
             </label>
             <input
@@ -154,18 +153,18 @@ const LoginForm = () => {
               value={formData.username}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={styles.input}
               placeholder={t("login.usernamePlaceholder")}
             />
           </div>
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <div className={styles.inputGroup}>
+            <div className={styles.inputLabelRow}>
+              <label htmlFor="password" className={styles.inputLabel}>
                 {t("login.password")}
               </label>
               <Link 
                 href="/reset-password" 
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                className={styles.forgotPasswordLink}
               >
                 {t("login.forgotPassword")}
               </Link>
@@ -177,20 +176,20 @@ const LoginForm = () => {
               value={formData.password}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={styles.input}
               placeholder={t("login.passwordPlaceholder")}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 mt-6"
+            className={styles.submitButton}
           >
             {t("login.submit")}
           </button>
-          <div className="flex items-center justify-center mb-1">
+          <div className={styles.forgotPasswordContainer}>
             <Link 
                   href="/reset-password" 
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                  className={styles.forgotPasswordLink}
                 >
                   {t("login.forgotPassword")}
             </Link>

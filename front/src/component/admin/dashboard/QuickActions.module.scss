@@ -1,0 +1,273 @@
+.quickActionsCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.quickActionsHeader {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.quickActionsTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.quickActionsDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.quickActionsList {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quickActionItem {
+  display: block;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+}
+
+.quickActionItemGreen {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+
+  &:hover {
+    background-color: #dcfce7;
+  }
+}
+
+.quickActionItemBlue {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+
+  &:hover {
+    background-color: #dbeafe;
+  }
+}
+
+.quickActionItemPurple {
+  background-color: #faf5ff;
+  color: #9333ea;
+  border-color: #e9d5ff;
+
+  &:hover {
+    background-color: #f3e8ff;
+  }
+}
+
+.quickActionItemGray {
+  background-color: #f9fafb;
+  color: #6b7280;
+  border-color: #e5e7eb;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+}
+
+.quickActionContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.quickActionIcon {
+  flex-shrink: 0;
+}
+
+.quickActionIconSvg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.quickActionDetails {
+  flex: 1;
+}
+
+.quickActionTitle {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.quickActionDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.quickActionArrow {
+  flex-shrink: 0;
+}
+
+.quickActionArrowSvg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+  fill: none;
+  stroke: currentColor;
+}
+
+.quickActionsFooter {
+  padding: 0.75rem 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.quickActionsNote {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .quickActionsHeader,
+  .quickActionsList,
+  .quickActionsFooter {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .quickActionItem {
+    padding: 0.75rem;
+  }
+
+  .quickActionIconSvg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .quickActionArrowSvg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// Focus states for accessibility
+.quickActionItem:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .quickActionsCard {
+    border-width: 2px;
+  }
+
+  .quickActionItem {
+    border-width: 3px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .quickActionItem {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .quickActionsCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .quickActionsTitle {
+    color: #f9fafb;
+  }
+
+  .quickActionsDescription {
+    color: #d1d5db;
+  }
+
+  .quickActionTitle {
+    color: #f9fafb;
+  }
+
+  .quickActionDescription {
+    color: #d1d5db;
+  }
+
+  .quickActionItemGreen {
+    background-color: #14532d;
+    color: #22c55e;
+    border-color: #16a34a;
+
+    &:hover {
+      background-color: #166534;
+    }
+  }
+
+  .quickActionItemBlue {
+    background-color: #1e3a8a;
+    color: #60a5fa;
+    border-color: #2563eb;
+
+    &:hover {
+      background-color: #1e40af;
+    }
+  }
+
+  .quickActionItemPurple {
+    background-color: #581c87;
+    color: #a78bfa;
+    border-color: #9333ea;
+
+    &:hover {
+      background-color: #6b21a8;
+    }
+  }
+
+  .quickActionItemGray {
+    background-color: #374151;
+    color: #9ca3af;
+    border-color: #6b7280;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+  }
+
+  .quickActionsFooter {
+    background-color: #4b5563;
+  }
+
+  .quickActionsNote {
+    color: #9ca3af;
+  }
+
+  .quickActionArrowSvg {
+    color: #6b7280;
+  }
+}

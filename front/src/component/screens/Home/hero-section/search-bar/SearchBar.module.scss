@@ -1,0 +1,30 @@
+.searchBar {
+  display: flex;
+  height: 3.5rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.searchIcon {
+  display: flex;
+  align-items: center;
+  border: 1px solid #f2f2f2;
+  background-color: white;
+  border-top-left-radius: 0.75rem;
+  border-bottom-left-radius: 0.75rem;
+  padding: 0 1rem;
+}
+
+.searchInput {
+  width: 100%;
+  border: 1px solid #d0dbe7;
+  padding: 0 1rem;
+  border-top-right-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  background-color: white;
+  color: black;
+
+  &:focus {
+    outline: none;
+  }
+}

@@ -1,0 +1,213 @@
+.rentalCatalog {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  position: relative;
+}
+
+.sidebar {
+  width: 20rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.backButton {
+  margin-bottom: 1rem;
+  color: #2563eb;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+
+  &:hover {
+    color: #1d4ed8;
+  }
+}
+
+.imageGallery {
+  // Галерея изображений
+}
+
+.mainImage {
+  width: 100%;
+  height: 10rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.thumbnailContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.thumbnail {
+  width: 4rem;
+  height: 3rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  transition: border-color 0.2s ease;
+
+  &.active {
+    border-color: #3b82f6;
+  }
+
+  &:hover {
+    border-color: #2563eb;
+  }
+}
+
+.houseDetails {
+  // Детали недвижимости
+}
+
+.houseAddress {
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.housePrice {
+  color: #059669;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.houseInfo {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.houseDescription {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.filtersContainer {
+  // Контейнер фильтров
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.filtersSection {
+  margin-bottom: 1.5rem;
+}
+
+.filtersTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.priceInputs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filterInput {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+}
+
+.filterSelect {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+}
+
+.roomsInputs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.optionsSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.optionsTitle {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.optionCheckbox {
+  margin-right: 0.5rem;
+}
+
+.resultsInfo {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.mapContainer {
+  flex: 1;
+  height: 100vh;
+}

@@ -1,0 +1,225 @@
+.filtersCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.filtersGridSecond {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.filterInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.filterSelect {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.resetButtonContainer {
+  display: flex;
+  align-items: flex-end;
+}
+
+.resetButton {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #e5e7eb;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.searchSection {
+  margin-top: 1rem;
+}
+
+.searchLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .filtersCard {
+    padding: 1rem;
+  }
+
+  .filtersGrid,
+  .filtersGridSecond {
+    gap: 0.75rem;
+  }
+}
+
+// Focus states for accessibility
+.filterInput:focus-visible,
+.filterSelect:focus-visible,
+.resetButton:focus-visible,
+.searchInput:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .filtersCard {
+    border-width: 2px;
+  }
+
+  .filterInput,
+  .filterSelect,
+  .searchInput {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .filterInput,
+  .filterSelect,
+  .resetButton,
+  .searchInput {
+    transition: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .filtersCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .filterLabel,
+  .searchLabel {
+    color: #e5e7eb;
+  }
+
+  .filterInput,
+  .filterSelect,
+  .searchInput {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+
+    &:focus {
+      background-color: #374151;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .resetButton {
+    background-color: #4b5563;
+    color: #d1d5db;
+
+    &:hover {
+      background-color: #6b7280;
+    }
+  }
+}

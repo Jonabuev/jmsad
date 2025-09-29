@@ -1,0 +1,182 @@
+.adminUserDetailPage {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContent {
+  text-align: center;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin: 0 auto 1rem;
+}
+
+.loadingText {
+  color: #6b7280;
+}
+
+.accessDeniedContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accessDeniedContent {
+  text-align: center;
+}
+
+.accessDeniedIcon {
+  width: 4rem;
+  height: 4rem;
+  background-color: #fee2e2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.accessDeniedIconSvg {
+  width: 2rem;
+  height: 2rem;
+  color: #dc2626;
+  fill: none;
+  stroke: currentColor;
+}
+
+.accessDeniedTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.accessDeniedMessage {
+  color: #6b7280;
+}
+
+.userNotFoundContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userNotFoundContent {
+  text-align: center;
+}
+
+.userNotFoundIcon {
+  width: 4rem;
+  height: 4rem;
+  background-color: #fef3c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.userNotFoundIconSvg {
+  width: 2rem;
+  height: 2rem;
+  color: #d97706;
+  fill: none;
+  stroke: currentColor;
+}
+
+.userNotFoundTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.userNotFoundMessage {
+  color: #6b7280;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .accessDeniedTitle,
+  .userNotFoundTitle {
+    font-size: 1.25rem;
+  }
+}
+
+// Focus states for accessibility
+.accessDeniedContainer:focus-visible,
+.userNotFoundContainer:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .accessDeniedIcon,
+  .userNotFoundIcon {
+    border: 2px solid;
+  }
+
+  .accessDeniedIcon {
+    border-color: #dc2626;
+  }
+
+  .userNotFoundIcon {
+    border-color: #d97706;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .loadingSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .adminUserDetailPage,
+  .loadingContainer,
+  .accessDeniedContainer,
+  .userNotFoundContainer {
+    background-color: #1f2937;
+  }
+
+  .loadingText,
+  .accessDeniedMessage,
+  .userNotFoundMessage {
+    color: #d1d5db;
+  }
+
+  .accessDeniedTitle,
+  .userNotFoundTitle {
+    color: #f9fafb;
+  }
+}

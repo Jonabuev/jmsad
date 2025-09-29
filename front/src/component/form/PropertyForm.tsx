@@ -7,6 +7,7 @@ import Script from "next/script";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { createProperty } from "@/api/propertyApi";
+import styles from "./PropertyForm.module.scss";
 
 interface PropertyFormInputs {
   address: string;
@@ -140,31 +141,31 @@ const PropertyForm: FC = () => {
         }}
       />
 
-      <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl text-center font-bold text-blue-500 mb-6">
+      <div className={styles.propertyForm}>
+        <h2 className={styles.formTitle}>
           {t("form.title")}
         </h2>
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className={styles.errorMessage}>
             {errorMessage}
           </div>
         )}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           {/* Адрес */}
-          <div className="relative">
-            <label className="block font-medium">{t("form.address")}</label>
+          <div className={styles.addressField}>
+            <label className={styles.formLabel}>{t("form.address")}</label>
             <input
               type="text"
               {...register("address", { required: true })}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
               autoComplete="off"
             />
             {suggestions.length > 0 && (
-              <ul className="absolute z-10 w-full bg-white border rounded shadow max-h-60 overflow-y-auto">
+              <ul className={styles.addressSuggestions}>
                 {suggestions.map((suggestion, index) => (
                   <li
                     key={index}
-                    className="p-2 hover:bg-blue-100 cursor-pointer"
+                    className={styles.suggestionItem}
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
                     {suggestion}
@@ -175,13 +176,13 @@ const PropertyForm: FC = () => {
           </div>
 
           {/* Тип */}
-          <div>
-            <label className="block font-medium">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("form.property_type")}
             </label>
             <select
               {...register("type_p", { required: true })}
-              className="w-full p-2 border rounded"
+              className={styles.formSelect}
             >
               <option value="">{t("form.select_type")}</option>
               <option value="apartment">{t("form.apartment")}</option>
@@ -191,131 +192,131 @@ const PropertyForm: FC = () => {
           </div>
 
           {/* Кол-во комнат */}
-          <div>
-            <label className="block font-medium">{t("form.rooms")}</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>{t("form.rooms")}</label>
             <input
               type="number"
               min={1}
               max={10}
               {...register("num_of_rooms", { required: true })}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
             />
           </div>
 
           {/* Цена */}
-          <div>
-            <label className="block font-medium">Цена</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Цена</label>
             <input
               type="number"
               min={0}
               step={0.01}
               {...register("price", { required: true })}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
             />
           </div>
 
           {/* Описание */}
-          <div>
-            <label className="block font-medium">Описание</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Описание</label>
             <textarea
               {...register("description")}
-              className="w-full p-2 border rounded"
+              className={styles.formTextarea}
             />
           </div>
 
           {/* Площадь */}
-          <div>
-            <label className="block font-medium">Площадь (м²)</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Площадь (м²)</label>
             <input
               type="number"
               min={0}
               step={0.1}
               {...register("area")}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
             />
           </div>
 
           {/* Этаж */}
-          <div>
-            <label className="block font-medium">Этаж</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Этаж</label>
             <input
               type="number"
               min={0}
               {...register("floor")}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
             />
           </div>
 
           {/* Этажность дома */}
-          <div>
-            <label className="block font-medium">Этажность дома</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Этажность дома</label>
             <input
               type="number"
               min={1}
               {...register("total_floors")}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
             />
           </div>
 
           {/* Год постройки */}
-          <div>
-            <label className="block font-medium">Год постройки</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Год постройки</label>
             <input
               type="number"
               min={1900}
               max={2100}
               {...register("year_built")}
-              className="w-full p-2 border rounded"
+              className={styles.formInput}
             />
           </div>
 
           {/* Меблировка */}
-          <div className="flex items-center">
+          <div className={styles.checkboxGroup}>
             <input
               type="checkbox"
               {...register("is_furnished")}
-              className="mr-2"
+              className={styles.checkbox}
             />
-            <label className="block font-medium">Меблировка</label>
+            <label className={styles.checkboxLabel}>Меблировка</label>
           </div>
 
           {/* Балкон */}
-          <div className="flex items-center">
+          <div className={styles.checkboxGroup}>
             <input
               type="checkbox"
               {...register("has_balcony")}
-              className="mr-2"
+              className={styles.checkbox}
             />
-            <label className="block font-medium">Балкон</label>
+            <label className={styles.checkboxLabel}>Балкон</label>
           </div>
 
           {/* Комментарий */}
-          <div>
-            <label className="block font-medium">Комментарий</label>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Комментарий</label>
             <textarea
               {...register("comment")}
-              className="w-full p-2 border rounded"
+              className={styles.formTextarea}
             />
           </div>
 
           {/* Загрузка изображений */}
-          <div>
-            <label className="block font-medium">Фотографии апартамента</label>
+          <div className={styles.fileUploadGroup}>
+            <label className={styles.formLabel}>Фотографии апартамента</label>
             <input
               type="file"
               multiple
               accept="image/*"
               onChange={handleFileChange}
-              className="w-full p-2 border rounded"
+              className={styles.fileInput}
             />
             {selectedFiles.length > 0 && (
-              <div className="mt-2">
-                <p className="text-sm text-gray-600 mb-2">
+              <div className={styles.filePreview}>
+                <p className={styles.fileCount}>
                   Выбрано файлов: {selectedFiles.length}
                 </p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className={styles.fileGrid}>
                   {selectedFiles.map((file, index) => (
-                    <div key={index} className="text-xs text-gray-500">
+                    <div key={index} className={styles.fileItem}>
                       {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
                     </div>
                   ))}
@@ -326,7 +327,7 @@ const PropertyForm: FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md font-semibold"
+            className={styles.submitButton}
           >
             {t("form.submit")}
           </button>

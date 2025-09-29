@@ -4,6 +4,7 @@ import { getActivityLogs } from '@/api/adminApi';
 import ActivityFilters from './ActivityFilters';
 import ActivityLogsTable from './ActivityLogsTable';
 import { useAdminNotifications } from '@/component/hooks/useAdminNotifications';
+import styles from './ActivityLogsManagement.module.scss';
 
 interface ActivityLog {
   id: number;
@@ -90,12 +91,12 @@ const ActivityLogsManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+    <div className={styles.activityLogsManagement}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           {t('admin.activity.title')}
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className={styles.pageSubtitle}>
           {t('admin.activity.subtitle')}
         </p>
       </div>

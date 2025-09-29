@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import styles from "./AdminSidebar.module.scss";
 
 const AdminSidebar: FC = () => {
   const { t } = useTranslation("common");
@@ -71,12 +72,12 @@ const AdminSidebar: FC = () => {
   return (
     <>
       {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className={styles.mobileMenuButton}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-white p-2 rounded-md shadow-lg"
+          className={styles.mobileButton}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={styles.mobileButtonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -85,37 +86,31 @@ const AdminSidebar: FC = () => {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50"
+          className={styles.mobileOverlay}
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}
       >
-        <div className="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-blue-600 to-indigo-600">
-          <h1 className="text-xl font-bold text-white">{t("admin.title")}</h1>
+        <div className={styles.sidebarHeader}>
+          <h1 className={styles.sidebarTitle}>{t("admin.title")}</h1>
         </div>
         
-        <nav className="mt-8">
-          <div className="px-4 space-y-2">
+        <nav className={styles.navigation}>
+          <div className={styles.navigationList}>
             {navigation.map((item) => {
               const isActive = router.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                    isActive
-                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                  className={`${styles.navigationItem} ${isActive ? styles.navigationItemActive : ""}`}
                   onClick={() => setIsOpen(false)}
                 >
-                  <span className="mr-3">{item.icon}</span>
+                  <span className={styles.navigationIcon}>{item.icon}</span>
                   {item.name}
                 </Link>
               );
@@ -124,16 +119,16 @@ const AdminSidebar: FC = () => {
         </nav>
 
         {/* User info at bottom */}
-        <div className="absolute bottom-0 w-full p-4 border-t border-gray-200">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+        <div className={styles.userInfo}>
+          <div className={styles.userInfoContent}>
+            <div className={styles.userAvatar}>
+              <svg className={styles.userAvatarIcon} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700">Admin</p>
-              <p className="text-xs text-gray-500">Administrator</p>
+            <div className={styles.userDetails}>
+              <p className={styles.userName}>Admin</p>
+              <p className={styles.userRole}>Administrator</p>
             </div>
           </div>
         </div>

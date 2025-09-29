@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint } from "@/api/complaintsApi";
+import styles from "./EditComplaintForm.module.scss";
 
 interface ComplaintReason {
   id: number;
@@ -177,106 +178,88 @@ const EditComplaintForm: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 mx-auto mb-4"></div>
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-1/2 transform -translate-x-1/2"></div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}>
+            <div className={styles.loadingSpinnerOuter}></div>
+            <div className={styles.loadingSpinnerInner}></div>
           </div>
-          <p className="text-lg text-gray-600 animate-pulse">{t("Scomplaint.loading")}</p>
+          <p className={styles.loadingText}>{t("Scomplaint.loading")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className={styles.editComplaintForm}>
+      <div className={styles.container}>
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={styles.headerSection}>
+          <div className={styles.headerContent}>
+            <div className={styles.headerIcon}>
+              <svg className={styles.headerIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t("Scomplaint.editTitle")}</h2>
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700 font-medium">
-                    {t("Scomplaint.descriptionedit")}
-                  </p>
-                </div>
+            <h2 className={styles.headerTitle}>{t("Scomplaint.editTitle")}</h2>
+            <div className={styles.warningBox}>
+              <div className={styles.warningContent}>
+                <svg className={styles.warningIcon} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <p className={styles.warningText}>
+                  {t("Scomplaint.descriptionedit")}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Notifications */}
           {loadError && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mb-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700 font-medium">{t("Scomplaint.loadEditError")}</p>
-                </div>
+            <div className={`${styles.notification} ${styles.notificationError}`}>
+              <div className={styles.notificationContent}>
+                <svg className={`${styles.notificationIcon} ${styles.notificationIconError}`} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className={`${styles.notificationText} ${styles.notificationTextError}`}>{t("Scomplaint.loadEditError")}</p>
               </div>
             </div>
           )}
 
           {successMessage && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg mb-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-green-700 font-medium">{successMessage}</p>
-                </div>
+            <div className={`${styles.notification} ${styles.notificationSuccess}`}>
+              <div className={styles.notificationContent}>
+                <svg className={`${styles.notificationIcon} ${styles.notificationIconSuccess}`} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <p className={`${styles.notificationText} ${styles.notificationTextSuccess}`}>{successMessage}</p>
               </div>
             </div>
           )}
 
           {errorMessage && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mb-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700 font-medium">{errorMessage}</p>
-                </div>
+            <div className={`${styles.notification} ${styles.notificationError}`}>
+              <div className={styles.notificationContent}>
+                <svg className={`${styles.notificationIcon} ${styles.notificationIconError}`} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className={`${styles.notificationText} ${styles.notificationTextError}`}>{errorMessage}</p>
               </div>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className={styles.form}>
             {/* Description Card */}
-            <div className="bg-gray-50 rounded-xl p-6 border-l-4 border-blue-600">
-              <div className="flex items-start space-x-3 mb-4">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
+            <div className={`${styles.formCard} ${styles.formCardDescription}`}>
+              <div className={styles.descriptionSection}>
+                <div className={styles.descriptionIcon}>
+                  <svg className={styles.descriptionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
-                <div className="flex-1">
-                  <label className="block text-lg font-semibold text-gray-900 mb-2">
+                <div className={styles.descriptionContent}>
+                  <label className={styles.descriptionLabel}>
                     {t("Scomplaint.description")}
                   </label>
                   <textarea
@@ -284,7 +267,7 @@ const EditComplaintForm: React.FC = () => {
                     value={formData.description}
                     onChange={handleChange}
                     required
-                    className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[120px] resize-none transition-all duration-200"
+                    className={styles.descriptionTextarea}
                     placeholder={t("Scomplaint.describeComplaint")}
                   />
                 </div>
@@ -292,27 +275,27 @@ const EditComplaintForm: React.FC = () => {
             </div>
 
             {/* Reasons Card */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formCard}>
+              <div className={styles.formCardHeader}>
+                <div className={`${styles.formCardIcon} ${styles.formCardIconYellow}`}>
+                  <svg className={styles.formCardIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.reasons")}</h3>
+                <h3 className={styles.formCardTitle}>{t("Scomplaint.reasons")}</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={styles.reasonsGrid}>
                 {complaintReasons
                   .filter((reason) => reason.type === accusedRole)
                   .map((reason) => (
-                    <label key={reason.id} className="flex items-start space-x-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200">
+                    <label key={reason.id} className={styles.reasonItem}>
                       <input
                         type="checkbox"
                         checked={formData.reason.includes(reason.id)}
                         onChange={() => handleReasonChange(reason.id)}
-                        className="mt-1 rounded text-blue-600 focus:ring-blue-500 focus:ring-2"
+                        className={styles.reasonCheckbox}
                       />
-                      <span className="text-sm text-gray-700 leading-relaxed">
+                      <span className={styles.reasonText}>
                         {t(`Scomplaint.reason.${reason.reason}`)}
                       </span>
                     </label>
@@ -321,16 +304,16 @@ const EditComplaintForm: React.FC = () => {
             </div>
 
             {/* Photos Card */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formCard}>
+              <div className={styles.formCardHeader}>
+                <div className={`${styles.formCardIcon} ${styles.formCardIconIndigo}`}>
+                  <svg className={styles.formCardIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.additionalPhotos")}</h3>
+                <h3 className={styles.formCardTitle}>{t("Scomplaint.additionalPhotos")}</h3>
               </div>
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors duration-200">
+              <div className={styles.uploadArea}>
                 <input
                   type="file"
                   accept="image/*"
@@ -347,49 +330,49 @@ const EditComplaintForm: React.FC = () => {
                       evidenceImages: Array.from(files).slice(0, 10),
                     }));
                   }}
-                  className="hidden"
+                  className={styles.uploadInput}
                   id="photo-upload"
                 />
-                <label htmlFor="photo-upload" className="cursor-pointer">
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <label htmlFor="photo-upload" className={styles.uploadLabel}>
+                  <svg className={styles.uploadIcon} stroke="currentColor" fill="none" viewBox="0 0 48 48">
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <p className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium text-blue-600 hover:text-blue-500">{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
+                  <p className={styles.uploadText}>
+                    <span className={styles.uploadTextLink}>{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadHint")}</p>
+                  <p className={styles.uploadHint}>{t("Scomplaint.uploadHint")}</p>
                 </label>
               </div>
             </div>
 
             {/* Court Case Card */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={styles.formCard}>
+              <div className={styles.formCardHeader}>
+                <div className={`${styles.formCardIcon} ${styles.formCardIconPurple}`}>
+                  <svg className={styles.formCardIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{t("Scomplaint.isCourtCase")}</h3>
+                <h3 className={styles.formCardTitle}>{t("Scomplaint.isCourtCase")}</h3>
               </div>
               
-              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+              <div className={styles.courtCaseSection}>
                 <input
                   type="checkbox"
                   id="isCourtCase"
                   checked={formData.isCourtCase}
                   disabled
-                  className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 focus:ring-2"
+                  className={styles.courtCaseCheckbox}
                 />
-                <label htmlFor="isCourtCase" className="text-sm font-medium text-gray-700">
+                <label htmlFor="isCourtCase" className={styles.courtCaseLabel}>
                   {t("Scomplaint.isCourtCase")}
                 </label>
               </div>
 
               {formData.isCourtCase && (
-                <div className="mt-6 space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <div className={styles.courtCaseFields}>
+                  <div className={styles.courtCaseField}>
+                    <label className={styles.courtCaseFieldLabel}>
                       {t("Scomplaint.damageCost")}
                     </label>
                     <input
@@ -397,31 +380,31 @@ const EditComplaintForm: React.FC = () => {
                       name="damageCost"
                       value={formData.damageCost}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className={styles.courtCaseFieldInput}
                       placeholder="Введите сумму ущерба..."
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <div className={styles.courtCaseField}>
+                    <label className={styles.courtCaseFieldLabel}>
                       {t("Scomplaint.evidence")}
                     </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors duration-200">
+                    <div className={styles.courtCaseUploadArea}>
                       <input
                         type="file"
                         accept=".pdf,.doc,.docx,image/*"
                         onChange={handleCourtDocumentChange}
-                        className="hidden"
+                        className={styles.courtCaseUploadInput}
                         id="court-document-upload"
                       />
-                      <label htmlFor="court-document-upload" className="cursor-pointer">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <label htmlFor="court-document-upload" className={styles.courtCaseUploadLabel}>
+                        <svg className={styles.courtCaseUploadIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <p className="mt-2 text-sm text-gray-600">
-                          <span className="font-medium text-blue-600 hover:text-blue-500">{t("Scomplaint.uploadDocument")}</span>
+                        <p className={styles.courtCaseUploadText}>
+                          <span className={styles.courtCaseUploadTextLink}>{t("Scomplaint.uploadDocument")}</span>
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">{t("Scomplaint.uploadFormats")}</p>
+                        <p className={styles.courtCaseUploadHint}>{t("Scomplaint.uploadFormats")}</p>
                       </label>
                     </div>
                   </div>
@@ -430,17 +413,15 @@ const EditComplaintForm: React.FC = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div className={styles.submitSection}>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${
-                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`${styles.submitButton} ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className={styles.submitButtonSpinner} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -448,7 +429,7 @@ const EditComplaintForm: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={styles.submitButtonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     {t("Scomplaint.submitedit")}

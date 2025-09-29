@@ -1,0 +1,229 @@
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statCard {
+  display: block;
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+}
+
+.cardContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardInfo {
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.cardValue {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.cardChange {
+  font-size: 0.875rem;
+}
+
+.cardChangePositive {
+  color: #16a34a;
+}
+
+.cardChangeWarning {
+  color: #d97706;
+}
+
+.cardChangeNegative {
+  color: #dc2626;
+}
+
+.cardChangeNeutral {
+  color: #6b7280;
+}
+
+.cardIcon {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+  transition: transform 0.2s ease;
+}
+
+.cardIconBlue {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.cardIconRed {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.cardIconYellow {
+  background-color: #fffbeb;
+  color: #d97706;
+  border-color: #fed7aa;
+}
+
+.cardIconPurple {
+  background-color: #faf5ff;
+  color: #9333ea;
+  border-color: #e9d5ff;
+}
+
+.cardIconGray {
+  background-color: #f9fafb;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+.cardIconSvg {
+  width: 2rem;
+  height: 2rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.statCard:hover .cardIcon {
+  transform: scale(1.1);
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .statsGrid {
+    gap: 1rem;
+  }
+
+  .statCard {
+    padding: 1rem;
+  }
+
+  .cardValue {
+    font-size: 1.5rem;
+  }
+
+  .cardIcon {
+    padding: 0.5rem;
+  }
+
+  .cardIconSvg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+// Focus states for accessibility
+.statCard:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .statCard {
+    border-width: 2px;
+  }
+
+  .cardIcon {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .statCard,
+  .cardIcon {
+    transition: none;
+  }
+
+  .statCard:hover {
+    transform: none;
+  }
+
+  .statCard:hover .cardIcon {
+    transform: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .statCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .cardTitle {
+    color: #d1d5db;
+  }
+
+  .cardValue {
+    color: #f9fafb;
+  }
+
+  .cardIconBlue {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+    border-color: #1e40af;
+  }
+
+  .cardIconRed {
+    background-color: #7f1d1d;
+    color: #fca5a5;
+    border-color: #dc2626;
+  }
+
+  .cardIconYellow {
+    background-color: #78350f;
+    color: #fbbf24;
+    border-color: #d97706;
+  }
+
+  .cardIconPurple {
+    background-color: #581c87;
+    color: #c084fc;
+    border-color: #9333ea;
+  }
+
+  .cardIconGray {
+    background-color: #374151;
+    color: #9ca3af;
+    border-color: #6b7280;
+  }
+}

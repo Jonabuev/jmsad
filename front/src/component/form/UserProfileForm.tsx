@@ -9,6 +9,7 @@ import { IProfileData } from "../type/users.interface";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
 import { fetchUserProfile } from "../store/auth/authSlice";
+import styles from "./UserProfileForm.module.scss";
 
 
 
@@ -92,41 +93,41 @@ const UserProfileForm = () => {
 
 
   if (profileLoading) return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600 font-medium">{t("editProfile.loading")}</p>
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>{t("editProfile.loading")}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 backdrop-blur-sm">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    <div className={styles.userProfileForm}>
+      <div className={styles.formContainer}>
+        <div className={styles.formHeader}>
+          <h2 className={styles.formTitle}>
             Редактирование профиля
           </h2>
-          <p className="text-gray-600 text-sm">
+          <p className={styles.formSubtitle}>
             Обновите информацию о себе
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.fullName")}:
             </label>
             <input
               type="text"
               {...register("username")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+              className={styles.formInput}
             />
-            {errors.username && <p className="text-red-500 text-sm mt-2 font-medium">{errors.username.message}</p>}
+            {errors.username && <p className={styles.formError}>{errors.username.message}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.iin")}:
             </label>
             <input
@@ -137,25 +138,25 @@ const UserProfileForm = () => {
                   message: "ИИН должен содержать ровно 12 цифр"
                 }
               })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+              className={styles.formInput}
               placeholder="Введите 12-значный ИИН (необязательно)"
             />
-            {errors.identifier && <p className="text-red-500 text-sm mt-2 font-medium">{errors.identifier.message}</p>}
+            {errors.identifier && <p className={styles.formError}>{errors.identifier.message}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.phone")}:
             </label>
             <input
               type="text"
               {...register("phone_number")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+              className={styles.formInput}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.email")}:
             </label>
             <input
@@ -166,18 +167,18 @@ const UserProfileForm = () => {
                   message: "Некорректный формат email"
                 }
               })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+              className={styles.formInput}
             />
-            {errors.email && <p className="text-red-500 text-sm mt-2 font-medium">{errors.email.message}</p>}
+            {errors.email && <p className={styles.formError}>{errors.email.message}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.documentType")}:
             </label>
              <select
                {...register("document_type")}
-               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+               className={styles.formSelect}
              >
                <option value="">{t("editProfile.selectDocumentType")}</option>
                <option value="id_card">{t("editProfile.docType.id")}</option>
@@ -186,8 +187,8 @@ const UserProfileForm = () => {
              </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.passportExpiry")}:
             </label>
             <input
@@ -201,55 +202,55 @@ const UserProfileForm = () => {
                   return selected >= today || t("editProfile.doc_expired");
                 }
               })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+              className={styles.formInput}
             />
             {errors.passport_expiry && (
-              <p className="text-red-500 text-sm mt-2 font-medium">{errors.passport_expiry.message}</p>
+              <p className={styles.formError}>{errors.passport_expiry.message}</p>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.visaNumber")}:
             </label>
             <input
               type="text"
               {...register("visa_num")}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`${styles.formInput} ${docType !== "visa" ? styles.formInputDisabled : ""}`}
               disabled={docType !== "visa"}
               placeholder={docType !== "visa" ? t("editProfile.visaNumberHint") : ""}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
               {t("editProfile.uploadNew")}:
             </label>
             <input 
               type="file" 
               accept="image/*" 
               {...register("avatar")}
-              className="block w-full text-sm text-gray-700 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all duration-200 cursor-pointer"
+              className={styles.fileInput}
             />
           </div>
 
-          <div className="flex items-center p-4 bg-gray-50 rounded-xl">
+          <div className={styles.checkboxContainer}>
             <input 
               type="checkbox" 
               {...register("clearAvatar")} 
-              className="mr-3 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              className={styles.checkbox}
             />
-            <span className="text-sm text-gray-700">{t("editProfile.clearAvatar")}</span>
+            <span className={styles.checkboxLabel}>{t("editProfile.clearAvatar")}</span>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+            className={styles.submitButton}
             disabled={updateLoading}
           >
             {updateLoading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div className={styles.submitButtonSpinner}></div>
                 {t("editProfile.saving")}
               </>
             ) : (

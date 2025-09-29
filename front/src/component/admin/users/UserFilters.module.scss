@@ -1,0 +1,379 @@
+.filtersCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.filtersContent {
+  padding: 1.5rem;
+}
+
+.filtersHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.filtersTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #e5e7eb;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.toggleIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+  transition: transform 0.2s ease;
+
+  &.toggleIconRotated {
+    transform: rotate(180deg);
+  }
+}
+
+.searchSection {
+  margin-bottom: 1rem;
+}
+
+.searchLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.searchContainer {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  inset-y: 0;
+  left: 0;
+  padding-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.searchIconSvg {
+  height: 1.25rem;
+  width: 1.25rem;
+  color: #9ca3af;
+  fill: none;
+  stroke: currentColor;
+}
+
+.searchInput {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.advancedFilters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.filterSelect {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.filterActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filterButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.applyButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #1d4ed8;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.applyButtonSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 1rem;
+  width: 1rem;
+  border: 2px solid transparent;
+  border-top-color: white;
+  margin-right: 0.5rem;
+}
+
+.applyButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.resetButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #e5e7eb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.resetButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.activeFiltersInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .filtersContent {
+    padding: 1rem;
+  }
+
+  .filterActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .filterButtons {
+    justify-content: center;
+  }
+}
+
+// Focus states for accessibility
+.toggleButton:focus-visible,
+.searchInput:focus-visible,
+.filterSelect:focus-visible,
+.applyButton:focus-visible,
+.resetButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .filtersCard {
+    border-width: 2px;
+  }
+
+  .searchInput,
+  .filterSelect {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .toggleButton,
+  .searchInput,
+  .filterSelect,
+  .applyButton,
+  .resetButton {
+    transition: none;
+  }
+
+  .toggleIcon {
+    transition: none;
+  }
+
+  .applyButtonSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .filtersCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .filtersTitle {
+    color: #f9fafb;
+  }
+
+  .toggleButton {
+    background-color: #4b5563;
+    color: #e5e7eb;
+
+    &:hover {
+      background-color: #6b7280;
+    }
+  }
+
+  .searchLabel,
+  .filterLabel {
+    color: #e5e7eb;
+  }
+
+  .searchInput,
+  .filterSelect {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+
+    &:focus {
+      background-color: #374151;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .applyButton {
+    background-color: #1e40af;
+
+    &:hover:not(:disabled) {
+      background-color: #1e3a8a;
+    }
+  }
+
+  .resetButton {
+    background-color: #4b5563;
+    color: #e5e7eb;
+
+    &:hover:not(:disabled) {
+      background-color: #6b7280;
+    }
+  }
+
+  .activeFiltersInfo {
+    color: #d1d5db;
+  }
+}

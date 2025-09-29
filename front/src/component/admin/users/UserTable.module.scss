@@ -1,0 +1,591 @@
+.tableCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.loadingContainer {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.loadingContent {
+  padding: 2rem;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 2rem;
+  width: 2rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin-right: 0.75rem;
+}
+
+.loadingText {
+  color: #6b7280;
+}
+
+.emptyContainer {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.emptyContent {
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 3rem;
+  height: 3rem;
+  color: #9ca3af;
+  margin: 0 auto 1rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.emptyDescription {
+  color: #6b7280;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tableHead {
+  background-color: #f9fafb;
+}
+
+.tableHeader {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tableBody {
+  background-color: white;
+}
+
+.tableRow {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.tableCell {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+}
+
+.userAvatar {
+  flex-shrink: 0;
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.userAvatarImage {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userAvatarPlaceholder {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userAvatarIcon {
+  height: 1.5rem;
+  width: 1.5rem;
+  color: #9ca3af;
+  fill: currentColor;
+}
+
+.userInfo {
+  margin-left: 1rem;
+}
+
+.userName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.userEmail {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.roleBadge {
+  &.roleBadgeTenant {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.roleBadgeLandlord {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &.roleBadgeAdmin {
+    background-color: #e9d5ff;
+    color: #7c3aed;
+  }
+
+  &.roleBadgeDefault {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+}
+
+.verificationBadge {
+  &.verificationBadgeVerified {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &.verificationBadgePending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+}
+
+.statusBadge {
+  &.statusBadgeBanned {
+    background-color: #fecaca;
+    color: #991b1b;
+  }
+
+  &.statusBadgeActive {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+}
+
+.badgeIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.25rem;
+  fill: currentColor;
+}
+
+.registeredDate {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.actionsCell {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.actionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.viewLink {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #1d4ed8;
+  }
+}
+
+.actionButton {
+  color: #16a34a;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+
+  &:hover:not(:disabled) {
+    color: #15803d;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.actionButtonBan {
+    color: #dc2626;
+
+    &:hover:not(:disabled) {
+      color: #b91c1c;
+    }
+  }
+}
+
+.actionButtonSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 0.75rem;
+  width: 0.75rem;
+  border: 2px solid transparent;
+  margin-right: 0.25rem;
+
+  &.actionButtonSpinnerGreen {
+    border-top-color: #16a34a;
+  }
+
+  &.actionButtonSpinnerRed {
+    border-top-color: #dc2626;
+  }
+}
+
+.paginationContainer {
+  background-color: white;
+  padding: 1rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #e5e7eb;
+
+  @media (min-width: 640px) {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.paginationMobile {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+
+  @media (min-width: 640px) {
+    display: none;
+  }
+}
+
+.paginationDesktop {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (min-width: 640px) {
+    display: flex;
+  }
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.paginationInfoBold {
+  font-weight: 500;
+}
+
+.paginationNav {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  gap: 0;
+}
+
+.paginationButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+  }
+
+  &:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+  }
+
+  &:not(:first-child) {
+    margin-left: -1px;
+  }
+}
+
+.paginationButtonMobile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:first-child) {
+    margin-left: 0.75rem;
+  }
+}
+
+.paginationButtonIcon {
+  height: 1.25rem;
+  width: 1.25rem;
+  fill: currentColor;
+}
+
+.paginationPageButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.paginationPageButtonActive {
+    z-index: 10;
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #2563eb;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .tableCell {
+    padding: 0.75rem 1rem;
+  }
+
+  .tableHeader {
+    padding: 0.5rem 1rem;
+  }
+}
+
+// Focus states for accessibility
+.viewLink:focus-visible,
+.actionButton:focus-visible,
+.paginationButton:focus-visible,
+.paginationButtonMobile:focus-visible,
+.paginationPageButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .tableCard,
+  .loadingContainer,
+  .emptyContainer {
+    border-width: 2px;
+  }
+
+  .tableHeader {
+    border-bottom-width: 2px;
+  }
+
+  .tableRow {
+    border-bottom-width: 2px;
+  }
+
+  .paginationContainer {
+    border-top-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .tableRow,
+  .viewLink,
+  .actionButton,
+  .paginationButton,
+  .paginationButtonMobile,
+  .paginationPageButton {
+    transition: none;
+  }
+
+  .actionButtonSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .tableCard,
+  .loadingContainer,
+  .emptyContainer {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .tableHead {
+    background-color: #4b5563;
+  }
+
+  .tableHeader {
+    color: #d1d5db;
+  }
+
+  .tableBody {
+    background-color: #374151;
+  }
+
+  .tableRow:hover {
+    background-color: #4b5563;
+  }
+
+  .tableCell {
+    color: #e5e7eb;
+  }
+
+  .userName {
+    color: #f9fafb;
+  }
+
+  .userEmail,
+  .registeredDate {
+    color: #d1d5db;
+  }
+
+  .userAvatarPlaceholder {
+    background-color: #4b5563;
+  }
+
+  .userAvatarIcon {
+    color: #6b7280;
+  }
+
+  .paginationContainer {
+    background-color: #374151;
+    border-top-color: #6b7280;
+  }
+
+  .paginationInfo {
+    color: #e5e7eb;
+  }
+
+  .paginationButton,
+  .paginationButtonMobile,
+  .paginationPageButton {
+    background-color: #374151;
+    border-color: #6b7280;
+    color: #e5e7eb;
+
+    &:hover:not(:disabled) {
+      background-color: #4b5563;
+    }
+
+    &.paginationPageButtonActive {
+      background-color: #1e3a8a;
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+  }
+}

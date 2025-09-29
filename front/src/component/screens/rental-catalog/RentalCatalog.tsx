@@ -8,6 +8,7 @@ import RentalMap from "./rental-map/RentalMap";
 import { useState, useEffect } from "react";
 import { IHouse } from "@/component/type/properties.interface";
 import { apiUrl, mediaUrl } from "@/utils/url";
+import styles from "./RentalCatalog.module.scss";
 
 export default function RentalCatalog() {
   const { t } = useTranslation();
@@ -70,91 +71,93 @@ export default function RentalCatalog() {
   });
 
   return (
-    <div className="flex flex-row h-screen relative">
+    <div className={styles.rentalCatalog}>
       {/* Левая панель: фильтры или карточка */}
-      <div className="w-80 bg-white p-4 shadow-lg overflow-y-auto h-full transition-all duration-300">
+      <div className={styles.sidebar}>
         {selectedHouse ? (
           <div>
             <button
-              className="mb-4 text-blue-600 font-semibold"
+              className={styles.backButton}
               onClick={() => setSelectedHouse(null)}
             >
               ← {t("rentalCatalog.backToFilters")}
             </button>
             {/* Галерея изображений */}
             {selectedHouse.images?.length > 0 && (
-              <>
+              <div className={styles.imageGallery}>
                 <img
                   src={mediaUrl(selectedHouse.images[mainImgIdx])}
                   alt={t("rentalCatalog.photo")}
-                  className="w-full h-40 object-cover rounded mb-2"
+                  className={styles.mainImage}
                 />
                 {selectedHouse.images.length > 1 && (
-                  <div className="flex gap-2 mt-2 flex-wrap">
+                  <div className={styles.thumbnailContainer}>
                     {selectedHouse.images.map((img, idx) => (
                       <img
                         key={idx}
                         src={mediaUrl(img)}
                         alt={t("rentalCatalog.photo")}
-                        className={`w-16 h-12 object-cover rounded cursor-pointer border ${mainImgIdx === idx ? 'border-blue-500' : 'border-gray-200'}`}
+                        className={`${styles.thumbnail} ${mainImgIdx === idx ? styles.active : ''}`}
                         onClick={() => setMainImgIdx(idx)}
                       />
                     ))}
                   </div>
                 )}
-              </>
-            )}
-            <div className="font-bold text-lg mb-1">{selectedHouse.address}</div>
-            <div className="text-green-600 font-semibold mb-1">{selectedHouse.price} ₸/мес</div>
-            <div className="text-sm text-gray-700 mb-1">
-              {selectedHouse.area ? <>{t("rentalCatalog.area")}: {selectedHouse.area} м²<br /></> : null}
-              {selectedHouse.floor ? <>{t("rentalCatalog.floor")}: {selectedHouse.floor}{selectedHouse.total_floors ? `/${selectedHouse.total_floors}` : ''}<br /></> : null}
-              {selectedHouse.num_of_rooms ? <>{t("rentalCatalog.rooms")}: {selectedHouse.num_of_rooms}<br /></> : null}
-              {selectedHouse.is_furnished ? <>✓ {t("rentalCatalog.furnished")}<br /></> : null}
-              {selectedHouse.has_balcony ? <>✓ {t("rentalCatalog.balcony")}<br /></> : null}
-            </div>
-            {selectedHouse.description && (
-              <div className="text-xs text-gray-500 mb-2">
-                {selectedHouse.description.substring(0, 100)}
-                {selectedHouse.description.length > 100 ? '...' : ''}
               </div>
             )}
+            <div className={styles.houseDetails}>
+              <div className={styles.houseAddress}>{selectedHouse.address}</div>
+              <div className={styles.housePrice}>{selectedHouse.price} ₸/мес</div>
+              <div className={styles.houseInfo}>
+                {selectedHouse.area ? <>{t("rentalCatalog.area")}: {selectedHouse.area} м²<br /></> : null}
+                {selectedHouse.floor ? <>{t("rentalCatalog.floor")}: {selectedHouse.floor}{selectedHouse.total_floors ? `/${selectedHouse.total_floors}` : ''}<br /></> : null}
+                {selectedHouse.num_of_rooms ? <>{t("rentalCatalog.rooms")}: {selectedHouse.num_of_rooms}<br /></> : null}
+                {selectedHouse.is_furnished ? <>✓ {t("rentalCatalog.furnished")}<br /></> : null}
+                {selectedHouse.has_balcony ? <>✓ {t("rentalCatalog.balcony")}<br /></> : null}
+              </div>
+              {selectedHouse.description && (
+                <div className={styles.houseDescription}>
+                  {selectedHouse.description.substring(0, 100)}
+                  {selectedHouse.description.length > 100 ? '...' : ''}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold mb-4">🏠 {t("rentalCatalog.title")}</h1>
+            <h1 className={styles.title}>🏠 {t("rentalCatalog.title")}</h1>
             {/* Фильтры */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">{t("rentalCatalog.filters")}</h3>
-              <div className="grid grid-cols-1 gap-4">
+            <div className={styles.filtersSection}>
+              <h3 className={styles.filtersTitle}>{t("rentalCatalog.filters")}</h3>
+              <div className={styles.filtersGrid}>
                 {/* Цена */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.price")} (₸)</label>
-                  <div className="flex gap-2">
+                <div className={styles.filterGroup}>
+                  <label className={styles.filterLabel}>{t("rentalCatalog.price")} (₸)</label>
+                  <div className={styles.priceInputs}>
                     <input
                       type="number"
                       placeholder={t("rentalCatalog.from")}
                       value={filters.minPrice}
                       onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
-                      className="w-full p-2 border rounded text-sm"
+                      className={styles.filterInput}
                     />
                     <input
                       type="number"
                       placeholder={t("rentalCatalog.to")}
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
-                      className="w-full p-2 border rounded text-sm"
+                      className={styles.filterInput}
                     />
                   </div>
                 </div>
 
                 {/* Тип недвижимости */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.type")}</label>
+                <div className={styles.filterGroup}>
+                  <label className={styles.filterLabel}>{t("rentalCatalog.type")}</label>
                   <select
                     value={filters.propertyType}
                     onChange={(e) => setFilters({...filters, propertyType: e.target.value})}
-                    className="w-full p-2 border rounded text-sm"
+                    className={styles.filterSelect}
                   >
                     <option value="">{t("rentalCatalog.allTypes")}</option>
                     <option value="apartment">{t("rentalCatalog.apartment")}</option>
@@ -164,9 +167,9 @@ export default function RentalCatalog() {
                 </div>
 
                 {/* Количество комнат */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.rooms")}</label>
-                  <div className="flex gap-2">
+                <div className={styles.filterGroup}>
+                  <label className={styles.filterLabel}>{t("rentalCatalog.rooms")}</label>
+                  <div className={styles.roomsInputs}>
                     <input
                       type="number"
                       placeholder={t("rentalCatalog.from")}
@@ -174,7 +177,7 @@ export default function RentalCatalog() {
                       max="10"
                       value={filters.minRooms}
                       onChange={(e) => setFilters({...filters, minRooms: e.target.value})}
-                      className="w-full p-2 border rounded text-sm"
+                      className={styles.filterInput}
                     />
                     <input
                       type="number"
@@ -183,30 +186,30 @@ export default function RentalCatalog() {
                       max="10"
                       value={filters.maxRooms}
                       onChange={(e) => setFilters({...filters, maxRooms: e.target.value})}
-                      className="w-full p-2 border rounded text-sm"
+                      className={styles.filterInput}
                     />
                   </div>
                 </div>
 
                 {/* Дополнительные опции */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t("rentalCatalog.options")}</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center text-sm">
+                <div className={styles.filterGroup}>
+                  <label className={styles.optionsTitle}>{t("rentalCatalog.options")}</label>
+                  <div className={styles.optionsList}>
+                    <label className={styles.optionItem}>
                       <input
                         type="checkbox"
                         checked={filters.isFurnished}
                         onChange={(e) => setFilters({...filters, isFurnished: e.target.checked})}
-                        className="mr-2"
+                        className={styles.optionCheckbox}
                       />
                       {t("rentalCatalog.furnished")}
                     </label>
-                    <label className="flex items-center text-sm">
+                    <label className={styles.optionItem}>
                       <input
                         type="checkbox"
                         checked={filters.hasBalcony}
                         onChange={(e) => setFilters({...filters, hasBalcony: e.target.checked})}
-                        className="mr-2"
+                        className={styles.optionCheckbox}
                       />
                       {t("rentalCatalog.balcony")}
                     </label>
@@ -223,14 +226,14 @@ export default function RentalCatalog() {
               onSearch={fetchData}
               buttonText={t("rentalCatalog.find")}
             />
-            <div className="mt-4 text-sm text-gray-600">
+            <div className={styles.resultsInfo}>
               {t("rentalCatalog.found")}: {filteredRentals.length} {t("rentalCatalog.of")} {rentals.length} {t("rentalCatalog.objects")}
             </div>
           </>
         )}
       </div>
       {/* Карта */}
-      <div className="flex-1 h-screen">
+      <div className={styles.mapContainer}>
         {loading ? (
           <LoadingIndicator text={t("rentalCatalog.loading")} />
         ) : (

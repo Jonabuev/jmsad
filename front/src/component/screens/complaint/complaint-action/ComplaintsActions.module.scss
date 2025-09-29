@@ -1,0 +1,152 @@
+.complaintActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+}
+
+.actionsInfo {
+  flex: 1;
+}
+
+.actionsTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.actionsDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.actionsButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.approveButton {
+  background-color: #059669;
+
+  &:hover {
+    background-color: #047857;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px #10b981;
+  }
+}
+
+.rejectButton {
+  background-color: #dc2626;
+
+  &:hover {
+    background-color: #b91c1c;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px #ef4444;
+  }
+}
+
+.actionButtonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .actionsButtons {
+    width: 100%;
+  }
+
+  .actionButton {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+// Focus states for accessibility
+.actionButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .actionButton {
+    border: 2px solid white;
+  }
+
+  .approveButton {
+    border-color: #065f46;
+  }
+
+  .rejectButton {
+    border-color: #991b1b;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .actionButton {
+    transition: none;
+  }
+
+  .actionButton:hover,
+  .actionButton:active {
+    transform: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .actionsTitle {
+    color: #f9fafb;
+  }
+
+  .actionsDescription {
+    color: #d1d5db;
+  }
+}

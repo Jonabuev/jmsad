@@ -4,6 +4,7 @@ import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import PublicUserProfile from "@/component/screens/user-profile/PublicUserProfile";
 import { useRouter } from "next/router";
+import styles from "@/component/screens/user-profile/PublicUserProfile.module.scss";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -12,10 +13,10 @@ export default function UserProfilePage() {
   // Показываем загрузку пока router не готов
   if (!username) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Загрузка...</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>Загрузка...</p>
         </div>
       </div>
     );

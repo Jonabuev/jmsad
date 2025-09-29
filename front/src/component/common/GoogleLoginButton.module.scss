@@ -1,0 +1,65 @@
+.googleButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.googleIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.googleLoginContainer {
+  width: 100%;
+}
+
+// Состояния загрузки и ошибок
+.loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+// Адаптивность
+@media (max-width: 640px) {
+  .googleButton {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .googleIcon {
+    width: 1rem;
+    height: 1rem;
+  }
+}

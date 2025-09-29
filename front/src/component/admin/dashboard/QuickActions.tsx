@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
+import styles from "./QuickActions.module.scss";
 
 const QuickActions: FC = () => {
   const { t } = useTranslation("common");
@@ -56,42 +57,42 @@ const QuickActions: FC = () => {
   const getColorClasses = (color: string) => {
     switch (color) {
       case "green":
-        return "bg-green-50 text-green-600 border-green-200 hover:bg-green-100";
+        return styles.quickActionItemGreen;
       case "blue":
-        return "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
+        return styles.quickActionItemBlue;
       case "purple":
-        return "bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100";
+        return styles.quickActionItemPurple;
       case "gray":
-        return "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100";
+        return styles.quickActionItemGray;
       default:
-        return "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100";
+        return styles.quickActionItemGray;
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">{t("admin.quickActions")}</h2>
-        <p className="text-sm text-gray-600 mt-1">{t("admin.quickActionsDesc")}</p>
+    <div className={styles.quickActionsCard}>
+      <div className={styles.quickActionsHeader}>
+        <h2 className={styles.quickActionsTitle}>{t("admin.quickActions")}</h2>
+        <p className={styles.quickActionsDescription}>{t("admin.quickActionsDesc")}</p>
       </div>
       
-      <div className="p-6 space-y-4">
+      <div className={styles.quickActionsList}>
         {actions.map((action, index) => (
           <Link
             key={index}
             href={action.href}
-            className={`block p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${getColorClasses(action.color)}`}
+            className={`${styles.quickActionItem} ${getColorClasses(action.color)}`}
           >
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0">
+            <div className={styles.quickActionContent}>
+              <div className={styles.quickActionIcon}>
                 {action.icon}
               </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-gray-900">{action.title}</h3>
-                <p className="text-sm text-gray-600 mt-1">{action.description}</p>
+              <div className={styles.quickActionDetails}>
+                <h3 className={styles.quickActionTitle}>{action.title}</h3>
+                <p className={styles.quickActionDescription}>{action.description}</p>
               </div>
-              <div className="flex-shrink-0">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className={styles.quickActionArrow}>
+                <svg className={styles.quickActionArrowSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -100,8 +101,8 @@ const QuickActions: FC = () => {
         ))}
       </div>
       
-      <div className="px-6 py-3 bg-gray-50 rounded-b-xl">
-        <p className="text-xs text-gray-500 text-center">
+      <div className={styles.quickActionsFooter}>
+        <p className={styles.quickActionsNote}>
           {t("admin.quickActionsNote")}
         </p>
       </div>

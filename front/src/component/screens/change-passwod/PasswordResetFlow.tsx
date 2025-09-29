@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { requestPasswordReset, confirmPasswordReset } from "@/api/passwordApi";
+import styles from "./PasswordResetFlow.module.scss";
 
 type Step = "email" | "code" | "newPassword" | "success";
 
@@ -38,34 +39,34 @@ const PasswordResetFlow: FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 backdrop-blur-sm">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    <div className={styles.passwordResetFlow}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>
             {t("password.reset.title")}
           </h2>
-          <p className="text-gray-600 text-sm">
+          <p className={styles.description}>
             {t("password.reset.description")}
           </p>
         </div>
 
         {step === "email" && (
-          <form onSubmit={handleEmailSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <form onSubmit={handleEmailSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("password.reset.email_label")}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className={styles.submitButton}
             >
               {t("password.reset.send_code")}
             </button>
@@ -73,35 +74,35 @@ const PasswordResetFlow: FC = () => {
         )}
 
         {step === "code" && (
-          <form onSubmit={handleCodeSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <form onSubmit={handleCodeSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("password.reset.code_label")}
               </label>
               <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("password.reset.new_password_label")}
               </label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
                 required
                 minLength={8}
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className={styles.submitButton}
             >
               {t("password.reset.change_password")}
             </button>
@@ -109,19 +110,19 @@ const PasswordResetFlow: FC = () => {
         )}
 
         {step === "success" && (
-          <div className="text-center space-y-5">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className={styles.successContainer}>
+            <div className={styles.successIcon}>
+              <svg className={styles.successIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className={styles.successTitle}>
               {t("password.reset.success_title")}
             </h2>
-            <p className="text-gray-600">{t("password.reset.success_message")}</p>
+            <p className={styles.successMessage}>{t("password.reset.success_message")}</p>
             <a
               href="/login"
-              className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className={styles.successButton}
             >
               {t("password.reset.go_to_login")}
             </a>
@@ -129,14 +130,14 @@ const PasswordResetFlow: FC = () => {
         )}
 
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-red-600 text-sm text-center font-medium">{error}</p>
+          <div className={styles.errorMessage}>
+            <p className={styles.errorText}>{error}</p>
           </div>
         )}
         
         {message && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <p className="text-green-600 text-sm text-center font-medium">{message}</p>
+          <div className={styles.successMessageContainer}>
+            <p className={styles.successMessageText}>{message}</p>
           </div>
         )}
       </div>

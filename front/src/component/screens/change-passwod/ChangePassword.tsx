@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import PasswordResetFlow from "./PasswordResetFlow";
 import PasswordChangeFlow from "./PasswordChangeFlow";
+import styles from "./ChangePassword.module.scss";
 
 const ChangePassword: FC = () => {
   const router = useRouter();
@@ -22,13 +23,13 @@ const ChangePassword: FC = () => {
   }
   
   return (
-    <>
+    <div className={styles.changePassword}>
       {!isAuthenticated ? (
         <PasswordResetFlow />
       ) : (
         <PasswordChangeFlow />
       )}
-    </>
+    </div>
   );
 };
 

@@ -10,6 +10,7 @@ export interface IUser {
   // average_rating?: number;
   avatar?: string;
   is_superuser: boolean;
+  is_verified?: boolean;
   // rating?: number;
   complaints_rental: IComplaint[];
   document_type: "id_card" | "passport_kz" | "visa";

@@ -1,0 +1,406 @@
+.documentVerificationCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.verificationHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.verificationTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.verificationStatus {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid;
+
+  &.verificationStatusVerified {
+    background-color: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+  }
+
+  &.verificationStatusPending {
+    background-color: #fffbeb;
+    color: #d97706;
+    border-color: #fed7aa;
+  }
+}
+
+.verificationStatusIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: currentColor;
+}
+
+.infoSection {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.infoSectionTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  font-size: 0.875rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.infoLabel {
+  color: #6b7280;
+}
+
+.infoValue {
+  color: #111827;
+}
+
+.neuralAnalysisSection {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #eff6ff;
+  border-radius: 0.5rem;
+  border: 1px solid #bfdbfe;
+}
+
+.neuralAnalysisTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e40af;
+  margin-bottom: 0.75rem;
+}
+
+.neuralAnalysisContent {
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+
+.neuralAnalysisDescription {
+  margin-bottom: 0.5rem;
+}
+
+.neuralAnalysisGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.neuralAnalysisItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.neuralAnalysisLabel {
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+.neuralAnalysisValue {
+  color: #1e40af;
+}
+
+.verificationActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.commentSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.commentLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.commentTextarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.verificationButtons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.verificationButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  &.verificationButtonApprove {
+    background-color: #16a34a;
+
+    &:hover:not(:disabled) {
+      background-color: #15803d;
+    }
+  }
+
+  &.verificationButtonReject {
+    background-color: #dc2626;
+
+    &:hover:not(:disabled) {
+      background-color: #b91c1c;
+    }
+  }
+}
+
+.verificationButtonSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 1rem;
+  width: 1rem;
+  border: 2px solid transparent;
+  border-top-color: white;
+  margin-right: 0.5rem;
+}
+
+.verificationButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.verificationCompleted {
+  padding: 1rem;
+  background-color: #f0fdf4;
+  border-radius: 0.5rem;
+  border: 1px solid #bbf7d0;
+}
+
+.verificationCompletedContent {
+  display: flex;
+  align-items: center;
+}
+
+.verificationCompletedIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #4ade80;
+  margin-right: 0.5rem;
+  fill: currentColor;
+}
+
+.verificationCompletedTitle {
+  color: #166534;
+  font-weight: 500;
+}
+
+.verificationCompletedMessage {
+  color: #15803d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .verificationHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .verificationButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .verificationButton {
+    justify-content: center;
+  }
+}
+
+// Focus states for accessibility
+.commentTextarea:focus-visible,
+.verificationButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .documentVerificationCard {
+    border-width: 2px;
+  }
+
+  .infoSection,
+  .neuralAnalysisSection,
+  .verificationCompleted {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .commentTextarea,
+  .verificationButton {
+    transition: none;
+  }
+
+  .verificationButtonSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .documentVerificationCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .verificationTitle {
+    color: #f9fafb;
+  }
+
+  .infoSection {
+    background-color: #4b5563;
+  }
+
+  .infoSectionTitle {
+    color: #f9fafb;
+  }
+
+  .infoLabel {
+    color: #d1d5db;
+  }
+
+  .infoValue {
+    color: #f9fafb;
+  }
+
+  .neuralAnalysisSection {
+    background-color: #1e3a8a;
+    border-color: #3b82f6;
+  }
+
+  .neuralAnalysisTitle {
+    color: #93c5fd;
+  }
+
+  .neuralAnalysisContent {
+    color: #93c5fd;
+  }
+
+  .neuralAnalysisLabel {
+    color: #60a5fa;
+  }
+
+  .neuralAnalysisValue {
+    color: #93c5fd;
+  }
+
+  .commentLabel {
+    color: #e5e7eb;
+  }
+
+  .commentTextarea {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+
+    &:focus {
+      background-color: #374151;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .verificationCompleted {
+    background-color: #064e3b;
+    border-color: #10b981;
+  }
+
+  .verificationCompletedTitle {
+    color: #6ee7b7;
+  }
+
+  .verificationCompletedMessage {
+    color: #86efac;
+  }
+}

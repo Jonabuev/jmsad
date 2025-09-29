@@ -8,6 +8,7 @@ import { fetchComplaintReasons, fetchTenants, fetchLandlords } from "@/api/searc
 import { getVerificationStatus } from "@/api/userApi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/component/store/store";
+import styles from "./SearchPage.module.scss";
 
 interface IComplaintReason {
   id: number;
@@ -183,9 +184,9 @@ const TenantRegistry: React.FC = () => {
   // Показываем загрузку пока проверяем верификацию или восстанавливаем токены
   if (isVerified === null || (!isAuthenticated && localStorage.getItem("access_token"))) {
     return (
-      <div className="max-w-7xl mx-auto p-8 bg-white shadow-lg rounded-2xl mt-8">
-        <div className="flex justify-center items-center h-40">
-          <div className="text-xl text-gray-600 font-medium">{t("loading")}</div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingText}>{t("loading")}</div>
         </div>
       </div>
     );
@@ -197,45 +198,36 @@ const TenantRegistry: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto p-8">
+    <div className={styles.searchPage}>
+      <div className={styles.container}>
         {/* Заголовок с двуязычным названием */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <div className={styles.header}>
+          <h1 className={styles.title}>
             {t("profile.search.title")}
           </h1>
-          
         </div>
 
         {/* Табы */}
-        <div className="flex justify-center space-x-4 mb-8">
+        <div className={styles.tabsContainer}>
           <button
             onClick={() => setActiveTab("tenants")}
-            className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 ${
-              activeTab === "tenants" 
-                ? "bg-blue-600 text-white shadow-lg transform scale-105" 
-                : "bg-white text-gray-700 hover:bg-gray-50 shadow-md border border-gray-200"
-            }`}
+            className={`${styles.tabButton} ${activeTab === "tenants" ? styles.active : ""}`}
           >
             {t("profile.search.tenants")}
           </button>
           <button
             onClick={() => setActiveTab("landlords")}
-            className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 ${
-              activeTab === "landlords" 
-                ? "bg-blue-600 text-white shadow-lg transform scale-105" 
-                : "bg-white text-gray-700 hover:bg-gray-50 shadow-md border border-gray-200"
-            }`}
+            className={`${styles.tabButton} ${activeTab === "landlords" ? styles.active : ""}`}
           >
             {t("profile.search.landlords")}
           </button>
         </div>
         
         {/* Секция поиска и фильтров */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <div className={styles.searchSection}>
+          <div className={styles.searchGrid}>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("profile.search.fullName")}
               </label>
               <input
@@ -243,11 +235,11 @@ const TenantRegistry: React.FC = () => {
                 placeholder={t("profile.search.fullNamePlaceholder")}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("search.iin")}
               </label>
               <input
@@ -255,11 +247,11 @@ const TenantRegistry: React.FC = () => {
                 placeholder={t("profile.search.iinPlaceholder")}
                 value={iin}
                 onChange={(e) => setIin(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("profile.search.address")}
               </label>
               <input
@@ -267,11 +259,11 @@ const TenantRegistry: React.FC = () => {
                 placeholder={t("profile.search.addressPlaceholder")}
                 value={addressQuery}
                 onChange={(e) => setAddressQuery(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("profile.search.courtDecisionNumber")}
               </label>
               <input
@@ -279,75 +271,75 @@ const TenantRegistry: React.FC = () => {
                 placeholder={t("profile.search.courtDecisionPlaceholder")}
                 value={courtScore}
                 onChange={(e) => setCourtScore(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                className={styles.input}
               />
             </div>
           </div>
 
           {/* Диапазон дат */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className={styles.dateGrid}>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("profile.search.from")}
               </label>
-              <div className="relative">
+              <div className={styles.dateInputWrapper}>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                  className={styles.input}
                 />
-                <div className="absolute right-3 top-3 text-gray-400">
+                <div className={styles.dateIcon}>
                   📅
                 </div>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 {t("profile.search.to")}
               </label>
-              <div className="relative">
+              <div className={styles.dateInputWrapper}>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white"
+                  className={styles.input}
                 />
-                <div className="absolute right-3 top-3 text-gray-400">
+                <div className={styles.dateIcon}>
                   📅
                 </div>
               </div>
             </div>
           </div>
           {/* Причины жалоб */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">{t("search.filter_reasons")}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className={styles.reasonsSection}>
+            <h3 className={styles.reasonsTitle}>{t("search.filter_reasons")}</h3>
+            <div className={styles.reasonsGrid}>
               {reasons.map((reason) => (
-                <label key={reason.id} className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 cursor-pointer border border-gray-200">
+                <label key={reason.id} className={styles.reasonLabel}>
                   <input
                     type="checkbox"
                     checked={selectedReasons.includes(reason.id)}
                     onChange={() => toggleReason(reason.id)}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className={styles.checkbox}
                   />
-                  <span className="text-gray-700 font-medium">{getTranslatedReasons(reason.reason)}</span>
+                  <span className={styles.reasonText}>{getTranslatedReasons(reason.reason)}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Кнопки действий */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className={styles.actionsContainer}>
             <button
               onClick={fetchUsers}
-              className="bg-green-600 text-white py-4 px-8 rounded-xl font-semibold hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className={styles.searchButton}
             >
               {t("profile.search.search")}
             </button>
             <Link
               href="/profile/add-complaint"
-              className="bg-blue-600 text-white py-4 px-8 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-center"
+              className={styles.complaintButton}
             >
               {t("profile.search.submitComplaint")}
             </Link>
@@ -359,71 +351,71 @@ const TenantRegistry: React.FC = () => {
 
         {/* Результаты поиска */}
         {users.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <p className="text-gray-500 text-xl">{t("search.noData")}</p>
+          <div className={styles.noDataContainer}>
+            <p className={styles.noDataText}>{t("search.noData")}</p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+          <div className={styles.resultsContainer}>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead className={styles.tableHead}>
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {activeTab === "tenants" ? t("search.tenant") : t("search.tenant")}
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {t("profile.search.iin")}
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {t("profile.search.complaintCount")}
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {t("profile.search.complaintDates")}
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {t("profile.search.courtDecisionNumber")}
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {t("profile.search.complaintReasonsColumn")}
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className={styles.tableHeader}>
                       {t("profile.search.profile")}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className={styles.tableBody}>
                   {users.map((user, index) => (
-                    <tr key={user.identifier} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="text-sm font-medium text-gray-900">{user.username}</div>
+                    <tr key={user.identifier} className={styles.tableRow}>
+                      <td className={styles.tableCell}>
+                        <div className={styles.tableCellFlex}>
+                          <div className={styles.userName}>{user.username}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">
+                      <td className={`${styles.tableCell} ${styles.identifier}`}>
                         {user.identifier}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className={styles.tableCell}>
                         {user.complaint_count ?? 0}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className={styles.tableCell}>
                         {user.complaint_dates && user.complaint_dates.length > 0
                           ? user.complaint_dates
                               .map((date) => new Date(date).toLocaleDateString("ru-RU"))
                               .join(", ")
                           : "-"}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className={styles.tableCell}>
                         {user.court_scores || "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 max-w-xs">
-                        <div className="truncate">
+                      <td className={`${styles.tableCell} ${styles.complaintReasons}`}>
+                        <div className={styles.truncatedText}>
                           {getTranslatedReasons(user.complaint_reasons)}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className={styles.tableCell}>
                         <Link
                           href={`/user/${user.username}`}
-                          className="text-blue-600 hover:text-blue-800 transition-colors duration-200 font-semibold"
+                          className={styles.profileLink}
                         >
                           {t("profile.search.viewProfile")}
                         </Link>
@@ -435,26 +427,26 @@ const TenantRegistry: React.FC = () => {
             </div>
             
             {/* Пагинация */}
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
+            <div className={styles.paginationContainer}>
+              <div className={styles.paginationContent}>
+                <div className={styles.paginationInfo}>
                   {t("profile.search.showingRecords", { count: users.length })}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <div className={styles.paginationButtons}>
+                  <button className={styles.paginationButton}>
                     {t("profile.search.previous")}
                   </button>
-                  <button className="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg">
+                  <button className={`${styles.paginationButton} ${styles.active}`}>
                     1
                   </button>
-                  <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                  <button className={styles.paginationButton}>
                     2
                   </button>
-                  <span className="px-3 py-2 text-sm text-gray-500">...</span>
-                  <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                  <span className={styles.paginationEllipsis}>...</span>
+                  <button className={styles.paginationButton}>
                     10
                   </button>
-                  <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                  <button className={styles.paginationButton}>
                     {t("profile.search.next")}
                   </button>
                 </div>

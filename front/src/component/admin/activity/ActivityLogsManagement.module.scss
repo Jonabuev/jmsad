@@ -1,0 +1,40 @@
+.activityLogsManagement {
+  padding: 1.5rem;
+}
+
+.pageHeader {
+  margin-bottom: 1.5rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pageSubtitle {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .activityLogsManagement {
+    padding: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .pageTitle {
+    color: #f9fafb;
+  }
+
+  .pageSubtitle {
+    color: #d1d5db;
+  }
+}

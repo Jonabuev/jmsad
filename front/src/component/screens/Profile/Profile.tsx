@@ -11,6 +11,7 @@ import AdminComplaintsTable from "./admin-section/AdminSection";
 import UserSection from "./user-section/UserSection";
 import { fetchUserProfile, disputeComplaint } from "@/api/userApi";
 import { clearAllTokens } from "@/utils/tokenUtils";
+import styles from "./Profile.module.scss";
 
 const tabs = [
   { key: "info", label: "profile.info" },
@@ -166,78 +167,78 @@ const Profile: FC = () => {
     }
   }, [showComments, profileData]);
 
-  if (loading) return <div>Загрузка...</div>;
+  if (loading) return <div className={styles.loading}>Загрузка...</div>;
   if (error)
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
+    return <div className={styles.error}>{error}</div>;
   if (!profileData)
-    return <div className="text-center mt-10">Профиль не найден.</div>;
+    return <div className={styles.notFound}>Профиль не найден.</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className={styles.profile}>
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+      <div className={styles.heroSection}>
+        <div className={styles.heroOverlay}></div>
+        <div className={styles.heroContent}>
+          <div className={styles.heroLayout}>
             {/* Profile Info */}
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20">
+            <div className={styles.profileInfo}>
+              <div className={styles.avatarContainer}>
+                <div className={styles.avatar}>
                   <Image
                     src={mediaUrl(profileData.avatar || profileData.user?.avatar || "/media/avatars/def.jpg")}
                     alt="Avatar"
                     width={128}
                     height={128}
-                    className="object-cover w-full h-full"
+                    className={styles.avatarImage}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = mediaUrl("/media/avatars/def.jpg");
                     }}
                   />
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className={styles.statusIndicator}>
+                  <svg className={styles.statusIcon} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
               </div>
-              <div>
-                <h1 className="text-4xl font-bold mb-2">{profileData.user.username}</h1>
-                <div className="flex flex-wrap items-center gap-6 text-blue-100">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <div className={styles.userDetails}>
+                <h1 className={styles.userName}>{profileData.user.username}</h1>
+                <div className={styles.userInfo}>
+                  <div className={styles.infoItem}>
+                    <svg className={styles.infoIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                     <span>{profileData.user.email}</span>
                     {profileData.user.email_confirmed && (
-                      <span className="bg-green-500/20 text-green-200 px-2 py-1 rounded-full text-xs font-medium">
+                      <span className={styles.confirmedBadge}>
                         ✓ {t("profile.confirmed")}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoItem}>
+                    <svg className={styles.infoIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                     </svg>
                     <span>{profileData.phone_number || t("profile.noPhone")}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={styles.infoItem}>
+                    <svg className={styles.infoIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
                     </svg>
                     <span>{profileData.user.identifier || t("profile.noIIN")}</span>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 mt-3">
+                <div className={styles.userBadges}>
                   {profileData.user.is_superuser && (
-                    <div className="inline-flex items-center gap-2 bg-yellow-500/20 text-yellow-200 px-3 py-1 rounded-full text-sm font-medium">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <div className={`${styles.badge} ${styles.adminBadge}`}>
+                      <svg className={styles.badgeIcon} fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                       </svg>
                       {t("profile.administrator")}
                     </div>
                   )}
-                  <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <div className={`${styles.badge} ${styles.roleBadge}`}>
+                    <svg className={styles.badgeIcon} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                     {profileData.user.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}

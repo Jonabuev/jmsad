@@ -1,0 +1,199 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16rem;
+}
+
+.loadingContent {
+  text-align: center;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin: 0 auto 1rem;
+}
+
+.loadingText {
+  color: #6b7280;
+}
+
+.errorContainer {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.errorContent {
+  display: flex;
+  align-items: center;
+}
+
+.errorIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #f87171;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.errorText {
+  color: #991b1b;
+}
+
+.welcomeSection {
+  background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: white;
+}
+
+.welcomeContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcomeText {
+  flex: 1;
+}
+
+.welcomeTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.welcomeSubtitle {
+  color: #bfdbfe;
+  font-size: 1.125rem;
+}
+
+.welcomeIcon {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+.welcomeIconContainer {
+  width: 5rem;
+  height: 5rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcomeIconSvg {
+  width: 2.5rem;
+  height: 2.5rem;
+  fill: currentColor;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.recentActivityColumn {
+  @media (min-width: 1024px) {
+    grid-column: span 2;
+  }
+}
+
+.quickActionsColumn {
+  @media (min-width: 1024px) {
+    grid-column: span 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .welcomeTitle {
+    font-size: 1.5rem;
+  }
+
+  .welcomeSubtitle {
+    font-size: 1rem;
+  }
+
+  .welcomeSection {
+    padding: 1rem;
+  }
+}
+
+// Focus states for accessibility
+.loadingContainer:focus-visible,
+.errorContainer:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .errorContainer {
+    border-width: 2px;
+  }
+
+  .welcomeSection {
+    border: 2px solid #1d4ed8;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .loadingSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .loadingText {
+    color: #d1d5db;
+  }
+
+  .errorContainer {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+  }
+
+  .errorText {
+    color: #fca5a5;
+  }
+
+  .welcomeSection {
+    background: linear-gradient(90deg, #1e3a8a 0%, #3730a3 100%);
+  }
+
+  .welcomeSubtitle {
+    color: #93c5fd;
+  }
+}

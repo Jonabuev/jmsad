@@ -1,0 +1,381 @@
+.complaintPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (min-width: 640px) {
+    padding: 0 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 2rem;
+  }
+}
+
+.loadingContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContent {
+  text-align: center;
+}
+
+.loadingSpinner {
+  position: relative;
+  margin: 0 auto 1rem;
+}
+
+.loadingSpinnerOuter {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 4rem;
+  width: 4rem;
+  border: 4px solid #dbeafe;
+  margin: 0 auto;
+}
+
+.loadingSpinnerInner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 4rem;
+  width: 4rem;
+  border: 4px solid #3b82f6;
+  border-top-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.loadingText {
+  font-size: 1.125rem;
+  color: #6b7280;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.notFoundContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notFoundContent {
+  text-align: center;
+}
+
+.notFoundEmoji {
+  font-size: 3.75rem;
+  margin-bottom: 1rem;
+}
+
+.notFoundTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.notFoundDescription {
+  color: #6b7280;
+}
+
+.headerSection {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.headerTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.statusBadgePending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.statusBadgeReviewed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.statusBadgeRejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.statusDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.statusDotPending {
+  background-color: #f59e0b;
+}
+
+.statusDotReviewed {
+  background-color: #10b981;
+}
+
+.statusDotRejected {
+  background-color: #ef4444;
+}
+
+.createdDate {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.actionsSection {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.userActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px;
+  }
+}
+
+.editButton {
+  color: #2563eb;
+  background-color: #dbeafe;
+
+  &:hover {
+    background-color: #bfdbfe;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+}
+
+.disputeButton {
+  color: #dc2626;
+  background-color: #fee2e2;
+
+  &:hover {
+    background-color: #fecaca;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px #ef4444;
+  }
+}
+
+.actionButtonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.adminActions {
+  width: 100%;
+
+  @media (min-width: 640px) {
+    width: auto;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .headerSection {
+    padding: 1.5rem;
+  }
+
+  .headerTitle {
+    font-size: 1.5rem;
+  }
+
+  .headerMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .actionsContainer {
+    align-items: stretch;
+  }
+
+  .userActions {
+    width: 100%;
+  }
+
+  .actionButton {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+// Focus states for accessibility
+.actionButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .headerSection {
+    border: 2px solid #374151;
+  }
+
+  .statusBadge {
+    border: 2px solid currentColor;
+  }
+
+  .actionButton {
+    border: 2px solid currentColor;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .actionButton,
+  .loadingSpinnerOuter,
+  .loadingSpinnerInner {
+    transition: none;
+    animation: none;
+  }
+
+  .actionButton:hover {
+    transform: none;
+  }
+
+  .loadingText {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .complaintPage {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  }
+
+  .headerSection {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+
+  .headerTitle {
+    color: #f9fafb;
+  }
+
+  .createdDate {
+    color: #d1d5db;
+  }
+
+  .notFoundTitle {
+    color: #f9fafb;
+  }
+
+  .notFoundDescription {
+    color: #d1d5db;
+  }
+}

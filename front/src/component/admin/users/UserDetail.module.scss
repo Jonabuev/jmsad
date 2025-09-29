@@ -1,0 +1,444 @@
+.userDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16rem;
+}
+
+.loadingContent {
+  text-align: center;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin: 0 auto 1rem;
+}
+
+.loadingText {
+  color: #6b7280;
+}
+
+.errorContainer {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.errorContent {
+  display: flex;
+  align-items: center;
+}
+
+.errorIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #f87171;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.errorText {
+  color: #991b1b;
+}
+
+.notFoundContainer {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.notFoundTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.notFoundMessage {
+  color: #6b7280;
+}
+
+.headerCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #374151;
+  }
+}
+
+.backLinkIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+.badgesContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.roleBadge {
+  &.roleBadgeTenant {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.roleBadgeLandlord {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &.roleBadgeAdmin {
+    background-color: #e9d5ff;
+    color: #7c3aed;
+  }
+
+  &.roleBadgeDefault {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+}
+
+.statusBadge {
+  &.statusBadgeBanned {
+    background-color: #fecaca;
+    color: #991b1b;
+  }
+
+  &.statusBadgeActive {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+}
+
+.badgeIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.25rem;
+  fill: currentColor;
+}
+
+.userInfoCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.userInfoContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.userAvatar {
+  flex-shrink: 0;
+}
+
+.userAvatarImage {
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userAvatarPlaceholder {
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userAvatarIcon {
+  height: 2.5rem;
+  width: 2.5rem;
+  color: #9ca3af;
+  fill: currentColor;
+}
+
+.userDetails {
+  flex: 1;
+}
+
+.userName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.userEmail {
+  color: #6b7280;
+}
+
+.userInfoGrid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.userInfoItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.userInfoLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.userInfoValue {
+  font-size: 0.875rem;
+  color: #111827;
+
+  &.userInfoValueGreen {
+    color: #16a34a;
+  }
+
+  &.userInfoValueRed {
+    color: #dc2626;
+  }
+}
+
+.actionsCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.actionsTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  &.actionButtonUnban {
+    background-color: #16a34a;
+
+    &:hover:not(:disabled) {
+      background-color: #15803d;
+    }
+  }
+
+  &.actionButtonBan {
+    background-color: #dc2626;
+
+    &:hover:not(:disabled) {
+      background-color: #b91c1c;
+    }
+  }
+
+  &.actionButtonRemoveAdmin {
+    background-color: #d97706;
+
+    &:hover:not(:disabled) {
+      background-color: #b45309;
+    }
+  }
+
+  &.actionButtonMakeAdmin {
+    background-color: #7c3aed;
+
+    &:hover:not(:disabled) {
+      background-color: #6d28d9;
+    }
+  }
+}
+
+.actionButtonSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 1rem;
+  width: 1rem;
+  border: 2px solid transparent;
+  border-top-color: white;
+  margin-right: 0.5rem;
+}
+
+.actionButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  fill: none;
+  stroke: currentColor;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .userInfoContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .badgesContainer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .actionsContainer {
+    flex-direction: column;
+  }
+}
+
+// Focus states for accessibility
+.backLink:focus-visible,
+.actionButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .headerCard,
+  .userInfoCard,
+  .actionsCard {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .backLink,
+  .actionButton {
+    transition: none;
+  }
+
+  .actionButtonSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support (if needed in future)
+@media (prefers-color-scheme: dark) {
+  .headerCard,
+  .userInfoCard,
+  .actionsCard {
+    background-color: #374151;
+    border-color: #6b7280;
+  }
+
+  .userName,
+  .actionsTitle {
+    color: #f9fafb;
+  }
+
+  .userEmail,
+  .userInfoLabel {
+    color: #d1d5db;
+  }
+
+  .userInfoValue {
+    color: #f9fafb;
+  }
+
+  .userAvatarPlaceholder {
+    background-color: #4b5563;
+  }
+
+  .userAvatarIcon {
+    color: #6b7280;
+  }
+
+  .backLink {
+    color: #d1d5db;
+
+    &:hover {
+      color: #f9fafb;
+    }
+  }
+}
