@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
+import styles from './ComplaintReasonTable.module.scss';
 
 interface ComplaintReason {
   id: number;
@@ -31,10 +32,10 @@ const ComplaintReasonTable: React.FC<ComplaintReasonTableProps> = ({ reasons, lo
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('admin.settings.complaintReasons.loading')}</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>{t('admin.settings.complaintReasons.loading')}</p>
         </div>
       </div>
     );
@@ -42,97 +43,97 @@ const ComplaintReasonTable: React.FC<ComplaintReasonTableProps> = ({ reasons, lo
 
   if (reasons.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-8 text-center">
-          <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={styles.emptyContainer}>
+        <div className={styles.emptyContent}>
+          <svg className={styles.emptyIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('admin.settings.complaintReasons.no_reasons')}</h3>
-          <p className="text-gray-600">{t('admin.settings.complaintReasons.no_reasons_description')}</p>
+          <h3 className={styles.emptyTitle}>{t('admin.settings.complaintReasons.no_reasons')}</h3>
+          <p className={styles.emptyDescription}>{t('admin.settings.complaintReasons.no_reasons_description')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+    <div className={styles.tableCard}>
+      <div className={styles.tableContainer}>
+        <table className={styles.table}>
+          <thead className={styles.tableHead}>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.complaintReasons.reason')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 🇰🇿 KZ
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 🇺🇸 EN
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.complaintReasons.type')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.complaintReasons.is_default')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.complaintReasons.order')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.complaintReasons.actions')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className={styles.tableBody}>
             {reasons.map((reason) => (
-              <tr key={reason.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+              <tr key={reason.id} className={styles.tableRow}>
+                <td className={`${styles.tableCell} ${styles.tableCellReason}`}>
+                  <div className={styles.reasonText}>
                     {reason.reason}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className={styles.tableCell}>
                   {reason.reason_kz ? (
-                    <span className="text-green-600">✅</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckPresent}`}>✅</span>
                   ) : (
-                    <span className="text-red-400">❌</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckMissing}`}>❌</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className={styles.tableCell}>
                   {reason.reason_en ? (
-                    <span className="text-green-600">✅</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckPresent}`}>✅</span>
                   ) : (
-                    <span className="text-red-400">❌</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckMissing}`}>❌</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    reason.type === 'tenant' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                <td className={styles.tableCell}>
+                  <span className={`${styles.badge} ${
+                    reason.type === 'tenant' ? styles.badgeTenant : styles.badgeLandlord
                   }`}>
                     {getTypeLabel(reason.type)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    reason.is_default ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                <td className={styles.tableCell}>
+                  <span className={`${styles.badge} ${
+                    reason.is_default ? styles.badgeDefault : styles.badgeCustom
                   }`}>
                     {reason.is_default ? t('admin.settings.complaintReasons.default') : t('admin.settings.complaintReasons.custom')}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {reason.order}
+                <td className={styles.tableCell}>
+                  <span className={styles.orderText}>{reason.order}</span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex space-x-2">
+                <td className={styles.tableCell}>
+                  <div className={styles.actionsContainer}>
                     <Link
                       href={`/admin/settings/complaint-reasons/${reason.id}`}
-                      className="text-blue-600 hover:text-blue-900"
+                      className={styles.editLink}
                     >
                       {t('admin.settings.complaintReasons.edit')}
                     </Link>
                     <button
                       onClick={() => onDelete(reason.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className={styles.deleteButton}
                     >
                       {t('admin.settings.complaintReasons.delete')}
                     </button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
+import styles from './FAQTable.module.scss';
 
 interface FAQ {
   id: number;
@@ -50,10 +51,10 @@ const FAQTable: React.FC<FAQTableProps> = ({ faqs, loading, onDelete }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('admin.settings.faq.loading')}</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>{t('admin.settings.faq.loading')}</p>
         </div>
       </div>
     );
@@ -61,103 +62,101 @@ const FAQTable: React.FC<FAQTableProps> = ({ faqs, loading, onDelete }) => {
 
   if (faqs.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-8 text-center">
-          <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={styles.emptyContainer}>
+        <div className={styles.emptyContent}>
+          <svg className={styles.emptyIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('admin.settings.faq.no_faq')}</h3>
-          <p className="text-gray-600">{t('admin.settings.faq.no_faq_description')}</p>
+          <h3 className={styles.emptyTitle}>{t('admin.settings.faq.no_faq')}</h3>
+          <p className={styles.emptyDescription}>{t('admin.settings.faq.no_faq_description')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+    <div className={styles.tableCard}>
+      <div className={styles.tableContainer}>
+        <table className={styles.table}>
+          <thead className={styles.tableHead}>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.faq.question')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 🇰🇿 KZ
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 🇺🇸 EN
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.faq.category')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.faq.user_type')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.faq.is_active')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.faq.order')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={styles.tableHeader}>
                 {t('admin.settings.faq.actions')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className={styles.tableBody}>
             {faqs.map((faq) => (
-              <tr key={faq.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+              <tr key={faq.id} className={styles.tableRow}>
+                <td className={`${styles.tableCell} ${styles.tableCellQuestion}`}>
+                  <div className={styles.questionText}>
                     {faq.question_ru}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className={styles.tableCell}>
                   {faq.question_kz ? (
-                    <span className="text-green-600">✅</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckPresent}`}>✅</span>
                   ) : (
-                    <span className="text-red-400">❌</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckMissing}`}>❌</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className={styles.tableCell}>
                   {faq.question_en ? (
-                    <span className="text-green-600">✅</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckPresent}`}>✅</span>
                   ) : (
-                    <span className="text-red-400">❌</span>
+                    <span className={`${styles.languageCheck} ${styles.languageCheckMissing}`}>❌</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                <td className={styles.tableCell}>
+                  <span className={`${styles.badge} ${styles.badgeCategory}`}>
                     {getCategoryLabel(faq.category)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                <td className={styles.tableCell}>
+                  <span className={`${styles.badge} ${styles.badgeUserType}`}>
                     {getUserTypeLabel(faq.user_type)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    faq.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                <td className={styles.tableCell}>
+                  <span className={`${styles.badge} ${faq.is_active ? styles.badgeActive : styles.badgeInactive}`}>
                     {faq.is_active ? t('admin.settings.faq.active') : t('admin.settings.faq.inactive')}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {faq.order}
+                <td className={styles.tableCell}>
+                  <span className={styles.orderText}>{faq.order}</span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex space-x-2">
+                <td className={styles.tableCell}>
+                  <div className={styles.actionsContainer}>
                     <Link
                       href={`/admin/settings/faq/${faq.id}`}
-                      className="text-blue-600 hover:text-blue-900"
+                      className={styles.editLink}
                     >
                       {t('admin.settings.faq.edit')}
                     </Link>
                     <button
                       onClick={() => onDelete(faq.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className={styles.deleteButton}
                     >
                       {t('admin.settings.faq.delete')}
                     </button>

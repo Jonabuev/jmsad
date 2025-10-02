@@ -48,14 +48,22 @@
 
 .sidebar {
   position: fixed;
-  inset-y: 0;
+  top: 4rem; // Высота мобильного хедера (64px)
+  bottom: 0;
   left: 0;
-  z-index: 30;
+  z-index: 40;
   width: 16rem;
   background-color: white;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @media (min-width: 640px) {
+    top: 5rem; // Высота десктоп хедера (80px)
+  }
 
   @media (min-width: 1024px) {
     transform: translateX(0);
@@ -67,12 +75,14 @@
 }
 
 .sidebarHeader {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 4rem;
+  height: 3.5rem;
   padding: 0 1rem;
   background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebarTitle {
@@ -82,7 +92,35 @@
 }
 
 .navigation {
-  margin-top: 2rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  min-height: 0; // Важно для корректной работы flex и scroll
+
+  // Стилизация скроллбара
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+
+  // Для Firefox
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f3f4f6;
 }
 
 .navigationList {
@@ -124,11 +162,11 @@
 }
 
 .userInfo {
-  position: absolute;
-  bottom: 0;
+  flex-shrink: 0;
   width: 100%;
   padding: 1rem;
   border-top: 1px solid #e5e7eb;
+  background-color: white;
 }
 
 .userInfoContent {

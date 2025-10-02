@@ -6,6 +6,7 @@ import ComplaintReasonTable from './ComplaintReasonTable';
 import { getComplaintReasons, deleteComplaintReason } from '@/api/adminApi';
 import { useAdminNotifications } from '@/component/hooks/useAdminNotifications';
 import ComplaintReasonFiltersComponent from './ComplaintReasonFilters';
+import styles from './ComplaintReasonsManagement.module.scss';
 
 interface ComplaintReason {
   id: number;
@@ -61,22 +62,22 @@ const ComplaintReasonsManagement: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+    <div className={styles.complaintReasonsManagement}>
+      <div className={styles.pageHeader}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerInfo}>
+            <h1 className={styles.pageTitle}>
               {t('admin.settings.complaintReasons.title')}
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className={styles.pageSubtitle}>
               {t('admin.settings.complaintReasons.subtitle')}
             </p>
           </div>
           <Link
             href="/admin/settings/complaint-reasons/create"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+            className={styles.createButton}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={styles.createButtonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             <span>{t('admin.settings.complaintReasons.create')}</span>

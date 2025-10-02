@@ -1,0 +1,55 @@
+.adminComplaintsPage {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  @media (min-width: 640px) {
+    padding: 2rem 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem 2rem;
+  }
+}
+
+.pageHeader {
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pageSubtitle {
+  margin-top: 0.5rem;
+  color: #6b7280;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .adminComplaintsPage {
+    background-color: #1f2937;
+  }
+
+  .pageTitle {
+    color: #f9fafb;
+  }
+
+  .pageSubtitle {
+    color: #d1d5db;
+  }
+}

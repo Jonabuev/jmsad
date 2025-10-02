@@ -5,6 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import AdminLayout from "@/component/admin/AdminLayout";
 import axios from "axios";
 import { apiUrl } from "@/utils/url";
+import styles from "./PDFCheckPage.module.scss";
 
 interface Candidate {
   fio: string;
@@ -102,32 +103,32 @@ const PDFCheckPage: FC = () => {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-4">PDF Check</h1>
+      <div className={styles.pdfCheckPage}>
+        <h1 className={styles.pageTitle}>PDF Check</h1>
 
         {/* выбор PDF */}
         <input
           type="file"
           accept="application/pdf"
           onChange={handleFileChange}
-          className="border p-2 mb-4"
+          className={styles.fileInput}
         />
         <button
           onClick={handleUpload}
           disabled={!file || loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className={styles.uploadButton}
         >
           {loading ? "Uploading..." : "Upload & Check"}
         </button>
 
-        {error && <p className="text-red-600 mt-4">{error}</p>}
-        {success && <p className="text-green-600 mt-4">{success}</p>}
+        {error && <p className={styles.errorMessage}>{error}</p>}
+        {success && <p className={styles.successMessage}>{success}</p>}
 
         {/* список кандидатов */}
         {candidates.length > 0 && (
-          <div className="mt-6">
-            <h2 className="font-semibold mb-2">Найденные кандидаты:</h2>
-            <ul className="space-y-2">
+          <div className={styles.candidatesSection}>
+            <h2 className={styles.candidatesTitle}>Найденные кандидаты:</h2>
+            <ul className={styles.candidatesList}>
               {candidates.map((c, index) => (
                 <div
                   key={index}
@@ -135,12 +136,12 @@ const PDFCheckPage: FC = () => {
                     setSelected(c);
                     setCourtNumber(c.court_decision_score || "");
                   }}
-                  className={`cursor-pointer p-3 border rounded-lg mb-2 ${
-                    selected?.fio === c.fio ? "bg-blue-100 border-blue-500" : "bg-white"
+                  className={`${styles.candidateCard} ${
+                    selected?.fio === c.fio ? styles.candidateCardSelected : ""
                   }`}
                 >
-                  <div className="text-lg font-semibold">{c.fio}</div>
-                  <div className="text-sm text-gray-600">{c.after}</div>
+                  <div className={styles.candidateName}>{c.fio}</div>
+                  <div className={styles.candidateDescription}>{c.after}</div>
                 </div>
               ))}
             </ul>
@@ -149,22 +150,22 @@ const PDFCheckPage: FC = () => {
 
         {/* форма жалобы */}
         {selected && (
-          <div className="mt-6 bg-gray-50 p-4 rounded shadow">
-            <h2 className="font-semibold mb-2">Создать жалобу для: {selected.fio}</h2>
+          <div className={styles.complaintForm}>
+            <h2 className={styles.formTitle}>Создать жалобу для: {selected.fio}</h2>
 
             <input
               type="text"
               placeholder="Номер дела"
               value={courtNumber}
               onChange={(e) => setCourtNumber(e.target.value)}
-              className="w-full border p-2 mb-2"
+              className={styles.formInput}
             />
             
             <textarea
               placeholder="Описание жалобы"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border p-2 mb-2"
+              className={styles.formTextarea}
             />
 
             <input
@@ -174,12 +175,12 @@ const PDFCheckPage: FC = () => {
               onChange={(e) =>
                 setSelected(selected ? { ...selected, birth_date: e.target.value } : null)
               }
-              className="w-full border p-2 mb-2"
+              className={styles.formInput}
             />
 
             <button
               onClick={handleSubmit}
-              className="bg-green-600 text-white px-4 py-2 rounded"
+              className={styles.submitButton}
             >
               Отправить жалобу
             </button>

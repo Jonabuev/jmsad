@@ -1,0 +1,95 @@
+.complaintReasonsManagement {
+  padding: 1.5rem;
+}
+
+.pageHeader {
+  margin-bottom: 1.5rem;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pageSubtitle {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #16a34a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #15803d;
+  }
+}
+
+.createButtonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .complaintReasonsManagement {
+    padding: 1rem;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .createButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// Focus states for accessibility
+.createButton:focus-visible {
+  outline: 2px solid #16a34a;
+  outline-offset: 2px;
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .createButton {
+    transition: none;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .complaintReasonsManagement {
+    background-color: #1f2937;
+  }
+
+  .pageTitle {
+    color: #f9fafb;
+  }
+
+  .pageSubtitle {
+    color: #d1d5db;
+  }
+}

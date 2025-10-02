@@ -1,0 +1,302 @@
+.loadingContainer {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.loadingContent {
+  padding: 2rem;
+  text-align: center;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #2563eb;
+  margin: 0 auto;
+}
+
+.loadingText {
+  margin-top: 1rem;
+  color: #6b7280;
+}
+
+.emptyContainer {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emptyContent {
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 4rem;
+  height: 4rem;
+  color: #9ca3af;
+  margin: 0 auto 1rem;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.emptyDescription {
+  color: #6b7280;
+}
+
+.tableCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tableHead {
+  background-color: #f9fafb;
+}
+
+.tableHeader {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tableBody {
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tableRow {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.tableCell {
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+
+  &.tableCellQuestion {
+    max-width: 24rem;
+  }
+}
+
+.questionText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+  max-width: 24rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.languageCheck {
+  &.languageCheckPresent {
+    color: #16a34a;
+  }
+
+  &.languageCheckMissing {
+    color: #f87171;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+
+  &.badgeCategory {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.badgeUserType {
+    background-color: #e9d5ff;
+    color: #7c3aed;
+  }
+
+  &.badgeActive {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &.badgeInactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.orderText {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.actionsContainer {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editLink {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #1e40af;
+  }
+}
+
+.deleteButton {
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #991b1b;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .tableHeader,
+  .tableCell {
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .questionText {
+    max-width: 12rem;
+  }
+}
+
+// Focus states for accessibility
+.editLink:focus-visible,
+.deleteButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .tableCard {
+    border: 1px solid #d1d5db;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .tableRow,
+  .editLink,
+  .deleteButton {
+    transition: none;
+  }
+
+  .loadingSpinner {
+    animation: none;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .loadingContainer,
+  .emptyContainer,
+  .tableCard {
+    background-color: #374151;
+  }
+
+  .loadingText,
+  .emptyDescription {
+    color: #d1d5db;
+  }
+
+  .emptyTitle {
+    color: #f9fafb;
+  }
+
+  .emptyIcon {
+    color: #6b7280;
+  }
+
+  .tableHead {
+    background-color: #4b5563;
+  }
+
+  .tableHeader {
+    color: #d1d5db;
+  }
+
+  .tableBody {
+    background-color: #374151;
+    border-top-color: #6b7280;
+  }
+
+  .tableRow {
+    border-bottom-color: #6b7280;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+  }
+
+  .questionText,
+  .orderText {
+    color: #f9fafb;
+  }
+
+  .editLink {
+    color: #60a5fa;
+
+    &:hover {
+      color: #93c5fd;
+    }
+  }
+
+  .deleteButton {
+    color: #f87171;
+
+    &:hover {
+      color: #fca5a5;
+    }
+  }
+}

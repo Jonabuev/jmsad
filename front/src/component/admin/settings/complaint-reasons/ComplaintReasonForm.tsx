@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { createComplaintReason, updateComplaintReason, getComplaintReasons } from '@/api/adminApi';
 import { useAdminNotifications } from '@/component/hooks/useAdminNotifications';
+import styles from './ComplaintReasonForm.module.scss';
 
 interface ComplaintReasonFormProps {
   isEdit?: boolean;
@@ -99,138 +100,132 @@ const ComplaintReasonForm: React.FC<ComplaintReasonFormProps> = ({ isEdit = fals
 
   if (loading && isEdit) {
     return (
-      <div className="p-6">
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className={styles.complaintReasonForm}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+    <div className={styles.complaintReasonForm}>
+      <div className={styles.pageHeader}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerInfo}>
+            <h1 className={styles.pageTitle}>
               {isEdit ? t('admin.settings.complaintReasons.edit') : t('admin.settings.complaintReasons.create')}
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className={styles.pageSubtitle}>
               {isEdit ? t('admin.settings.complaintReasons.edit_subtitle') : t('admin.settings.complaintReasons.create_subtitle')}
             </p>
           </div>
           <Link
             href="/admin/settings/complaint-reasons"
-            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            className={styles.backButton}
           >
             {t('admin.settings.complaintReasons.back_to_list')}
           </Link>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.formGrid}>
           {/* Russian (Required) */}
-          <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className={`${styles.languageSection} ${styles.languageSectionFull}`}>
+            <h3 className={styles.languageHeader}>
               🇷🇺 {t('admin.settings.complaintReasons.russian')} *
             </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  reason *
-                </label>
-                <textarea
-                  value={formData.reason}
-                  onChange={(e) => handleInputChange('reason', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={3}
-                  required
-                />
-              </div>
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>
+                reason *
+              </label>
+              <textarea
+                value={formData.reason}
+                onChange={(e) => handleInputChange('reason', e.target.value)}
+                className={styles.formTextarea}
+                rows={3}
+                required
+              />
             </div>
           </div>
 
           {/* Kazakh */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className={styles.languageSection}>
+            <h3 className={styles.languageHeader}>
               🇰🇿 {t('admin.settings.complaintReasons.kazakh')}
             </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  reason_kz
-                </label>
-                <textarea
-                  value={formData.reason_kz}
-                  onChange={(e) => handleInputChange('reason_kz', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={3}
-                />
-              </div>
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>
+                reason_kz
+              </label>
+              <textarea
+                value={formData.reason_kz}
+                onChange={(e) => handleInputChange('reason_kz', e.target.value)}
+                className={styles.formTextarea}
+                rows={3}
+              />
             </div>
           </div>
 
           {/* English */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className={styles.languageSection}>
+            <h3 className={styles.languageHeader}>
               🇺🇸 {t('admin.settings.complaintReasons.english')}
             </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  reason_en
-                </label>
-                <textarea
-                  value={formData.reason_en}
-                  onChange={(e) => handleInputChange('reason_en', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={3}
-                />
-              </div>
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>
+                reason_en
+              </label>
+              <textarea
+                value={formData.reason_en}
+                onChange={(e) => handleInputChange('reason_en', e.target.value)}
+                className={styles.formTextarea}
+                rows={3}
+              />
             </div>
           </div>
 
           {/* Settings */}
-          <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className={styles.settingsSection}>
+            <h3 className={styles.settingsHeader}>
               {t('admin.settings.complaintReasons.settings')}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className={styles.settingsGrid}>
+              <div className={styles.settingsField}>
+                <label className={styles.settingsLabel}>
                   {t('admin.settings.complaintReasons.type')}
                 </label>
                 <select
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={styles.settingsSelect}
                 >
                   <option value="tenant">{t('admin.settings.complaintReasons.type_tenant')}</option>
                   <option value="landlord">{t('admin.settings.complaintReasons.type_landlord')}</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className={styles.settingsField}>
+                <label className={styles.settingsLabel}>
                   {t('admin.settings.complaintReasons.order')}
                 </label>
                 <input
                   type="number"
                   value={formData.order}
                   onChange={(e) => handleInputChange('order', Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={styles.settingsInput}
                   min="0"
                 />
               </div>
-              <div>
-                <label className="flex items-center mt-6">
+              <div className={styles.settingsField}>
+                <label className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
                     checked={formData.is_default}
                     onChange={(e) => handleInputChange('is_default', e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className={styles.checkbox}
                   />
-                  <span className="ml-2 text-sm text-gray-700">
+                  <span className={styles.checkboxText}>
                     {t('admin.settings.complaintReasons.is_default')}
                   </span>
                 </label>
@@ -239,17 +234,17 @@ const ComplaintReasonForm: React.FC<ComplaintReasonFormProps> = ({ isEdit = fals
           </div>
         </div>
 
-        <div className="mt-8 flex justify-end space-x-4">
+        <div className={styles.formActions}>
           <Link
             href="/admin/settings/complaint-reasons"
-            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            className={styles.cancelButton}
           >
             {t('admin.settings.complaintReasons.cancel')}
           </Link>
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={styles.submitButton}
           >
             {loading ? (isEdit ? t('admin.settings.complaintReasons.updating') : t('admin.settings.complaintReasons.creating')) : (isEdit ? t('admin.settings.complaintReasons.update') : t('admin.settings.complaintReasons.create'))}
           </button>

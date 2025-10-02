@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import styles from './FAQFilters.module.scss';
 
 interface FAQFilters {
   category?: string;
@@ -66,49 +67,49 @@ const FAQFilters: React.FC<FAQFiltersProps> = ({
   const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
   return (
-    <div className="mb-6">
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <FunnelIcon className="w-5 h-5 text-gray-500" />
-            <h3 className="text-lg font-medium text-gray-900">
+    <div className={styles.filtersContainer}>
+      <div className={styles.filtersCard}>
+        <div className={styles.filtersHeader}>
+          <div className={styles.filtersHeaderContent}>
+            <FunnelIcon className={styles.filtersIcon} />
+            <h3 className={styles.filtersTitle}>
               {t('admin.settings.faq.filters.title')}
             </h3>
           </div>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className={styles.toggleButton}
           >
             {isExpanded ? t('admin.settings.faq.filters.hide') : t('admin.settings.faq.filters.show')}
           </button>
         </div>
 
         {/* Поиск */}
-        <div className="mb-4">
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div className={styles.searchSection}>
+          <div className={styles.searchContainer}>
+            <MagnifyingGlassIcon className={styles.searchIcon} />
             <input
               type="text"
               placeholder={t('admin.settings.faq.filters.search_placeholder')}
               value={filters.search || ''}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={styles.searchInput}
             />
           </div>
         </div>
 
         {/* Расширенные фильтры */}
         {isExpanded && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className={styles.advancedFilters}>
             {/* Категория */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>
                 {t('admin.settings.faq.category')}
               </label>
               <select
                 value={filters.category || ''}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={styles.filterSelect}
               >
                 {categoryOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -119,14 +120,14 @@ const FAQFilters: React.FC<FAQFiltersProps> = ({
             </div>
 
             {/* Тип пользователя */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>
                 {t('admin.settings.faq.user_type')}
               </label>
               <select
                 value={filters.user_type || ''}
                 onChange={(e) => handleFilterChange('user_type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={styles.filterSelect}
               >
                 {userTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -137,14 +138,14 @@ const FAQFilters: React.FC<FAQFiltersProps> = ({
             </div>
 
             {/* Статус */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>
                 {t('admin.settings.faq.is_active')}
               </label>
               <select
                 value={filters.is_active || ''}
                 onChange={(e) => handleFilterChange('is_active', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={styles.filterSelect}
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -157,18 +158,18 @@ const FAQFilters: React.FC<FAQFiltersProps> = ({
         )}
 
         {/* Кнопки действий */}
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
+        <div className={styles.actionsContainer}>
+          <div className={styles.actionsButtons}>
             <button
               onClick={handleApplyFilters}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className={styles.applyButton}
             >
               {t('admin.settings.faq.filters.apply')}
             </button>
             {hasActiveFilters && (
               <button
                 onClick={handleClearFilters}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                className={styles.clearButton}
               >
                 {t('admin.settings.faq.filters.clear')}
               </button>
@@ -178,8 +179,8 @@ const FAQFilters: React.FC<FAQFiltersProps> = ({
 
         {/* Активные фильтры */}
         {hasActiveFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex flex-wrap gap-2">
+          <div className={styles.activeFiltersSection}>
+            <div className={styles.activeFiltersList}>
               {Object.entries(filters).map(([key, value]) => {
                 if (!value) return null;
 
@@ -207,14 +208,14 @@ const FAQFilters: React.FC<FAQFiltersProps> = ({
                 return (
                   <span
                     key={key}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                    className={styles.activeFilterBadge}
                   >
                     {label}
                     <button
                       onClick={() => handleFilterChange(key as keyof FAQFilters, '')}
-                      className="ml-2 text-blue-600 hover:text-blue-800"
+                      className={styles.removeFilterButton}
                     >
-                      <XMarkIcon className="w-3 h-3" />
+                      <XMarkIcon className={styles.removeFilterIcon} />
                     </button>
                   </span>
                 );
