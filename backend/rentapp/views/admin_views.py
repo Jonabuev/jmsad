@@ -35,7 +35,19 @@ class AdminUserListView(generics.ListAPIView):
     pagination_class = AdminUserPagination
 
     def get_queryset(self):
-        queryset = CustomUser.objects.all().order_by('-date_joined')
+        # ✅ Оптимизация: используем select_related и prefetch_related для избежания N+1 запросов
+        queryset = CustomUser.objects.select_related(
+            'identity_verification'
+        ).prefetch_related(
+            'filed_rental_complaints',
+            'received_rental_complaints',
+            'house_set',
+            'notifications'
+        ).annotate(
+            complaints_filed_count=Count('filed_rental_complaints', distinct=True),
+            complaints_received_count=Count('received_rental_complaints', distinct=True),
+            properties_count=Count('house_set', distinct=True)
+        ).order_by('-date_joined')
         
         # Поиск по имени, email или ИИН
         search = self.request.query_params.get('search', None)

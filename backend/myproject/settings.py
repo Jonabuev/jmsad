@@ -77,6 +77,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',  # ✅ Сжатие ответов (добавлено для оптимизации)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,8 +86,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    
 ]
 
 # CORS/CSRF для прод-доменов и разработки
@@ -184,6 +183,45 @@ DATABASES = {
     }
 }
 
+
+# Cache configuration
+# https://docs.djangoproject.com/en/4.2/ref/settings/#caches
+CACHES = {
+    'default': {
+        # Для разработки используем простой кэш в памяти
+        # Для продакшена рекомендуется Redis (см. комментарий ниже)
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,  # 5 минут
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
+# Для продакшена раскомментируйте и используйте Redis:
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#             'SOCKET_CONNECT_TIMEOUT': 5,
+#             'SOCKET_TIMEOUT': 5,
+#             'CONNECTION_POOL_KWARGS': {
+#                 'max_connections': 50,
+#                 'retry_on_timeout': True
+#             },
+#             'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+#             'PARSER_CLASS': 'django_redis.parsers.json.JSONParser',
+#         },
+#         'KEY_PREFIX': 'jmsad',
+#         'TIMEOUT': 300,
+#     }
+# }
+
+# Для продакшена также нужно установить:
+# pip install django-redis redis
 
 
 # Password validation

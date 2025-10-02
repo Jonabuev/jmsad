@@ -9,5 +9,5 @@ export const login = (username: string, password: string) =>
 export const fetchProfileWithToken = (token: string) =>
   api.get("/profile/", { headers: { Authorization: `Bearer ${token}` } });
 
-export const register = (formData: any) =>
+export const register = (formData: FormData) =>
   api.post("/register/", formData); 

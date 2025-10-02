@@ -4,7 +4,7 @@ import api from "@/service/api";
 export const fetchComplaints = () => api.get("/complaints/");
 
 // Добавить жалобу
-export const addComplaint = (data: any) => api.post("/complaints/", data);
+export const addComplaint = (data: FormData | Record<string, unknown>) => api.post("/complaints/", data);
 
 // Получить жалобу по id
 export const fetchComplaintById = (id: string | number) => api.get(`/complaints/${id}/`);

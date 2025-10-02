@@ -409,6 +409,26 @@ class CustomUser(AbstractUser):
         if not self.anonymous_name:
             self.anonymous_name = self.generate_anonymous_name()
         
+        # ✅ Оптимизация: автоматически сжимаем аватар при загрузке
+        if self.avatar and hasattr(self.avatar, 'file'):
+            try:
+                # Проверяем, был ли аватар изменен
+                if self.pk:
+                    try:
+                        original = CustomUser.objects.get(pk=self.pk)
+                        if original.avatar != self.avatar:
+                            from rentapp.utils.image_optimization import optimize_avatar
+                            self.avatar = optimize_avatar(self.avatar)
+                    except CustomUser.DoesNotExist:
+                        pass
+                else:
+                    # Новый пользователь
+                    from rentapp.utils.image_optimization import optimize_avatar
+                    self.avatar = optimize_avatar(self.avatar)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Не удалось оптимизировать аватар: {e}")
+        
         super().save(*args, **kwargs)    
     
     def get_avatar_url(self):
@@ -1110,6 +1130,17 @@ def complaint_image_upload_path(instance, filename):
 class ComplaintImage(models.Model):
     complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=complaint_image_upload_path)
+    
+    def save(self, *args, **kwargs):
+        # ✅ Оптимизация: автоматически сжимаем изображение перед сохранением
+        if self.image and not self.pk:  # Только при первом сохранении
+            try:
+                from rentapp.utils.image_optimization import optimize_complaint_image
+                self.image = optimize_complaint_image(self.image)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Ошибка оптимизации изображения: {e}")
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Изображение для жалобы {self.complaint.id}"

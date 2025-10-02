@@ -31,7 +31,13 @@ export const verifyUserDocument = (id: number, approved: boolean, comment?: stri
   api.post(`/admin/users/${id}/verify-document/`, { approved, comment });
 
 // Settings management
-export const getFAQ = (params?: any) => api.get("/admin/settings/faq/", { params });
+export const getFAQ = (params?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  category?: string;
+  is_active?: boolean;
+}) => api.get("/admin/settings/faq/", { params });
 
 export const createFAQ = (data: {
   question_ru: string;
@@ -47,7 +53,13 @@ export const updateFAQ = (id: number, data: {
 
 export const deleteFAQ = (id: number) => api.delete(`/admin/settings/faq/${id}/`);
 
-export const getComplaintReasons = (params?: any) => api.get("/admin/settings/complaint-reasons/", { params });
+export const getComplaintReasons = (params?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  type?: string;
+  is_default?: boolean;
+}) => api.get("/admin/settings/complaint-reasons/", { params });
 
 export const createComplaintReason = (data: {
   reason: string;
@@ -85,7 +97,7 @@ export const getRecentActivity = (limit: number = 5) =>
 // System settings
 export const getSystemSettings = () => api.get("/admin/settings/system/");
 
-export const updateSystemSettings = (data: any) => api.put("/admin/settings/system/", data);
+export const updateSystemSettings = (data: Record<string, unknown>) => api.put("/admin/settings/system/", data);
 
 // ==================== COMPLAINT MANAGEMENT ====================
 

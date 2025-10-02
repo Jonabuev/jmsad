@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -15,10 +15,9 @@ import NotificationsFilters from './components/NotificationsFilters';
 import NotificationsStats from './components/NotificationsStats';
 import NotificationsList from './components/NotificationsList';
 import styles from './NotificationsPage.module.scss';
+import { logger } from '../../../utils/logger';
 
-interface NotificationsPageProps {}
-
-const NotificationsPage: React.FC<NotificationsPageProps> = () => {
+const NotificationsPage: React.FC = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -42,8 +41,8 @@ const NotificationsPage: React.FC<NotificationsPageProps> = () => {
     search: '',
   });
 
-  // Загрузка уведомлений
-  const fetchNotifications = async (pageNum: number = 1, reset: boolean = false) => {
+  // ✅ Оптимизация: мемоизация функции загрузки
+  const fetchNotifications = useCallback(async (pageNum: number = 1, reset: boolean = false) => {
     try {
       setLoading(true);
       setError(null);
@@ -72,13 +71,14 @@ const NotificationsPage: React.FC<NotificationsPageProps> = () => {
       setTotalCount(data.count);
       setPage(pageNum);
       
-    } catch (error: any) {
-      console.error('Ошибка загрузки уведомлений:', error);
-      setError(error.message || 'Ошибка загрузки уведомлений');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка загрузки уведомлений';
+      logger.error('Ошибка загрузки уведомлений:', error);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   // Загрузка при монтировании
   useEffect(() => {
@@ -92,7 +92,7 @@ const NotificationsPage: React.FC<NotificationsPageProps> = () => {
     if (isAuthenticated) {
       fetchNotifications(1, true);
     }
-  }, [filters, isAuthenticated]);
+  }, [filters, isAuthenticated, fetchNotifications]);
 
   // Проверка аутентификации
   useEffect(() => {
@@ -101,23 +101,23 @@ const NotificationsPage: React.FC<NotificationsPageProps> = () => {
     }
   }, [isAuthenticated, router]);
 
-  // Обработчик обновления уведомления
-  const handleNotificationUpdate = () => {
+  // ✅ Оптимизация: мемоизация обработчиков
+  const handleNotificationUpdate = useCallback(() => {
     fetchNotifications(page, true);
-  };
+  }, [fetchNotifications, page]);
 
   // Отметить все как прочитанные
-  const handleMarkAllAsRead = async () => {
+  const handleMarkAllAsRead = useCallback(async () => {
     try {
       await markAllNotificationsAsRead();
       handleNotificationUpdate();
     } catch (error) {
-      console.error('Ошибка при отметке всех уведомлений как прочитанных:', error);
+      logger.error('Ошибка при отметке всех уведомлений как прочитанных:', error);
     }
-  };
+  }, [handleNotificationUpdate]);
 
   // Массовое удаление
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = useCallback(async () => {
     if (selectedNotifications.length === 0) return;
     
     try {
@@ -125,28 +125,28 @@ const NotificationsPage: React.FC<NotificationsPageProps> = () => {
       setSelectedNotifications([]);
       handleNotificationUpdate();
     } catch (error) {
-      console.error('Ошибка при массовом удалении:', error);
+      logger.error('Ошибка при массовом удалении:', error);
     }
-  };
+  }, [selectedNotifications, handleNotificationUpdate]);
 
   // Переключение выбора уведомления
-  const toggleNotificationSelection = (id: number) => {
+  const toggleNotificationSelection = useCallback((id: number) => {
     setSelectedNotifications(prev => 
       prev.includes(id) 
         ? prev.filter(nId => nId !== id)
         : [...prev, id]
     );
-  };
+  }, []);
 
   // Выбрать все
-  const selectAll = () => {
+  const selectAll = useCallback(() => {
     setSelectedNotifications(notifications.map(n => n.id));
-  };
+  }, [notifications]);
 
   // Снять выбор со всех
-  const deselectAll = () => {
+  const deselectAll = useCallback(() => {
     setSelectedNotifications([]);
-  };
+  }, []);
 
   if (!isAuthenticated) {
     return null;

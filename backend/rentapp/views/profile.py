@@ -45,26 +45,46 @@ def profile(request):
         # average_rating = user.objects.aggregate(Avg('rating'))['rating__avg']
         # print(f"Average user rating: {average_rating}")
 
+        # ✅ Оптимизация: используем select_related и prefetch_related
         # Жалобы
-        complaint_send = RentalComplaint.objects.filter(complainant=user)
-        complaint_received = RentalComplaint.objects.filter(accused=user)
+        complaint_send = RentalComplaint.objects.select_related(
+            'complainant', 'accused', 'moderated_by'
+        ).prefetch_related('reasons', 'images').filter(complainant=user)
+        
+        complaint_received = RentalComplaint.objects.select_related(
+            'complainant', 'accused', 'moderated_by'
+        ).prefetch_related('reasons', 'images').filter(accused=user)
 
         # Дома (только если арендодатель)
-        houses = House.objects.filter(owner=user) if user.role == "landlord" else []
-        rentals_all = Rental.objects.all()
+        houses = House.objects.select_related('owner').prefetch_related(
+            'rental_set__tenant'
+        ).filter(owner=user) if user.role == "landlord" else []
+        
+        # ✅ Оптимизация: избегаем загрузки всех аренд без необходимости
+        rentals_all = Rental.objects.select_related(
+            'house__owner', 'tenant'
+        ).all()[:100]  # Ограничиваем количество для производительности
 
         # Аренды (только если арендатор)
-        rentals = Rental.objects.filter(tenant=user) if user.role == "tenant" else []
+        rentals = Rental.objects.select_related(
+            'house__owner', 'tenant'
+        ).filter(tenant=user) if user.role == "tenant" else []
 
-        # Жалобы по арендам (раньше rental__..., теперь по complainant / accused)
+        # Жалобы по арендам
         rental_complaints = (
-            RentalComplaint.objects.filter(complainant=user)
+            RentalComplaint.objects.select_related(
+                'complainant', 'accused', 'moderated_by'
+            ).prefetch_related('reasons', 'images').filter(complainant=user)
             if user.role == "tenant"
-            else RentalComplaint.objects.filter(accused=user.identifier)
+            else RentalComplaint.objects.select_related(
+                'complainant', 'accused', 'moderated_by'
+            ).prefetch_related('reasons', 'images').filter(accused=user.identifier)
         )
 
         # Админские жалобы
-        admin_complaints = RentalComplaint.objects.filter(status='pending')
+        admin_complaints = RentalComplaint.objects.select_related(
+            'complainant', 'accused', 'moderated_by'
+        ).prefetch_related('reasons', 'images').filter(status='pending')
 
         
         

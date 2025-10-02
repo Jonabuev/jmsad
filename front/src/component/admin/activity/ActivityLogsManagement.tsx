@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { getActivityLogs } from '@/api/adminApi';
 import ActivityFilters from './ActivityFilters';
 import ActivityLogsTable from './ActivityLogsTable';
 import { useAdminNotifications } from '@/component/hooks/useAdminNotifications';
+import { logger } from '@/utils/logger';
 import styles from './ActivityLogsManagement.module.scss';
 
 interface ActivityLog {
@@ -17,7 +18,7 @@ interface ActivityLog {
   target_object_type: string | null;
   target_object_id: number | null;
   ip_address: string | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -52,7 +53,7 @@ const ActivityLogsManagement: React.FC = () => {
     ordering: '-created_at'
   });
 
-  const fetchLogs = async (page = 1) => {
+  const fetchLogs = useCallback(async (page = 1) => {
     try {
       setLoading(true);
       const params = {
@@ -71,16 +72,16 @@ const ActivityLogsManagement: React.FC = () => {
         page_size: pagination.page_size
       });
     } catch (error) {
-      console.error('Error fetching activity logs:', error);
+      logger.error('Error fetching activity logs:', error);
       addNotification('error', t('admin.activity.error_loading'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.page_size, addNotification, t]);
 
   useEffect(() => {
     fetchLogs();
-  }, [filters]);
+  }, [fetchLogs]);
 
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));

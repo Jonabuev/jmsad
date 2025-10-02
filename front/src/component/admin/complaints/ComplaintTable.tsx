@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { moderateComplaint } from '@/api/adminApi';
 import { useAdminNotifications } from '@/component/hooks/useAdminNotifications';
+import { logger } from '@/utils/logger';
 
 interface Complaint {
   id: number;
@@ -106,8 +107,8 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
         'success',
         `Жалоба ${action === 'approve' ? 'одобрена' : 'отклонена'}`
       );
-    } catch (error: any) {
-      console.error('Error moderating complaint:', error);
+    } catch (error: unknown) {
+      logger.error('Error moderating complaint:', error);
       addNotification('error', 'Ошибка при модерации жалобы');
     } finally {
       setModeratingComplaint(null);

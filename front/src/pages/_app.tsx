@@ -11,6 +11,8 @@ import Footer from "@/component/footer/Footer";
 import { checkAndCleanExpiredTokens, getValidAccessToken } from "@/utils/tokenUtils";
 import { useTokenValidation } from "@/component/hooks/useTokenValidation";
 import { useAutoRefreshToken } from "@/component/hooks/useAutoRefreshToken";
+import { reportWebVitals } from "@/utils/webVitals";
+import { logger } from "@/utils/logger";
 // Push-уведомления инициализируются через PushNotificationPrompt
 import Head from "next/head";
 
@@ -27,6 +29,9 @@ const AppContent = (props: AppProps) => {
     // Проверяем, что мы на клиенте
     if (typeof window === 'undefined') return;
 
+    // ✅ Инициализируем мониторинг производительности
+    reportWebVitals();
+
     const initializeAuth = async () => {
       try {
         // Проверяем и очищаем истекшие токены при загрузке приложения
@@ -34,16 +39,16 @@ const AppContent = (props: AppProps) => {
         
         const token = getValidAccessToken();
         if (token) {
-          console.log('Valid token found, restoring user profile...');
+          logger.log('Valid token found, restoring user profile...');
           await dispatch(fetchUserProfile());
           
           // Push-уведомления будут инициализированы через PushNotificationPrompt
           // когда пользователь явно даст разрешение
         } else {
-          console.log('No valid token found');
+          logger.log('No valid token found');
         }
       } catch (error) {
-        console.error('Error during auth initialization:', error);
+        logger.error('Error during auth initialization:', error);
       }
     };
 

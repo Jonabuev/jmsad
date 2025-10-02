@@ -4,11 +4,17 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import RentalDatePicker from "./rental-date/RentalDatePicker";
 import LoadingIndicator from "./loading/LoadingIndicator";
-import RentalMap from "./rental-map/RentalMap";
 import { useState, useEffect } from "react";
 import { IHouse } from "@/component/type/properties.interface";
 import { apiUrl, mediaUrl } from "@/utils/url";
 import styles from "./RentalCatalog.module.scss";
+import dynamic from "next/dynamic";
+
+// ✅ Оптимизация: Yandex Map загружается динамически (уменьшает начальный бандл)
+const RentalMap = dynamic(() => import("./rental-map/RentalMap"), {
+  ssr: false,
+  loading: () => <div className={styles.mapLoading}>Загрузка карты...</div>,
+});
 
 export default function RentalCatalog() {
   const { t } = useTranslation();

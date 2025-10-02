@@ -13,7 +13,7 @@ interface ActivityLog {
   target_object_type: string | null;
   target_object_id: number | null;
   ip_address: string | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 

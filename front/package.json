@@ -33,7 +33,9 @@
     "react-pdf": "^10.0.1",
     "react-redux": "^9.2.0",
     "react-simple-star-rating": "^5.1.7",
+    "sass": "^1.93.2",
     "swr": "^2.3.6",
+    "web-vitals": "^4.2.4",
     "ymaps": "^0.2.1"
   },
   "devDependencies": {

@@ -273,7 +273,17 @@ def update_complaint(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_complaint_by_uuid(request, uuid):
     try:
-        complaint = RentalComplaint.objects.get(uuid=uuid)
+        # ✅ Оптимизация: загружаем связанные объекты за один запрос
+        complaint = RentalComplaint.objects.select_related(
+            'complainant',
+            'accused',
+            'moderated_by'
+        ).prefetch_related(
+            'reasons',
+            'images',
+            'comments__user',
+            'complaintdispute_set'
+        ).get(uuid=uuid)
     except RentalComplaint.DoesNotExist:
         return Response({"error": "Жалоба не найдена"}, status=404)
 

@@ -33,7 +33,15 @@ class NotificationListView(generics.ListAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        queryset = Notification.objects.filter(user=self.request.user)
+        # ✅ Оптимизация: загружаем связанные объекты заранее
+        queryset = Notification.objects.select_related(
+            'user',
+            'related_complaint__complainant',
+            'related_complaint__accused',
+            'related_rental__house',
+            'related_rental__tenant',
+            'related_house__owner'
+        ).filter(user=self.request.user)
         
         # Фильтр по дате (последние 30 дней по умолчанию)
         days = self.request.query_params.get('days', 30)
@@ -83,18 +91,39 @@ class NotificationMarkAsReadView(generics.UpdateAPIView):
 class NotificationMarkAllAsReadView(APIView):
     """
     Отметить все уведомления как прочитанные
+    ✅ Оптимизировано с bulk_update для лучшей производительности
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        updated_count = Notification.objects.filter(
+        # ✅ Оптимизация: используем bulk_update вместо update() для больших объемов
+        notifications = list(Notification.objects.filter(
             user=request.user, 
             is_read=False
-        ).update(is_read=True, read_at=timezone.now())
+        ).only('id', 'is_read', 'read_at'))
+        
+        if not notifications:
+            return Response({
+                'message': 'Нет непрочитанных уведомлений',
+                'updated_count': 0
+            })
+        
+        # Обновляем в памяти
+        now = timezone.now()
+        for notification in notifications:
+            notification.is_read = True
+            notification.read_at = now
+        
+        # Массовое обновление (быстрее чем update() на больших объемах)
+        Notification.objects.bulk_update(
+            notifications, 
+            ['is_read', 'read_at'], 
+            batch_size=100  # Обрабатываем по 100 записей за раз
+        )
         
         return Response({
-            'message': f'Отмечено как прочитанные {updated_count} уведомлений',
-            'updated_count': updated_count
+            'message': f'Отмечено как прочитанные {len(notifications)} уведомлений',
+            'updated_count': len(notifications)
         })
 
 

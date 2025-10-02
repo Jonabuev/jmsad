@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from "react";
-import { useTranslation } from "next-i18next";
 import styles from "./AdminNotification.module.scss";
 
 interface NotificationProps {
@@ -15,7 +14,6 @@ const AdminNotification: FC<NotificationProps> = ({
   onClose, 
   duration = 5000 
 }) => {
-  const { t } = useTranslation("common");
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
