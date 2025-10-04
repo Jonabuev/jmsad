@@ -136,22 +136,23 @@ def extract_birth_date(text: str):
         "september": 9, "october": 10, "november": 11, "december": 12,
     }
 
-    context_words = r"(туған|туылған|туғаны|туғанда|года рождения|родился|уроженец|born)"
+    context_words = r"(туған|туылған|туғаны|туғанда|года\s+рождения|родился|родилась|уроженец|уроженка|born)"
 
-    # Паттерн для числовых дат после дефиса или пробела
+    # Паттерн 1: Числовой формат DD.MM.YYYY (казахский или русский)
     pattern_num = re.compile(
-        r"[-\s]+(\d{1,2})[.\-](\d{1,2})[.\-](\d{4})\s*жылы?.{0,50}?"+context_words,
+        r"(\d{1,2})[.\-](\d{1,2})[.\-](\d{4})\s*(?:жылы)?\s*.{0,50}?" + context_words,
         flags=re.IGNORECASE | re.DOTALL
     )
 
-    # Паттерн для словесных дат (казахский или русский месяц)
+    # Паттерн 2: Словесный формат День Месяц Год (русский или казахский)
     pattern_word = re.compile(
-        r"(\d{1,2})\s*([А-Яа-яёӘәІіҢңҒғҮүҰұҚқӨөҺһa-z]+)\s*(\d{4})\s*жылы?.{0,50}?"+context_words,
+        r"(\d{1,2})\s*([А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z]+)\s*(\d{4})\s*(?:жылы)?\s*.{0,50}?" + context_words,
         flags=re.IGNORECASE | re.DOTALL
     )
 
+    # Паттерн 3: Год жылы День Месяцде (казахский)
     pattern_year_first = re.compile(
-        r"(\d{4})\s*жылы\s*(\d{1,2})\s*([А-Яа-яёӘәІіҢңҒғҮүҰұҚқӨөҺһa-z]+)де?.{0,50}?"+context_words,
+        r"(\d{4})\s*жылы\s*(\d{1,2})\s*([А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z]+)де?\s*.{0,50}?" + context_words,
         flags=re.IGNORECASE | re.DOTALL
     )
 
@@ -176,7 +177,6 @@ def extract_birth_date(text: str):
                     return f"{int(day):02d}.{month:02d}.{year}"
 
     return None
-
 
 def extract_text_from_pdf(pdf_file) -> str:
     text = ""
