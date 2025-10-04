@@ -12,6 +12,7 @@ interface Candidate {
   birth_date: string;
   court_decision_score?: string;
   after: string;
+  before: string;
 }
 
 const PDFCheckPage: FC = () => {
@@ -60,6 +61,7 @@ const PDFCheckPage: FC = () => {
           ? response.data.main_accused.map((a: any) => ({
               fio: a.fio,
               after: a.after,
+              before: a.before,
               birth_date: response.data.birth_date,
               court_decision_score: Array.isArray(response.data.case_numbers)
                 ? response.data.case_numbers[0]?.replace(/^№\s?/, "")
@@ -140,6 +142,7 @@ const PDFCheckPage: FC = () => {
                     selected?.fio === c.fio ? styles.candidateCardSelected : ""
                   }`}
                 >
+                  <div className={styles.candidateDescription}>{c.before}</div>
                   <div className={styles.candidateName}>{c.fio}</div>
                   <div className={styles.candidateDescription}>{c.after}</div>
                 </div>

@@ -78,16 +78,8 @@ def extract_main_accused(text: str):
         r"ҮКІМ\s*ЕТТІ",
         r"CONVICTED"
     ]
-    pattern = r"(?:{})(?::|-)?\s*(.*)".format("|".join(keywords))
-    match = re.search(pattern, text, flags=re.IGNORECASE | re.DOTALL)
-    if not match:
-        return None
-
-    after_text = match.group(1)
-    words = after_text.split()
 
     fio_pattern = re.compile(r"^[А-ЯЁA-ZӘІҢҒҮҰҚӨҺ][а-яёa-zәіңғүұқөһ]+$")
-
     patronymic_endings = (
         "вич", "вна", "ович", "евич", "ична",
         "улы", "ұлы", "қызы",
@@ -99,18 +91,26 @@ def extract_main_accused(text: str):
 
     found_fios = []
 
-    for i in range(len(words) - 2):
-        w1, w2, w3 = words[i:i+3]
-        if fio_pattern.match(w1) and fio_pattern.match(w2) and fio_pattern.match(w3):
-            if any(w3.lower().endswith(end) for end in extended_endings):
-                before = " ".join(words[max(i-3, 0):i])
-                after = " ".join(words[i+3:i+8])
-                fio = normalize_fio(f"{w1} {w2} {w3}")
-                found_fios.append({
-                    "fio": fio,
-                    "before": before,
-                    "after": after
-                })
+    for kw in keywords:
+        kw_pattern = re.compile(kw, flags=re.IGNORECASE)
+        for match in kw_pattern.finditer(text):
+            start_pos = match.start()
+            # Берём кусок текста после keyword
+            after_text = text[start_pos + len(match.group()):]
+            words = after_text.split()
+            for i in range(len(words) - 2):
+                w1, w2, w3 = words[i:i+3]
+                if fio_pattern.match(w1) and fio_pattern.match(w2) and fio_pattern.match(w3):
+                    if any(w3.lower().endswith(end) for end in extended_endings):
+                        before = match.group()  # сам keyword
+                        after = " ".join(words[i+3:i+15])
+                        fio = normalize_fio(f"{w1} {w2} {w3}")
+                        found_fios.append({
+                            "fio": fio,
+                            "before": before,
+                            "after": after
+                        })
+                        break  # берём только первый ФИО после keyword
 
     # Уникальные ФИО
     unique = []
