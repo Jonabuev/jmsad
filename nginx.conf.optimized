@@ -79,7 +79,7 @@ server {
     # МЕДИА ФАЙЛЫ (Backend)
     # ========================================
     location /media/ {
-   	 alias /home/ubuntu/Jmsad/backend/media/;
+   	    alias /app/backend/media/;
         
         # ✅ Кэширование изображений на 30 дней
         expires 30d;
@@ -101,7 +101,7 @@ server {
     # СТАТИЧЕСКИЕ ФАЙЛЫ Django (Backend)
     # ========================================
     location /static/ {
-	alias /home/ubuntu/Jmsad/backend/staticfiles/;
+	    alias /app/backend/staticfiles/;
         
         # ✅ Кэширование на 1 год
         expires 1y;
