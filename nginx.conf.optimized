@@ -79,7 +79,7 @@ server {
     # МЕДИА ФАЙЛЫ (Backend)
     # ========================================
     location /media/ {
-        alias /app/backend/media/;
+   	 alias /home/ubuntu/Jmsad/backend/media/;
         
         # ✅ Кэширование изображений на 30 дней
         expires 30d;
@@ -101,7 +101,7 @@ server {
     # СТАТИЧЕСКИЕ ФАЙЛЫ Django (Backend)
     # ========================================
     location /static/ {
-        alias /app/backend/staticfiles/;
+	alias /home/ubuntu/Jmsad/backend/staticfiles/;
         
         # ✅ Кэширование на 1 год
         expires 1y;
@@ -146,7 +146,7 @@ server {
     # ========================================
     # ADMIN ПАНЕЛЬ Django
     # ========================================
-    location /admin/ {
+    location /django-admin/ {
         proxy_pass http://backend;
         proxy_http_version 1.1;
         
