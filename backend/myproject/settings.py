@@ -40,6 +40,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Hosts, включая боевые домены
 ALLOWED_HOSTS = [
+    "dev.arno.kz",
     'arno.kz',
     'www.arno.kz',
     'api.arno.kz',
