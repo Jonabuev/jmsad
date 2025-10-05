@@ -23,7 +23,7 @@ services:
 
   # Бэкенд Django
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: jmsad_backend_vps
@@ -52,20 +52,26 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - backend_static:/app/staticfiles
-      - backend_media:/app/media
+      - ./backend/staticfiles:/app/staticfiles
+      - ./backend/media:/app/media
     restart: unless-stopped
     networks:
       - jmsad-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
 
   # Фронтенд Next.js
   frontend:
-    build: 
+    build:
       context: ./front
       dockerfile: Dockerfile
     container_name: jmsad_frontend_vps
