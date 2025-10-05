@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   output: 'standalone', // Включаем standalone режим для Docker
   images: {
     remotePatterns: [
+      // Локальные адреса для разработки
       {
         protocol: 'http',
         hostname: '127.0.0.1',
@@ -34,6 +35,19 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: 'backend',
         port: '8000',
+        pathname: '/**',
+      },
+      // Продакшн адреса
+      {
+        protocol: 'https',
+        hostname: 'api.arno.kz',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'api.arno.kz',
+        port: '',
         pathname: '/**',
       },
     ],
