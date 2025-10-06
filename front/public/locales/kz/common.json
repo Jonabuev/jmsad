@@ -33,7 +33,8 @@
     "register": "Тіркелу",
     "catalog": "Каталог",
     "login": "Кіру",
-    "language": "Тіл"
+    "language": "Тіл",
+    "admin": "Әкімші панелі"
   },
   "profile": {
     "generalInfo": "Жалпы ақпарат",

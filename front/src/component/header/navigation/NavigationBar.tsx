@@ -79,28 +79,19 @@ const NavigationBar: React.FC = () => {
             )}
           </Link>
         )}
-        <Link
-          className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
-            router.pathname === "/rental-catalog" ? "text-blue-600" : ""
-          }`}
-          href="/rental-catalog"
-        >
-          {t("navigation.catalog")}
-          {router.pathname === "/rental-catalog" && (
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
-          )}
-        </Link>
-        <Link
-          className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
-            router.pathname === "/analiticsML" ? "text-blue-600" : ""
-          }`}
-          href="/analiticsML"
-        >
-          {t("navigation.analytics")}
-          {router.pathname === "/analiticsML" && (
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
-          )}
-        </Link>
+        {isAuthenticated && user?.user.is_superuser && (
+          <Link 
+            className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
+              router.pathname.startsWith("/admin") ? "text-blue-600" : ""
+            }`} 
+            href="/admin"
+          >
+            {t("navigation.admin")}
+            {router.pathname.startsWith("/admin") && (
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
+            )}
+          </Link>
+        )}
       </div>
 
       <div className="flex gap-2 lg:gap-4 items-center relative">

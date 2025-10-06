@@ -33,7 +33,8 @@
     "register": "Регистрация",
     "login": "Войти",
     "language": "Язык",
-    "catalog": "Каталог"
+    "catalog": "Каталог",
+    "admin": "Админ-панель"
   },
   "profile": {
     "generalInfo": "Общая информация",

@@ -33,7 +33,8 @@
     "register": "Register",
     "catalog": "Catalog",
     "login": "Login",
-    "language": "Language"
+    "language": "Language",
+    "admin": "Admin Panel"
   },
   "profile": {
     "generalInfo": "General Information",

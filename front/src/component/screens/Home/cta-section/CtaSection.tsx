@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { FC } from "react";
 import { useTranslation } from "next-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "@/component/store/store";
 import styles from "./CtaSection.module.scss";
 
 const CtaSection: FC = () => {
   const { t } = useTranslation();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  // Если пользователь авторизован, не показываем секцию
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <section
