@@ -12,6 +12,9 @@ test/*
 test/Scripts/*
 !test/Scripts/myproject/
 
+backend/rentapp/migrations/*
+!backend/rentapp/migrations/__init__.py
+
 # ❌ Игнорируем виртуальное окружение
 test/Lib/
 test/Include/
@@ -28,6 +31,7 @@ test/Scripts/activate.bat
 
 # 🔒 Настройки окружения
 .env
+env.vps
 
 # 💻 IDE и ОС файлы
 .vscode/
