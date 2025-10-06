@@ -57,3 +57,5 @@ front/src/component/header/navigation/NavigationBar.tsx.save
 nginx.conf.save
 front/src/utils/url.ts.save
 nginx.conf
+backend/rentapp/migrations/0009_customuser_birth_date_customuser_is_from_pdf.py
+/backend/rentapp/migrations
