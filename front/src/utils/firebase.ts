@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { FCMToken } from '@/types/notifications';
+import { getCookie } from './cookieUtils';
 
 // Конфигурация Firebase
 const firebaseConfig = {
@@ -65,7 +66,7 @@ export const getFCMToken = async (): Promise<string | null> => {
     
     if (permission === 'granted') {
       // Проверяем, что пользователь аутентифицирован
-      const accessToken = localStorage.getItem('access_token');
+      const accessToken = getCookie('access_token');
       if (!accessToken) {
         console.warn('Пользователь не аутентифицирован, пропускаем получение FCM токена');
         return null;
@@ -100,7 +101,7 @@ export const registerFCMToken = async (token: string, deviceType: string = 'web'
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${getCookie('access_token')}`
       },
       body: JSON.stringify({
         token,
@@ -137,7 +138,7 @@ export const unregisterFCMToken = async (token: string): Promise<boolean> => {
     const response = await fetch(`/api/fcm/unregister/${token}/`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${getCookie('access_token')}`
       }
     });
 
@@ -239,7 +240,7 @@ export const initializePushNotifications = async (): Promise<boolean> => {
 
   try {
     // Проверяем, что пользователь аутентифицирован
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = getCookie('access_token');
     if (!accessToken) {
       console.warn('Пользователь не аутентифицирован, пропускаем инициализацию push уведомлений');
       return false;
@@ -281,7 +282,7 @@ export const sendTestPushNotification = async (): Promise<boolean> => {
     const response = await fetch('/api/fcm/test/', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${getCookie('access_token')}`
       }
     });
 

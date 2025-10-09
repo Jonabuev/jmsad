@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IProfile } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
 import { fetchUserProfile, verifyIdentity } from "@/api/userApi";
+import { getCookie } from "@/utils/cookieUtils";
 import styles from "./VerifyIdentityForm.module.scss";
 
 const VerifyIdentityForm: React.FC = () => {
@@ -23,7 +24,7 @@ const VerifyIdentityForm: React.FC = () => {
       // Проверяем, что мы на клиенте
       if (typeof window === 'undefined') return;
 
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       if (!token) return;
       try {
         const response = await fetchUserProfile();

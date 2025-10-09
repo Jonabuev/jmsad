@@ -32,6 +32,15 @@ test/Scripts/activate.bat
 
 # 🔒 Настройки окружения
 .env
+.env.local
+.env.production.local
+.env.development.local
+backend/.env
+backend/.env.local
+backend/.env.production
+front/.env
+front/.env.local
+front/.env.production
 env.vps
 
 # 💻 IDE и ОС файлы
@@ -51,10 +60,47 @@ Thumbs.db
 *.swp
 
 # === Local/Temp configs ===
+# Файлы с реальными секретами (никогда не коммитить!)
 env.vps
+.env.vps
 front/.env.production
 front/.env.production.save
-front/src/component/header/navigation/NavigationBar.tsx.save
+
+# Временные и backup файлы
+*.save
 nginx.conf.save
+front/src/component/header/navigation/NavigationBar.tsx.save
 front/src/utils/url.ts.save
+
+# Конфигурация nginx с реальными доменами (опционально)
 nginx.conf
+
+# 🔐 ДОПОЛНИТЕЛЬНАЯ БЕЗОПАСНОСТЬ
+# Секреты и ключи шифрования
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+private_key.json
+service-account.json
+FIELD_ENCRYPTION_KEY
+
+# Резервные копии БД
+backups/
+*.sql
+*.sql.gz
+*.sql.enc
+*.sql.gz.enc
+*.dump
+
+# Логи безопасности
+backend/logs/security.log
+backend/logs/audit.log
+
+# SSL сертификаты
+certbot/
+*.crt
+*.cer
+*.der
+*.csr

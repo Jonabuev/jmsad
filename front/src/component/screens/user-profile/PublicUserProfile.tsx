@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IComplaint, IHouse, IPublicProfileData, IRental } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/component/store/store";
 import { useApi } from "@/component/hooks/useApi";
@@ -62,7 +63,7 @@ const PublicUserProfile: FC = () => {
       // перед отправкой загружаем актуальные комментарии
       const resCheck = await fetch(apiUrl(`/comments/?target_user=${profileData.username}`), {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+          Authorization: `Bearer ${getCookie("access_token") || ""}`,
         },
       });
 
@@ -79,7 +80,7 @@ const PublicUserProfile: FC = () => {
       }
 
       // теперь можно постить
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
 
       const res = await fetch(apiUrl(`/comments/`), {
         method: "POST",
@@ -145,7 +146,7 @@ const PublicUserProfile: FC = () => {
         const res = await fetch(apiUrl(`/user/profile/${username}/`), {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+            Authorization: `Bearer ${getCookie("access_token") || ""}`,
           },
         });
 

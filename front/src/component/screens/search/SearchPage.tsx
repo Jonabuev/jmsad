@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MyComponent } from "@/component/star/Star";
 import { ITenant } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import { fetchComplaintReasons, fetchTenants, fetchLandlords } from "@/api/searchApi";
 import { getVerificationStatus } from "@/api/userApi";
 import { useSelector } from "react-redux";
@@ -36,7 +37,7 @@ const TenantRegistry: React.FC = () => {
   // Функция для проверки статуса верификации
   const checkVerificationStatus = async () => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       if (!token) {
         router.push("/login");
         return;
@@ -67,7 +68,7 @@ const TenantRegistry: React.FC = () => {
   useEffect(() => {
     // Добавляем задержку для восстановления токенов при перезагрузке
     const timeoutId = setTimeout(() => {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       
       if (token && !verificationChecked) {
         // Если есть токен, но isAuthenticated еще false (при перезагрузке)
@@ -89,7 +90,7 @@ const TenantRegistry: React.FC = () => {
   useEffect(() => {
     const fetchReasons = async () => {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = getCookie("access_token");
         if (!token) {
           console.error("No token found");
           return;
@@ -139,7 +140,7 @@ const TenantRegistry: React.FC = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       if (!token) {
         router.push("/login");
         return;
@@ -182,7 +183,7 @@ const TenantRegistry: React.FC = () => {
           setSelectedReasons([]);
         }, [activeTab]);
   // Показываем загрузку пока проверяем верификацию или восстанавливаем токены
-  if (isVerified === null || (!isAuthenticated && localStorage.getItem("access_token"))) {
+  if (isVerified === null || (!isAuthenticated && getCookie("access_token"))) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingContent}>

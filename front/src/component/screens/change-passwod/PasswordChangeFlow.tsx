@@ -1,5 +1,6 @@
 import { FC, useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import Link from "next/link";
 import { requestPasswordChange, confirmPasswordChange, changePassword } from "@/api/passwordApi";
 import { fetchUserProfile } from "@/api/userApi";
@@ -20,7 +21,7 @@ const PasswordChangeFlow: FC = () => {
   useEffect(() => {
     const fetchUserEmail = async () => {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = getCookie("access_token");
         if (token) {
           const response = await fetchUserProfile();
           setUserEmail(response.data.user.email || "");

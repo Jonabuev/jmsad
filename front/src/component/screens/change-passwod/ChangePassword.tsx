@@ -1,5 +1,6 @@
 import { FC, useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { getCookie } from "@/utils/cookieUtils";
 import PasswordResetFlow from "./PasswordResetFlow";
 import PasswordChangeFlow from "./PasswordChangeFlow";
 import styles from "./ChangePassword.module.scss";
@@ -13,7 +14,7 @@ const ChangePassword: FC = () => {
     // Проверяем, что мы на клиенте
     if (typeof window === 'undefined') return;
 
-    const token = localStorage.getItem('access_token');
+    const token = getCookie('access_token');
     setIsAuthenticated(!!token);
   }, []);
 

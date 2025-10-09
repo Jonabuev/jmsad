@@ -2,6 +2,7 @@ import { useDateRange } from "@/component/hooks/catalog-rental/useDateRange";
 import { useRentals } from "@/component/hooks/catalog-rental/useRentals";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import RentalDatePicker from "./rental-date/RentalDatePicker";
 import LoadingIndicator from "./loading/LoadingIndicator";
 import { useState, useEffect } from "react";
@@ -56,7 +57,7 @@ export default function RentalCatalog() {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${getCookie("access_token")}`,
           },
         }
       )

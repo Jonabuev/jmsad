@@ -22,7 +22,7 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
     try {
       setLoading(prev => ({ ...prev, [rentalId]: true }));
       setError(null);
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
@@ -40,7 +40,7 @@ const ApartmentsBlock: FC<Props> = ({ profileData, t }) => {
     try {
       setLoading(prev => ({ ...prev, [rentalId]: true }));
       setError(null);
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       if (!token) {
         throw new Error("No authentication token found");
       }

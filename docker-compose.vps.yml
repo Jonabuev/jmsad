@@ -30,7 +30,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - env.vps
+      - .env.test
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG}

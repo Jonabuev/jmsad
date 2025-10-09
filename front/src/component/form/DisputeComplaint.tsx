@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { fetchRentalComplaintByUuid, disputeRentalComplaint } from "@/api/complaintsApi";
+import { getCookie } from "@/utils/cookieUtils";
 import styles from "./DisputeComplaint.module.scss";
 
 export default function DisputeComplaintPage() {
@@ -21,11 +22,11 @@ export default function DisputeComplaintPage() {
         // Проверяем, что мы на клиенте
         if (typeof window === 'undefined') return;
 
-        const token = localStorage.getItem("access_token");
+        const token = getCookie("access_token");
         if (!token || !uuid) return;
 
         try {
-            const token = localStorage.getItem("access_token");
+            const token = getCookie("access_token");
             if (!token) throw new Error("No token");
 
             const payload = JSON.parse(atob(token.split(".")[1]));

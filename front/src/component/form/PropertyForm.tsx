@@ -87,7 +87,7 @@ const PropertyForm: FC = () => {
 
   const onSubmit = async (data: PropertyFormInputs) => {
     setErrorMessage(null); // Сброс ошибки при новом сабмите
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) {
       setErrorMessage("Вы не авторизованы");
       return;

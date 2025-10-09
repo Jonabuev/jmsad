@@ -11,6 +11,7 @@ import AdminComplaintsTable from "./admin-section/AdminSection";
 import UserSection from "./user-section/UserSection";
 import { fetchUserProfile, disputeComplaint } from "@/api/userApi";
 import { clearAllTokens } from "@/utils/tokenUtils";
+import { getCookie } from "@/utils/cookieUtils";
 import styles from "./Profile.module.scss";
 
 const tabs = [
@@ -58,7 +59,7 @@ const Profile: FC = () => {
 
   const handleDispute = async (complaintId: number, newDescription = "") => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       await disputeComplaint(complaintId, newDescription, token!);
 
       // Обновить статус локально
@@ -114,7 +115,7 @@ const Profile: FC = () => {
       if (typeof window === 'undefined') return;
 
       try {
-        const token = localStorage.getItem("access_token");
+        const token = getCookie("access_token");
         if (!token) {
           router.push("/login");
           return;

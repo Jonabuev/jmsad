@@ -2,6 +2,7 @@
 import React, { FC, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getCookie } from "@/utils/cookieUtils";
 import AdminLayout from "@/component/admin/AdminLayout";
 import axios from "axios";
 import { apiUrl } from "@/utils/url";
@@ -48,7 +49,7 @@ const PDFCheckPage: FC = () => {
     formData.append("pdf_file", file);
 
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       const response = await axios.post(apiUrl("/pdf/"), formData, {
         headers: { 
           "Content-Type": "multipart/form-data",
@@ -89,7 +90,7 @@ const PDFCheckPage: FC = () => {
     formData.append("evidence", file); // тот же файл уходит как доказательство
 
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       const response = await axios.post(apiUrl("/user_pdf/"), formData, {
         headers: { 
           "Content-Type": "multipart/form-data",

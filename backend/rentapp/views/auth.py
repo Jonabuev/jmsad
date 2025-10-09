@@ -163,14 +163,39 @@ def login_view(request):
         except Exception as e:
             print('Ошибка логирования входа:', e)
 
-        # Возвращаем успешный ответ с токенами
+        # Создаем успешный ответ с токенами
         profile_url = f"http://localhost:3000/profile/"
-        return Response({
+        response = Response({
             "message": "Логин успешен",
             "access_token": access_token,
             "refresh_token": str(refresh),
             "profile_url": profile_url,
         }, status=status.HTTP_200_OK)
+        
+        # Устанавливаем токены в cookies
+        # Access token (5 часов = 300 минут)
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            max_age=300 * 60,  # 5 часов в секундах
+            httponly=False,  # Нужен False чтобы frontend мог читать
+            secure=False,  # False для localhost (без HTTPS)
+            samesite='Lax',
+            path='/'
+        )
+        
+        # Refresh token (3 дня)
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh),
+            max_age=3 * 24 * 60 * 60,  # 3 дня в секундах
+            httponly=False,  # Нужен False чтобы frontend мог читать
+            secure=False,  # False для localhost
+            samesite='Lax',
+            path='/'
+        )
+        
+        return response
     else:
         # Неверные учетные данные
         return Response({
@@ -350,8 +375,8 @@ class GoogleAuthView(APIView):
 
         # Выдаем JWT токены
         refresh = RefreshToken.for_user(user)
-
-        return Response({
+        
+        response = Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'user': {
@@ -360,6 +385,31 @@ class GoogleAuthView(APIView):
                 'name': user.username,
             }
         })
+        
+        # Устанавливаем токены в cookies
+        # Access token (5 часов)
+        response.set_cookie(
+            key='access_token',
+            value=str(refresh.access_token),
+            max_age=300 * 60,  # 5 часов
+            httponly=False,  # False чтобы frontend мог читать
+            secure=False,  # False для localhost
+            samesite='Lax',
+            path='/'
+        )
+        
+        # Refresh token (3 дня)
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh),
+            max_age=3 * 24 * 60 * 60,  # 3 дня
+            httponly=False,
+            secure=False,
+            samesite='Lax',
+            path='/'
+        )
+        
+        return response
 
 # Представление для обновления токена
 class CustomTokenObtainPairView(TokenObtainPairView):

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import { fetchComplaintReasons, submitRentalComplaint, searchUsersByIin } from "@/api/complaintsApi";
 import styles from "./SubmitComplaint.module.scss";
 
@@ -75,7 +76,7 @@ const SubmitComplaintForm: React.FC = () => {
         setErrorMessage("");
       }
 
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
 
       if (token && value.length === 12) {
         // если ровно 12 — ищем сразу и сохраняем роль

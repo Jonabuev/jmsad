@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint } from "@/api/complaintsApi";
 import styles from "./EditComplaintForm.module.scss";
 
@@ -47,7 +48,7 @@ const EditComplaintForm: React.FC = () => {
 
   // Загрузка данных жалобы
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token || typeof uuid !== "string") {
       setErrorMessage(t("Scomplaint.authRequired"));
       setLoadError(true);
@@ -77,7 +78,7 @@ const EditComplaintForm: React.FC = () => {
 
   // Загрузка причин
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
       return;
@@ -143,7 +144,7 @@ const EditComplaintForm: React.FC = () => {
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
       setIsSubmitting(false);

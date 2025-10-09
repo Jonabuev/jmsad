@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
+import { getCookie } from "@/utils/cookieUtils";
 import { fetchRentalRequests, updateRentalStatus } from "@/api/rentalApi";
 
 interface RentalRequest {
@@ -20,7 +21,7 @@ const RentalRequestsTable: React.FC = () => {
     // Проверяем, что мы на клиенте
     if (typeof window === 'undefined') return;
 
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) return setError("Нет токена авторизации");
 
     try {
@@ -41,7 +42,7 @@ const RentalRequestsTable: React.FC = () => {
     // Проверяем, что мы на клиенте
     if (typeof window === 'undefined') return;
 
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) return;
 
     try {

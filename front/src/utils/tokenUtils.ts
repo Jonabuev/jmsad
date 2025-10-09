@@ -1,3 +1,5 @@
+import { getCookie, setCookie, deleteCookie } from './cookieUtils';
+
 interface TokenPayload {
   exp: number;
   user_id: number;
@@ -49,17 +51,17 @@ export const isTokenExpiringSoon = (token: string, minutes: number = 5): boolean
 };
 
 /**
- * Получает access token из localStorage и проверяет его валидность
+ * Получает access token из cookies и проверяет его валидность
  */
 export const getValidAccessToken = (): string | null => {
   if (typeof window === 'undefined') return null;
   
-  const token = localStorage.getItem('access_token');
+  const token = getCookie('access_token');
   if (!token) return null;
   
   if (isTokenExpired(token)) {
-    console.log('Access token истек, удаляем из localStorage');
-    localStorage.removeItem('access_token');
+    console.log('Access token истек, удаляем из cookies');
+    deleteCookie('access_token');
     return null;
   }
   
@@ -67,17 +69,17 @@ export const getValidAccessToken = (): string | null => {
 };
 
 /**
- * Получает refresh token из localStorage и проверяет его валидность
+ * Получает refresh token из cookies и проверяет его валидность
  */
 export const getValidRefreshToken = (): string | null => {
   if (typeof window === 'undefined') return null;
   
-  const token = localStorage.getItem('refresh_token');
+  const token = getCookie('refresh_token');
   if (!token) return null;
   
   if (isTokenExpired(token)) {
-    console.log('Refresh token истек, удаляем из localStorage');
-    localStorage.removeItem('refresh_token');
+    console.log('Refresh token истек, удаляем из cookies');
+    deleteCookie('refresh_token');
     return null;
   }
   
@@ -85,16 +87,16 @@ export const getValidRefreshToken = (): string | null => {
 };
 
 /**
- * Очищает все токены из localStorage
+ * Очищает все токены из cookies
  */
 export const clearAllTokens = (): void => {
   if (typeof window === 'undefined') return;
   
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  localStorage.removeItem('profile');
-  localStorage.removeItem('user');
-  console.log('Все токены удалены из localStorage');
+  deleteCookie('access_token');
+  deleteCookie('refresh_token');
+  deleteCookie('profile');
+  deleteCookie('user');
+  console.log('Все токены удалены из cookies');
 };
 
 /**
@@ -103,22 +105,22 @@ export const clearAllTokens = (): void => {
 export const checkAndCleanExpiredTokens = (): void => {
   if (typeof window === 'undefined') return;
   
-  const accessToken = localStorage.getItem('access_token');
-  const refreshToken = localStorage.getItem('refresh_token');
+  const accessToken = getCookie('access_token');
+  const refreshToken = getCookie('refresh_token');
   
   if (accessToken && isTokenExpired(accessToken)) {
     console.log('Обнаружен истекший access token, удаляем');
-    localStorage.removeItem('access_token');
+    deleteCookie('access_token');
   }
   
   if (refreshToken && isTokenExpired(refreshToken)) {
     console.log('Обнаружен истекший refresh token, удаляем');
-    localStorage.removeItem('refresh_token');
+    deleteCookie('refresh_token');
   }
 };
 
 /**
- * Сохраняет токены в localStorage с проверкой валидности
+ * Сохраняет токены в cookies с проверкой валидности
  */
 export const saveTokens = (accessToken: string, refreshToken?: string): void => {
   if (typeof window === 'undefined') return;
@@ -128,11 +130,36 @@ export const saveTokens = (accessToken: string, refreshToken?: string): void => 
     return;
   }
   
-  localStorage.setItem('access_token', accessToken);
+  // Получаем информацию о сроке действия токена
+  const accessTokenInfo = getTokenExpiryInfo(accessToken);
+  const accessExpiresDays = accessTokenInfo.timeUntilExpiry 
+    ? accessTokenInfo.timeUntilExpiry / (24 * 60 * 60) 
+    : 7;
+  
+  // Сохраняем access token в cookie
+  setCookie('access_token', accessToken, {
+    expires: accessExpiresDays,
+    path: '/',
+    secure: false, // для localhost
+    sameSite: 'lax'
+  });
   
   if (refreshToken && !isTokenExpired(refreshToken)) {
-    localStorage.setItem('refresh_token', refreshToken);
+    const refreshTokenInfo = getTokenExpiryInfo(refreshToken);
+    const refreshExpiresDays = refreshTokenInfo.timeUntilExpiry 
+      ? refreshTokenInfo.timeUntilExpiry / (24 * 60 * 60) 
+      : 7;
+    
+    // Сохраняем refresh token в cookie
+    setCookie('refresh_token', refreshToken, {
+      expires: refreshExpiresDays,
+      path: '/',
+      secure: false, // для localhost
+      sameSite: 'lax'
+    });
   }
+  
+  console.log('✅ Токены сохранены в cookies');
 };
 
 /**

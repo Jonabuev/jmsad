@@ -6,6 +6,7 @@ import {
 } from "@react-oauth/google";
 import { googleAuth } from "@/api/authApi";
 import { saveTokens } from "@/utils/tokenUtils";
+import { setCookie } from "@/utils/cookieUtils";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { useDispatch } from "react-redux";
@@ -77,7 +78,14 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 
       console.log("💾 Сохраняем токены...");
       saveTokens(data.access, data.refresh);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // Сохраняем данные пользователя в cookie
+      setCookie("user", JSON.stringify(data.user), {
+        expires: 7,
+        path: '/',
+        secure: false,
+        sameSite: 'lax'
+      });
 
       console.log("🔄 Обновляем Redux store...");
       await dispatch(fetchUserProfile());

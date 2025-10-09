@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { login, fetchProfileWithToken } from "@/api/authApi";
 import { saveTokens } from "@/utils/tokenUtils";
+import { setCookie } from "@/utils/cookieUtils";
 import GoogleLoginButton from "@/component/common/GoogleLoginButton";
 import { useTranslation } from "next-i18next";
 import { fetchUserProfile } from "@/component/store/auth/authSlice";
@@ -49,7 +50,14 @@ const LoginForm = () => {
       console.log("📋 Получаем профиль пользователя...");
       const profileResponse = await fetchProfileWithToken(accessToken);
       const profileData = profileResponse.data;
-      localStorage.setItem("profile", JSON.stringify(profileData));
+      
+      // Сохраняем профиль в cookie (для совместимости)
+      setCookie("profile", JSON.stringify(profileData), {
+        expires: 7, // 7 дней
+        path: '/',
+        secure: false,
+        sameSite: 'lax'
+      });
 
       // 3. Обновляем Redux store
       console.log("🔄 Обновляем Redux store...");
