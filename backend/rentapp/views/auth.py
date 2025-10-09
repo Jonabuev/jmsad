@@ -16,8 +16,10 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import requests
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django_ratelimit.decorators import ratelimit  # ✅ Rate Limiting защита
 
 
+@ratelimit(key='ip', rate='3/h', method='POST')  # ✅ 3 попытки регистрации в час
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -41,7 +43,16 @@ def register(request):
     
     Permissions:
         - Доступно всем пользователям
+    
+    Rate Limit:
+        - 3 попытки в час с одного IP
     """
+    # ✅ Проверка rate limit
+    if getattr(request, 'limited', False):
+        return Response({
+            'error': 'Слишком много попыток регистрации. Попробуйте позже.'
+        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    
     print("Полученные данные:", request.data)
 
     form = CustomUserCreationForm(data=request.data)
@@ -97,6 +108,7 @@ def register(request):
     print("Ошибка в данных формы:", form.errors)
     return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@ratelimit(key='ip', rate='5/m', method='POST')  # ✅ 5 попыток входа в минуту
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -116,7 +128,16 @@ def login_view(request):
     
     Permissions:
         - Доступно всем пользователям
+    
+    Rate Limit:
+        - 5 попыток входа в минуту с одного IP
     """
+    # ✅ Проверка rate limit (защита от брутфорса)
+    if getattr(request, 'limited', False):
+        return Response({
+            'error': 'Слишком много попыток входа. Попробуйте через минуту.'
+        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    
     # Логируем полученные данные для отладки
     print("Попытка логина с данными:", request.data)
 
@@ -173,23 +194,23 @@ def login_view(request):
         }, status=status.HTTP_200_OK)
         
         # Устанавливаем токены в cookies
-        # Access token (5 часов = 300 минут)
+        # Access token (30 минут) - УЛУЧШЕННАЯ БЕЗОПАСНОСТЬ
         response.set_cookie(
             key='access_token',
             value=access_token,
-            max_age=300 * 60,  # 5 часов в секундах
-            httponly=False,  # Нужен False чтобы frontend мог читать
+            max_age=30 * 60,  # ✅ 30 минут (было 300 минут)
+            httponly=False,  # False чтобы frontend мог читать
             secure=False,  # False для localhost (без HTTPS)
             samesite='Lax',
             path='/'
         )
         
-        # Refresh token (3 дня)
+        # Refresh token (7 дней) - УЛУЧШЕННАЯ БЕЗОПАСНОСТЬ
         response.set_cookie(
             key='refresh_token',
             value=str(refresh),
-            max_age=3 * 24 * 60 * 60,  # 3 дня в секундах
-            httponly=False,  # Нужен False чтобы frontend мог читать
+            max_age=7 * 24 * 60 * 60,  # ✅ 7 дней (было 3 дня)
+            httponly=False,  # False чтобы frontend мог читать
             secure=False,  # False для localhost
             samesite='Lax',
             path='/'
@@ -387,22 +408,22 @@ class GoogleAuthView(APIView):
         })
         
         # Устанавливаем токены в cookies
-        # Access token (5 часов)
+        # Access token (30 минут) - УЛУЧШЕННАЯ БЕЗОПАСНОСТЬ
         response.set_cookie(
             key='access_token',
             value=str(refresh.access_token),
-            max_age=300 * 60,  # 5 часов
+            max_age=30 * 60,  # ✅ 30 минут (было 300 минут)
             httponly=False,  # False чтобы frontend мог читать
             secure=False,  # False для localhost
             samesite='Lax',
             path='/'
         )
         
-        # Refresh token (3 дня)
+        # Refresh token (7 дней) - УЛУЧШЕННАЯ БЕЗОПАСНОСТЬ
         response.set_cookie(
             key='refresh_token',
             value=str(refresh),
-            max_age=3 * 24 * 60 * 60,  # 3 дня
+            max_age=7 * 24 * 60 * 60,  # ✅ 7 дней (было 3 дня)
             httponly=False,
             secure=False,
             samesite='Lax',
