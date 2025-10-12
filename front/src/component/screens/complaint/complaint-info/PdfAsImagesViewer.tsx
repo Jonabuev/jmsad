@@ -44,20 +44,29 @@ const PdfAsImagesViewer: FC<Props> = ({ pdfUrl }) => {
   if (images.length === 0) return <div>Loading PDF...</div>;
 
   return (
-    <div className="select-none pointer-events-auto mt-2">
+    <div className="select-none pointer-events-auto mt-2 text-gray-900">
       <img src={images[pageIndex]} alt={`Page ${pageIndex + 1}`} className="w-full max-w-[600px] mx-auto" />
       <div className="flex justify-between text-sm mt-2">
-        <button onClick={() => setPageIndex(p => Math.max(p - 1, 0))} disabled={pageIndex === 0}>
+        <button
+          onClick={() => setPageIndex(p => Math.max(p - 1, 0))}
+          disabled={pageIndex === 0}
+          className="text-gray-900 hover:text-gray-700"
+        >
           ← Prev
         </button>
         <span>
           Page {pageIndex + 1} of {images.length}
         </span>
-        <button onClick={() => setPageIndex(p => Math.min(p + 1, images.length - 1))} disabled={pageIndex === images.length - 1}>
+        <button
+          onClick={() => setPageIndex(p => Math.min(p + 1, images.length - 1))}
+          disabled={pageIndex === images.length - 1}
+          className="text-gray-900 hover:text-gray-700"
+        >
           Next →
         </button>
       </div>
     </div>
+
   );
 };
 
