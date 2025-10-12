@@ -399,20 +399,24 @@ class CustomUser(AbstractUser):
         return anonymous_name
     
     def save(self, *args, **kwargs):
+        # ✅ Автоматическая логика для superuser
+        if self.is_superuser:
+            self.email_confirmed = True
+
+        # ✅ Автообработка типа сущности и документов
         if self.type_entity != 'legal_entity':
             self.documents = {}
             self.type_identify = 'iin'
         elif self.type_entity == 'legal_entity':
             self.type_identify = 'bin'
         
-        # Генерируем анонимное имя, если его нет
+        # ✅ Генерация анонимного имени, если нет
         if not self.anonymous_name:
             self.anonymous_name = self.generate_anonymous_name()
-        
-        # ✅ Оптимизация: автоматически сжимаем аватар при загрузке
+
+        # ✅ Оптимизация аватара
         if self.avatar and hasattr(self.avatar, 'file'):
             try:
-                # Проверяем, был ли аватар изменен
                 if self.pk:
                     try:
                         original = CustomUser.objects.get(pk=self.pk)
@@ -422,15 +426,14 @@ class CustomUser(AbstractUser):
                     except CustomUser.DoesNotExist:
                         pass
                 else:
-                    # Новый пользователь
                     from rentapp.utils.image_optimization import optimize_avatar
                     self.avatar = optimize_avatar(self.avatar)
             except Exception as e:
                 import logging
                 logging.getLogger(__name__).warning(f"Не удалось оптимизировать аватар: {e}")
-        
-        super().save(*args, **kwargs)    
-    
+
+        super().save(*args, **kwargs)
+
     def get_avatar_url(self):
         if self.avatar and hasattr(self.avatar, 'url'):
             return self.avatar.url
