@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rentapp.forms import CustomUserCreationForm
-from rentapp.models import PasswordChangeRequest, CustomUser
+from rentapp.models import PasswordChangeRequest, CustomUser, AuditLog
 from rentapp.serializers import RequestPasswordChangeSerializer, ConfirmPasswordChangeSerializer
 from rentapp.utils import generate_code, send_confirmation_code
 from rentapp.notifications import create_notification
@@ -17,6 +17,10 @@ from django.core.exceptions import ValidationError
 import requests
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django_ratelimit.decorators import ratelimit  # ✅ Rate Limiting защита
+import logging  # ✅ Логирование безопасности
+
+# ✅ Логгер для событий безопасности
+security_logger = logging.getLogger('security')
 
 
 @ratelimit(key='ip', rate='3/h', method='POST')  # ✅ 3 попытки регистрации в час
@@ -79,6 +83,17 @@ def register(request):
             # Не блокируем регистрацию из-за уведомлений
             print('Ошибка создания уведомления при регистрации:', e)
         
+        # ✅ Audit Trail: Логируем регистрацию
+        AuditLog.log_action(
+            action='register',
+            request=request,
+            user=user,
+            details={
+                'username': user.username,
+                'role': user.role
+            }
+        )
+        
         # Логируем регистрацию
         try:
             from rentapp.utils import log_activity
@@ -138,12 +153,14 @@ def login_view(request):
             'error': 'Слишком много попыток входа. Попробуйте через минуту.'
         }, status=status.HTTP_429_TOO_MANY_REQUESTS)
     
-    # Логируем полученные данные для отладки
-    print("Попытка логина с данными:", request.data)
+    # БЕЗОПАСНОСТЬ: НЕ логируем request.data, так как содержит пароль!
+    # Используем безопасное логирование через security_logger
 
     # Получаем данные из запроса
     username = request.data.get('username')
     password = request.data.get('password')
+    ip_address = request.META.get('REMOTE_ADDR', 'unknown')
+    user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
 
     # Аутентификация пользователя
     user = authenticate(request, username=username, password=password)
@@ -161,7 +178,20 @@ def login_view(request):
                 "error": "Ваш аккаунт деактивирован. Обратитесь к администратору."
             }, status=status.HTTP_403_FORBIDDEN)
         
-        # Пользователь прошел аутентификацию, генерируем токены
+            # ✅ Логируем успешный вход
+            security_logger.info(
+                f"✅ Успешный вход | User: {username} | IP: {ip_address} | Agent: {user_agent[:50]}"
+            )
+            
+            # ✅ Audit Trail: Логируем успешный вход
+            AuditLog.log_action(
+                action='login',
+                request=request,
+                user=user,
+                details={'role': user.role}
+            )
+            
+            # Пользователь прошел аутентификацию, генерируем токены
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
@@ -170,19 +200,20 @@ def login_view(request):
             from rentapp.utils import log_activity
             log_activity(
                 action_type='user_login',
-                description=f'Пользователь {user.username} ({user.email}) вошел в систему',
+                description=f'Пользователь {user.username} вошел в систему',
                 user=user,
                 target_object=None,
                 request=request,
                 metadata={
                     'user_id': user.id,
                     'username': user.username,
-                    'email': user.email,
                     'role': user.role
+                    # email НЕ логируем для безопасности
                 }
             )
         except Exception as e:
-            print('Ошибка логирования входа:', e)
+            # Используем security_logger вместо print()
+            security_logger.error(f'Error logging user login: {str(e)}')
 
         # Создаем успешный ответ с токенами
         profile_url = f"http://localhost:3000/profile/"
@@ -218,8 +249,22 @@ def login_view(request):
         
         return response
     else:
-        # Неверные учетные данные
-        return Response({
+            # ✅ Логируем неудачную попытку входа (ВАЖНО для безопасности!)
+            security_logger.warning(
+                f"❌ Неудачная попытка входа | User: {username} | IP: {ip_address} | Agent: {user_agent[:50]}"
+            )
+            
+            # ✅ Audit Trail: Логируем неудачную попытку входа
+            AuditLog.log_action(
+                action='failed_login',
+                request=request,
+                user=None,
+                details={'attempted_username': username},
+                success=False
+            )
+            
+            # Неверные учетные данные
+            return Response({
             "error": "Неверное имя пользователя или пароль"
         }, status=status.HTTP_401_UNAUTHORIZED)
 

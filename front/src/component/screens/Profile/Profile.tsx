@@ -36,9 +36,7 @@ const Profile: FC = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [showComments, setShowComments] = useState(false);
 
-  console.log("🔍 Profile компонент загружен");
-  console.log("📍 Текущий путь:", router.asPath);
-  console.log("📊 Состояние:", { loading, error, profileData: !!profileData });
+  // БЕЗОПАСНОСТЬ: НЕ логируем данные пользователя в console
 
   const handleLogout = () => {
     clearAllTokens();
@@ -121,26 +119,22 @@ const Profile: FC = () => {
           return;
         }
 
-        console.log("Fetching profile data...");
+        // БЕЗОПАСНОСТЬ: НЕ логируем данные профиля
         const response = await fetchUserProfile();
-
-        console.log("Profile response:", response.data);
 
         if (response.data) {
           setProfileData(response.data);
-          console.log(response.data);
           
           // Если пользователь верифицирован, скрываем предупреждение о верификации
           if (response.data.user.email_confirmed) {
             setShowVerificationRequired(false);
           }
         } else {
-          console.error("Empty response data");
           setError("Не удалось загрузить данные профиля.");
         }
         setLoading(false);
       } catch (err: any) {
-        console.error("Profile fetch error:", err);
+        // БЕЗОПАСНОСТЬ: НЕ логируем ошибки с данными пользователя
         if (err.response?.status === 403) {
           setError("У вас нет доступа к этой странице.");
           router.push("/login");

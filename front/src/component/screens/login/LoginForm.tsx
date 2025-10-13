@@ -34,20 +34,17 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log("🔐 Начинаем процесс входа...");
+      // БЕЗОПАСНОСТЬ: НЕ логируем токены или чувствительные данные в console
       
       // 1. Авторизация
       const loginResponse = await login(formData.username, formData.password);
       const accessToken = loginResponse.data.access_token;
       const refreshToken = loginResponse.data.refresh_token;
       
-      console.log("✅ Получены токены, сохраняем...");
-      
       // Сохраняем токены с проверкой валидности
       saveTokens(accessToken, refreshToken);
 
       // 2. Получаем профиль пользователя и обновляем Redux store
-      console.log("📋 Получаем профиль пользователя...");
       const profileResponse = await fetchProfileWithToken(accessToken);
       const profileData = profileResponse.data;
       
@@ -60,39 +57,30 @@ const LoginForm = () => {
       });
 
       // 3. Обновляем Redux store
-      console.log("🔄 Обновляем Redux store...");
       await dispatch(fetchUserProfile());
 
       // 4. Переход на страницу профиля
-      console.log("🚀 Перенаправляем на профиль...");
-      console.log("📍 Текущий путь:", router.asPath);
-      console.log("🔗 Router объект:", router);
+      // БЕЗОПАСНОСТЬ: НЕ логируем данные пользователя
       
       try {
-        // Попробуем несколько способов перенаправления
-        console.log("🔄 Способ 1: router.push()");
+        // Перенаправление на профиль
         await router.push("/profile");
         
         // Если router.push не сработал, попробуем альтернативы
         setTimeout(() => {
-          console.log("⏰ Проверяем, произошло ли перенаправление...");
-          console.log("📍 Новый путь:", router.asPath);
+          // БЕЗОПАСНОСТЬ: НЕ логируем данные
           
-          if (router.asPath === "/profile") {
-            console.log("✅ Перенаправление успешно через router.push()");
-          } else {
-            console.log("❌ router.push() не сработал, пробуем window.location");
+          if (router.asPath !== "/profile") {
             window.location.href = "/profile";
           }
         }, 1000);
         
       } catch (redirectError) {
-        console.error("❌ Ошибка при перенаправлении:", redirectError);
-        console.log("🔄 Пробуем альтернативный способ: window.location");
+        // Альтернативный способ перенаправления
         window.location.href = "/profile";
       }
     } catch (err: any) {
-      console.error("❌ Ошибка входа:", err);
+      // Показываем ошибку пользователю
       setError("Неверное имя пользователя или пароль.");
     }
   };
@@ -116,20 +104,18 @@ const LoginForm = () => {
           <div className={styles.googleButtonContainer}>
             <GoogleLoginButton 
               onSuccess={async () => {
-                console.log("✅ Google login successful from login form");
-                console.log("🔄 Обновляем Redux store...");
+                // БЕЗОПАСНОСТЬ: НЕ логируем токены
                 try {
                   await dispatch(fetchUserProfile());
-                  console.log("🚀 Перенаправляем на профиль...");
                   router.push("/profile");
                 } catch (error) {
-                  console.error("❌ Ошибка при обновлении Redux store:", error);
                   // Fallback на window.location
                   window.location.href = "/profile";
                 }
               }}
               onError={(error) => {
-                console.error("Google login error:", error);
+                // Показываем ошибку пользователю
+                setError("Ошибка входа через Google");
               }}
               className="w-full"
             />

@@ -160,23 +160,3 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .adminUserDetailPage,
-  .loadingContainer,
-  .accessDeniedContainer,
-  .userNotFoundContainer {
-    background-color: #1f2937;
-  }
-
-  .loadingText,
-  .accessDeniedMessage,
-  .userNotFoundMessage {
-    color: #d1d5db;
-  }
-
-  .accessDeniedTitle,
-  .userNotFoundTitle {
-    color: #f9fafb;
-  }
-}

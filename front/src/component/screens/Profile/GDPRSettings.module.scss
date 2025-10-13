@@ -1,0 +1,264 @@
+.gdprSettings {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #1a1a1a;
+  border-bottom: 3px solid #4a90e2;
+  padding-bottom: 12px;
+}
+
+.section {
+  margin-bottom: 32px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f9f9f9;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #2c2c2c;
+  }
+}
+
+.rightsList {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+
+  li {
+    padding: 8px 0;
+    font-size: 16px;
+    color: #444;
+    border-bottom: 1px solid #e0e0e0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.description {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.exportButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #4a90e2;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+  }
+
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.deleteButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #dc3545;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  }
+}
+
+.warningText {
+  font-size: 15px;
+  color: #856404;
+  background: #fff3cd;
+  padding: 12px;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+  margin: 12px 0;
+  font-weight: 500;
+}
+
+.deleteList {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+
+  li {
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #444;
+  }
+}
+
+.confirmBox {
+  background: #fff;
+  padding: 20px;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.confirmText {
+  font-size: 16px;
+  color: #dc3545;
+  margin-bottom: 16px;
+  font-weight: 600;
+
+  strong {
+    color: #a02030;
+  }
+}
+
+.confirmInput {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #dc3545;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #a02030;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+  }
+}
+
+.confirmButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.confirmDeleteButton {
+  flex: 1;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #dc3545;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: #c82333;
+  }
+
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #e2e6ea;
+    border-color: #adb5bd;
+  }
+}
+
+.message {
+  padding: 16px 20px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 500;
+
+  &.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  &.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+}
+
+.infoText {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 8px;
+
+  a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .gdprSettings {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .confirmButtons {
+    flex-direction: column;
+  }
+
+  .confirmDeleteButton,
+  .cancelButton {
+    width: 100%;
+  }
+}
+

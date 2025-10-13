@@ -8,6 +8,8 @@ import styles from "./EditComplaintForm.module.scss";
 interface ComplaintReason {
   id: number;
   reason: string;
+  reason_kz?: string;
+  reason_en?: string;
   type: string;
 }
 
@@ -29,6 +31,14 @@ const EditComplaintForm: React.FC = () => {
   const router = useRouter();
   const { uuid } = router.query;
   const { t } = useTranslation();
+
+  // Хелпер для получения переведенного текста причины
+  const getReasonText = (reason: ComplaintReason): string => {
+    const locale = router.locale || 'ru';
+    if (locale === 'kz' && reason.reason_kz) return reason.reason_kz;
+    if (locale === 'en' && reason.reason_en) return reason.reason_en;
+    return reason.reason;
+  };
   const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
   const [accusedRole, setAccusedRole] = useState<"tenant" | "landlord" | null>(null);
   const [formData, setFormData] = useState({
@@ -76,26 +86,35 @@ const EditComplaintForm: React.FC = () => {
       .finally(() => setIsLoading(false));
   }, [uuid, t]);
 
-  // Загрузка причин
+  // Загрузка причин (загружаем ВСЕ причины без фильтрации по type)
   useEffect(() => {
     const token = getCookie("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
       return;
     }
-    fetchComplaintReasons(token)
+    const locale = router.locale || 'ru';
+    console.log("EditForm: Loading complaint reasons with locale:", locale);
+    // НЕ передаем type - загружаем все причины
+    fetchComplaintReasons(token, locale, undefined)
       .then((res) => {
+        console.log("EditForm: Complaint reasons loaded:", res.data);
         if (Array.isArray(res.data)) {
           setComplaintReasons(res.data);
+          console.log(`EditForm: Total reasons loaded: ${res.data.length}`);
+          console.log(`EditForm: Tenant reasons: ${res.data.filter(r => r.type === 'tenant').length}`);
+          console.log(`EditForm: Landlord reasons: ${res.data.filter(r => r.type === 'landlord').length}`);
         } else {
+          console.error("EditForm: Invalid data format:", res.data);
           setErrorMessage(t("Scomplaint.invalidDataFormat"));
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("EditForm: Error loading complaint reasons:", error);
         setLoadError(true);
         setErrorMessage(t("Scomplaint.loadReasonsError"));
       });
-  }, [t]);
+  }, [router.locale, t]);
 
   // Обработчики
   const handleChange = (
@@ -297,7 +316,7 @@ const EditComplaintForm: React.FC = () => {
                         className={styles.reasonCheckbox}
                       />
                       <span className={styles.reasonText}>
-                        {t(`Scomplaint.reason.${reason.reason}`)}
+                        {getReasonText(reason)}
                       </span>
                     </label>
                   ))}

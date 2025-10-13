@@ -129,7 +129,93 @@ class ComplaintRegistrySerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 from .models import CustomUser
 
+class PublicUserSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для публичного просмотра профиля пользователя.
+    Исключает чувствительные данные (phone, email, identifier, documents).
+    """
+    avatar = serializers.SerializerMethodField()
+    phone_number = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'username',
+            'anonymous_name',
+            'role',
+            'avatar',
+            'email_confirmed',
+            'phone_number',  # Маскированный
+            'email',  # Маскированный
+        ]
+        # Исключаем: identifier, documents, type_identify, citizenship, passport_expiry, visa_number
+    
+    def get_avatar(self, obj):
+        if obj.avatar:
+            return obj.avatar.url
+        return '/media/avatars/def.jpg'
+    
+    def get_phone_number(self, obj):
+        """Маскирует телефон для публичного просмотра"""
+        if obj.phone_number and len(obj.phone_number) > 4:
+            return obj.phone_number[:3] + ' ***-**-' + obj.phone_number[-2:]
+        return None
+    
+    def get_email(self, obj):
+        """Маскирует email для публичного просмотра"""
+        if obj.email:
+            parts = obj.email.split('@')
+            if len(parts) == 2:
+                username_part = parts[0][:1] + '***' if len(parts[0]) > 1 else parts[0]
+                domain_parts = parts[1].split('.')
+                if len(domain_parts) >= 2:
+                    domain_masked = domain_parts[0][:1] + '***.' + domain_parts[-1]
+                else:
+                    domain_masked = parts[1][:1] + '***'
+                return username_part + '@' + domain_masked
+        return None
+
+
+class PrivateUserSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для приватного просмотра собственного профиля.
+    Содержит все данные пользователя.
+    """
+    avatar = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'username',
+            'anonymous_name',
+            'role',
+            'thirdname',
+            'phone_number',
+            'email',
+            'email_confirmed',
+            'phone_confirmed',
+            'type_entity',
+            'type_identify',
+            'identifier',
+            'avatar',
+            'r_date',
+            'citizenship',
+            'passport_expiry',
+            'document_type',
+        ]
+        # documents намеренно исключен (будет шифроваться позже)
+    
+    def get_avatar(self, obj):
+        if obj.avatar:
+            return obj.avatar.url
+        return '/media/avatars/def.jpg'
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
+    """Deprecated: используйте PrivateUserSerializer или PublicUserSerializer"""
     avatar = serializers.SerializerMethodField()
     
     class Meta:
@@ -273,9 +359,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class ComplaintReasonSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для причин жалоб с поддержкой мультиязычности.
+    Включает переводы на русский, казахский и английский языки.
+    """
     class Meta:
         model = ComplaintReason
-        fields = ['id', 'reason', 'type', 'is_default', 'order']
+        fields = [
+            'id', 'reason', 'reason_kz', 'reason_en', 
+            'type', 'is_default', 'order'
+        ]
 
 
 class ComplaintImageSerializer(serializers.ModelSerializer):
@@ -519,14 +612,6 @@ class PublicFAQSerializer(serializers.ModelSerializer):
 
 
 # ==================== COMPLAINT REASON SERIALIZERS ====================
-
-class ComplaintReasonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ComplaintReason
-        fields = [
-            'id', 'reason', 'reason_kz', 'reason_en', 
-            'type', 'is_default', 'order'
-        ]
 
 class PublicComplaintReasonSerializer(serializers.ModelSerializer):
     reason_text = serializers.SerializerMethodField()

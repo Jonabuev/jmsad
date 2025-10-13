@@ -367,14 +367,37 @@ def complaint_reasons(request):
 @permission_classes([IsAuthenticated])
 def all_complaint_reasons(request):
     """
-    API endpoint для получения всех причин жалоб.
+    API endpoint для получения всех причин жалоб с поддержкой мультиязычности.
     Полезно для админ-панели или общего просмотра.
+    
+    Query Parameters:
+        - locale: Язык (ru, kz, en). По умолчанию 'ru'.
+        - type: Тип причины (tenant, landlord). Необязательный.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     # Убеждаемся, что дефолтные причины существуют
     ComplaintReason.ensure_default_reasons_exist()
     
+    reason_type = request.GET.get('type', '')
+    locale = request.GET.get('locale', 'ru')
+    
+    logger.info(f"Fetching complaint reasons: type={reason_type}, locale={locale}")
+    
     reasons = ComplaintReason.objects.all()
+    total_count = reasons.count()
+    logger.info(f"Total reasons in DB: {total_count}")
+    
+    if reason_type:
+        reasons = reasons.filter(type=reason_type)
+        filtered_count = reasons.count()
+        logger.info(f"Filtered reasons by type '{reason_type}': {filtered_count}")
+    
+    # Используем ComplaintReasonSerializer чтобы вернуть все поля переводов
     serializer = ComplaintReasonSerializer(reasons, many=True)
+    logger.info(f"Returning {len(serializer.data)} reasons")
+    
     return Response(serializer.data)
 
 
