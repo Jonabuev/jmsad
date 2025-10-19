@@ -164,7 +164,6 @@ services:
           cpus: "0.5"
           memory: 512M
 
-
   nginx_prod:
     image: nginx:latest
     container_name: jmsad_nginx_prod
@@ -181,6 +180,8 @@ services:
     networks:
       - jmsad-network
     restart: unless-stopped
+    depends_on:
+      - jmsad_backend_prod # <--- обязательно
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
