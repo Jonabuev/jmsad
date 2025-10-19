@@ -199,6 +199,18 @@ services:
           cpus: "1"
           memory: 512M
 
+  nginx_prod:
+    image: nginx:latest
+    container_name: jmsad_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx_full.conf:/etc/nginx/nginx.conf:ro
+      - ./staticfiles:/app/staticfiles:ro
+      - ./media:/app/media:rw
+      - ./certbot/www:/var/www/certbot:rw
+      - ./nginx/snippets:/etc/nginx/snippets:ro
   # Certbot для SSL сертификатов
   certbot:
     image: certbot/certbot
