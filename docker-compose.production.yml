@@ -165,6 +165,7 @@ services:
           memory: 512M
 
   nginx_prod:
+    user: "1000:1000"
     image: nginx:latest
     container_name: jmsad_nginx_prod
     ports:
