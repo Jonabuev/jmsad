@@ -28,13 +28,3 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .pageTitle {
-    color: #f9fafb;
-  }
-
-  .pageSubtitle {
-    color: #d1d5db;
-  }
-}

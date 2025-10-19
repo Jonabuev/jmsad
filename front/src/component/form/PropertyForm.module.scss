@@ -329,68 +329,6 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .propertyForm {
-    background-color: #374151;
-    color: #f9fafb;
-  }
-
-  .formTitle {
-    color: #60a5fa;
-  }
-
-  .formLabel,
-  .checkboxLabel {
-    color: #e5e7eb;
-  }
-
-  .formInput,
-  .formSelect,
-  .formTextarea {
-    background-color: #4b5563;
-    border-color: #6b7280;
-    color: #f9fafb;
-
-    &:focus {
-      background-color: #374151;
-    }
-
-    &::placeholder {
-      color: #9ca3af;
-    }
-  }
-
-  .addressSuggestions {
-    background-color: #4b5563;
-    border-color: #6b7280;
-  }
-
-  .suggestionItem {
-    color: #e5e7eb;
-    border-bottom-color: #6b7280;
-
-    &:hover {
-      background-color: #374151;
-    }
-  }
-
-  .fileCount,
-  .fileItem {
-    color: #9ca3af;
-  }
-
-  .fileItem {
-    background-color: #4b5563;
-  }
-
-  .errorMessage {
-    background-color: #7f1d1d;
-    border-color: #dc2626;
-    color: #fca5a5;
-  }
-}
-
 // Grid layout for form fields
 .formGrid {
   display: grid;

@@ -1,7 +1,7 @@
 # users/admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, BlacklistEntry, UserViolation, ComplaintReason
+from .models import CustomUser, BlacklistEntry, UserViolation, ComplaintReason, AuditLog
 
 @admin.register(BlacklistEntry)
 class BlacklistEntryAdmin(admin.ModelAdmin):
@@ -122,3 +122,61 @@ class CustomUserAdmin(UserAdmin):
         self.message_user(request, f"{count} пользователей деактивированы.")
     
     deactivate_users.short_description = "Деактивировать пользователей"
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    """
+    Админка для просмотра Audit Trail.
+    
+    ВАЖНО: Только для просмотра, редактирование запрещено для сохранения целостности логов.
+    """
+    list_display = ('timestamp', 'user_display', 'action', 'target_user_display', 'ip_address', 'success_display')
+    list_filter = ('action', 'success', 'timestamp')
+    search_fields = ('user__username', 'target_user__username', 'ip_address', 'user_agent')
+    ordering = ('-timestamp',)
+    date_hierarchy = 'timestamp'
+    readonly_fields = ('user', 'target_user', 'action', 'ip_address', 'user_agent', 'timestamp', 'details', 'success', 'error_message')
+    
+    # Запретить добавление, изменение, удаление (только просмотр)
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    def user_display(self, obj):
+        if obj.user:
+            return f"{obj.user.username} (ID: {obj.user.id})"
+        return "Anonymous"
+    user_display.short_description = "Пользователь"
+    
+    def target_user_display(self, obj):
+        if obj.target_user:
+            return f"{obj.target_user.username} (ID: {obj.target_user.id})"
+        return "-"
+    target_user_display.short_description = "Целевой пользователь"
+    
+    def success_display(self, obj):
+        return "✅" if obj.success else "❌"
+    success_display.short_description = "Статус"
+    
+    # Детальный просмотр
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('timestamp', 'action', 'success')
+        }),
+        ('Пользователи', {
+            'fields': ('user', 'target_user')
+        }),
+        ('Технические данные', {
+            'fields': ('ip_address', 'user_agent')
+        }),
+        ('Дополнительно', {
+            'fields': ('details', 'error_message'),
+            'classes': ('collapse',)
+        }),
+    )

@@ -19,9 +19,15 @@ export const updateComplaintStatus = (
 export const fetchMyRentals = (token: string) =>
   api.get("/my-rentals/", { headers: { Authorization: `Bearer ${token}` } });
 
-// Получить причины жалоб
-export const fetchComplaintReasons = (token: string) =>
-  api.get("/all-complaint-reasons/", { headers: { Authorization: `Bearer ${token}` } });
+// Получить причины жалоб с поддержкой мультиязычности
+export const fetchComplaintReasons = (token: string, locale: string = 'ru', type?: string) => {
+  const params = new URLSearchParams({ locale });
+  if (type) params.append('type', type);
+  
+  return api.get(`/all-complaint-reasons/?${params.toString()}`, { 
+    headers: { Authorization: `Bearer ${token}` } 
+  });
+};
 
 // Создать жалобу (submit complaint)
 export const submitRentalComplaint = (data: FormData, token: string) =>

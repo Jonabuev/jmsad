@@ -140,13 +140,3 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .actionsTitle {
-    color: #f9fafb;
-  }
-
-  .actionsDescription {
-    color: #d1d5db;
-  }
-}

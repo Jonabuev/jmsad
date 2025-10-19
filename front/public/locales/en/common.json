@@ -1256,5 +1256,29 @@
         "weekly": "Weekly"
       }
     }
+  },
+  "pdfCheck": {
+    "pageTitle": "PDF Court Decision Verification",
+    "pageSubtitle": "Upload a PDF file with a court decision for automatic analysis and complaint creation",
+    "uploadTitle": "Document Upload",
+    "uploadButton": "Check Document",
+    "processing": "Processing...",
+    "selectFile": "Select PDF file",
+    "changeFile": "Change file",
+    "fileSelected": "File selected",
+    "noFileSelected": "No file selected",
+    "candidatesTitle": "Found Candidates",
+    "selected": "Selected",
+    "formTitle": "Create Complaint for",
+    "courtNumber": "Case Number",
+    "courtNumberPlaceholder": "Enter case number",
+    "description": "Complaint Description",
+    "descriptionPlaceholder": "Describe complaint details...",
+    "birthDate": "Date of Birth",
+    "birthDatePlaceholder": "DD.MM.YYYY",
+    "submitButton": "Submit Complaint",
+    "successMessage": "Complaint successfully created (ID: {{id}})",
+    "errorUpload": "Upload error",
+    "errorSubmit": "Submit error"
   }
 }

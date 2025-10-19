@@ -174,26 +174,3 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .loadingText {
-    color: #d1d5db;
-  }
-
-  .errorContainer {
-    background-color: #7f1d1d;
-    border-color: #dc2626;
-  }
-
-  .errorText {
-    color: #fca5a5;
-  }
-
-  .welcomeSection {
-    background: linear-gradient(90deg, #1e3a8a 0%, #3730a3 100%);
-  }
-
-  .welcomeSubtitle {
-    color: #93c5fd;
-  }
-}

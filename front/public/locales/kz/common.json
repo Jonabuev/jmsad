@@ -1261,5 +1261,29 @@
         "weekly": "Апта сайын"
       }
     }
+  },
+  "pdfCheck": {
+    "pageTitle": "PDF Сот шешімдерін тексеру",
+    "pageSubtitle": "Автоматты талдау және шағым жасау үшін сот шешімі бар PDF файлын жүктеңіз",
+    "uploadTitle": "Құжатты жүктеу",
+    "uploadButton": "Құжатты тексеру",
+    "processing": "Өңдеу...",
+    "selectFile": "PDF файлын таңдаңыз",
+    "changeFile": "Файлды өзгерту",
+    "fileSelected": "Файл таңдалды",
+    "noFileSelected": "Файл таңдалмаған",
+    "candidatesTitle": "Табылған үміткерлер",
+    "selected": "Таңдалды",
+    "formTitle": "Шағым жасау",
+    "courtNumber": "Іс нөмірі",
+    "courtNumberPlaceholder": "Іс нөмірін енгізіңіз",
+    "description": "Шағымның сипаттамасы",
+    "descriptionPlaceholder": "Шағым мәліметтерін сипаттаңыз...",
+    "birthDate": "Туған күні",
+    "birthDatePlaceholder": "КК.АА.ЖЖЖЖ",
+    "submitButton": "Шағым жіберу",
+    "successMessage": "Шағым сәтті жасалды (ID: {{id}})",
+    "errorUpload": "Жүктеу қатесі",
+    "errorSubmit": "Жіберу қатесі"
   }
 }

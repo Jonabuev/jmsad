@@ -12,7 +12,7 @@ const AboutSection: FC = () => {
         <div className={styles.grid}>
           {/* Logo Section */}
           <div className={styles.logoSection}>
-            <Image src="/home/logo.png" alt="logo" width={420} height={105} />
+            <Image src="/home/logo.svg" alt="logo" width={420} height={105} />
           </div>
 
           {/* Content Section */}

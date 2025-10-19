@@ -13,7 +13,9 @@ import styles from "./SearchPage.module.scss";
 
 interface IComplaintReason {
   id: number;
-  reason: string;
+  reason_text: string;
+  type: string;
+  order: number;
 }
 
 const TenantRegistry: React.FC = () => {
@@ -95,30 +97,11 @@ const TenantRegistry: React.FC = () => {
           console.error("No token found");
           return;
         }
-        const res = await fetchComplaintReasons();
-        let filteredReasons = res.data;
-        if (activeTab === "tenants") {
-          filteredReasons = res.data.filter((reason: IComplaintReason) =>
-            [
-              "Просрочка платежей",
-              "Порча имущества",
-              "Нарушение условий договора",
-              "Жалобы от соседей / нарушение порядка",
-              "Самовольное выселение или отказ освободить помещение",
-            ].includes(reason.reason)
-          );
-        } else {
-          filteredReasons = res.data.filter((reason: IComplaintReason) =>
-            [
-              "Отсутствие ремонта помещения",
-              "Игнорирование заявок на устранение неисправностей",
-              "Повышение арендной платы без уведомления",
-              "Отказ предоставить документы на жилье",
-              "Нарушение конфиденциальности жильцов",
-            ].includes(reason.reason)
-          );
-        }
-        setReasons(filteredReasons);
+        const locale = router.locale || 'ru';
+        // Запрашиваем причины с фильтрацией по типу на бэкенде
+        const type = activeTab === "tenants" ? "tenant" : "landlord";
+        const res = await fetchComplaintReasons(locale, type);
+        setReasons(res.data);
       } catch (error) {
         console.error("Ошибка загрузки причин жалоб:", error);
       }
@@ -324,7 +307,7 @@ const TenantRegistry: React.FC = () => {
                     onChange={() => toggleReason(reason.id)}
                     className={styles.checkbox}
                   />
-                  <span className={styles.reasonText}>{getTranslatedReasons(reason.reason)}</span>
+                  <span className={styles.reasonText}>{reason.reason_text}</span>
                 </label>
               ))}
             </div>

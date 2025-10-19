@@ -1293,6 +1293,30 @@
       "enable": "Включить",
       "later": "Позже"
     }
+  },
+  "pdfCheck": {
+    "pageTitle": "PDF Проверка судебных решений",
+    "pageSubtitle": "Загрузите PDF файл с судебным решением для автоматического анализа и создания жалобы",
+    "uploadTitle": "Загрузка документа",
+    "uploadButton": "Проверить документ",
+    "processing": "Обработка...",
+    "selectFile": "Выберите PDF файл",
+    "changeFile": "Изменить файл",
+    "fileSelected": "Файл выбран",
+    "noFileSelected": "Файл не выбран",
+    "candidatesTitle": "Найденные кандидаты",
+    "selected": "Выбран",
+    "formTitle": "Создать жалобу для",
+    "courtNumber": "Номер судебного дела",
+    "courtNumberPlaceholder": "Введите номер дела",
+    "description": "Описание жалобы",
+    "descriptionPlaceholder": "Опишите детали жалобы...",
+    "birthDate": "Дата рождения",
+    "birthDatePlaceholder": "ДД.ММ.ГГГГ",
+    "submitButton": "Отправить жалобу",
+    "successMessage": "Жалоба успешно создана (ID: {{id}})",
+    "errorUpload": "Ошибка загрузки",
+    "errorSubmit": "Ошибка отправки"
   }
 }
 

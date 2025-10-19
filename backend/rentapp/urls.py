@@ -41,6 +41,8 @@ from .views.fcm_views import (
     FCMTokenListCreateView, FCMTokenDetailView, register_fcm_token,
     unregister_fcm_token, test_push_notification, fcm_token_stats
 )
+from .views.file_access import serve_protected_file, serve_complaint_image
+from .views.gdpr import request_data_deletion, export_user_data, gdpr_info
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -172,6 +174,19 @@ urlpatterns = [
     ])),
     # Read PDF
     path('pdf/', PDFCheckView.as_view(), name='pdf'),
-    path('user_pdf/', CreateUserFromPDFView.as_view(), name='pdf')
+    path('user_pdf/', CreateUserFromPDFView.as_view(), name='pdf'),
+    
+    # Защищенный доступ к файлам (БЕЗОПАСНОСТЬ)
+    path('protected-media/<str:file_type>/<str:user_id>/<str:filename>/', 
+         serve_protected_file, 
+         name='protected-media'),
+    path('protected-media/complaint/<int:complaint_id>/<str:filename>/', 
+         serve_complaint_image, 
+         name='protected-complaint-image'),
+    
+    # GDPR Compliance (Защита данных пользователей)
+    path('gdpr/delete-data/', request_data_deletion, name='gdpr-delete-data'),
+    path('gdpr/export-data/', export_user_data, name='gdpr-export-data'),
+    path('gdpr/info/', gdpr_info, name='gdpr-info'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

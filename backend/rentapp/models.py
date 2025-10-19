@@ -10,6 +10,7 @@ import random
 from PIL import Image
 import os
 from django.conf import settings
+from rentapp.validators import validate_avatar_image, validate_image_file  # ✅ Валидация файлов
 
 def user_avatar_upload_path(instance, filename):
     # Используем ID пользователя. Можно заменить на UUID, если у тебя есть поле UUID.
@@ -340,7 +341,13 @@ class CustomUser(AbstractUser):
     identifier = models.CharField(max_length=15, blank=True, null=True, unique=True)  
     confirmation_code = models.CharField(max_length=6, blank=True, null=True)
     #rating = models.PositiveSmallIntegerField(default=5)
-    avatar = models.ImageField(upload_to=user_avatar_upload_path, blank=True, null=True, default='avatars/def.jpg')
+    avatar = models.ImageField(
+        upload_to=user_avatar_upload_path, 
+        blank=True, 
+        null=True, 
+        default='avatars/def.jpg',
+        validators=[validate_avatar_image]  # ✅ Валидация аватара (макс 5MB, только jpg/png)
+    )
     r_date = models.DateTimeField(null=True)
     birth_date = models.DateField(null=True, blank=True)
     is_from_pdf = models.BooleanField(default=False)
@@ -509,7 +516,7 @@ class House(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    owner = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    owner = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='houses')
     
     # Основное поле адреса (оставляем для обратной совместимости)
     address = models.CharField(max_length=255)
@@ -608,7 +615,10 @@ def house_image_upload_path(instance, filename):
 
 class HouseImage(models.Model):
     house = models.ForeignKey('House', on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to=house_image_upload_path)
+    image = models.ImageField(
+        upload_to=house_image_upload_path,
+        validators=[validate_image_file]  # ✅ Валидация изображений (макс 10MB)
+    )
     description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -646,46 +656,61 @@ class ComplaintReason(models.Model):
     
     @classmethod
     def ensure_default_reasons_exist(cls):
-        """Убедиться, что дефолтные причины существуют"""
+        """Убедиться, что дефолтные причины существуют с переводами"""
         # Причины для жалоб на арендодателей (от арендаторов)
+        # Формат: (ru, kz, en)
         landlord_reasons = [
-            "Отсутствие ремонта помещения",
-            "Повышение арендной платы без уведомления", 
-            "Нарушение условий договора",
-            "Игнорирование заявок на устранение неисправностей",
-            "Отказ от предоставления документов на жилье"
+            ("Отсутствие ремонта помещения", "Үй-жайды жөндеу жоқ", "Lack of property repair"),
+            ("Повышение арендной платы без уведомления", "Хабарлаусыз жалдау ақысын арттыру", "Rent increase without notice"), 
+            ("Нарушение условий договора", "Шарт талаптарын бұзу", "Contract violation"),
+            ("Игнорирование заявок на устранение неисправностей", "Ақауларды жою өтінімдерін елемеу", "Ignoring repair requests"),
+            ("Отказ от предоставления документов на жилье", "Тұрғын үйге құжаттарды беруден бас тарту", "Refusal to provide property documents")
         ]
         
         # Причины для жалоб на арендаторов (от арендодателей)
         tenant_reasons = [
-            "Просрочка платежей",
-            "Порча имущества",
-            "Нарушение условий договора",
-            "Жалобы от соседей / нарушение порядка",
-            "Самовольное выселение или отказ освободить помещение"
+            ("Просрочка платежей", "Төлемдерді кешіктіру", "Late payments"),
+            ("Порча имущества", "Мүлікті бүлдіру", "Property damage"),
+            ("Нарушение условий договора", "Шарт талаптарын бұзу", "Contract violation"),
+            ("Жалобы от соседей / нарушение порядка", "Көршілерден шағымдар / тәртіпті бұзу", "Neighbor complaints / disturbance"),
+            ("Самовольное выселение или отказ освободить помещение", "Өз еркімен шығару немесе үй-жайды босатудан бас тарту", "Unlawful eviction or refusal to vacate")
         ]
         
         # Создаем причины для арендодателей
-        for i, reason_text in enumerate(landlord_reasons):
-            cls.objects.get_or_create(
-                reason=reason_text,
+        for i, (reason_ru, reason_kz, reason_en) in enumerate(landlord_reasons):
+            obj, created = cls.objects.get_or_create(
+                reason=reason_ru,
                 defaults={
+                    'reason_kz': reason_kz,
+                    'reason_en': reason_en,
                     'type': 'landlord',
                     'is_default': True,
                     'order': i
                 }
             )
+            # Обновляем переводы если запись уже существует
+            if not created and (not obj.reason_kz or not obj.reason_en):
+                obj.reason_kz = reason_kz
+                obj.reason_en = reason_en
+                obj.save()
         
         # Создаем причины для арендаторов
-        for i, reason_text in enumerate(tenant_reasons):
-            cls.objects.get_or_create(
-                reason=reason_text,
+        for i, (reason_ru, reason_kz, reason_en) in enumerate(tenant_reasons):
+            obj, created = cls.objects.get_or_create(
+                reason=reason_ru,
                 defaults={
+                    'reason_kz': reason_kz,
+                    'reason_en': reason_en,
                     'type': 'tenant',
                     'is_default': True,
                     'order': i
                 }
             )
+            # Обновляем переводы если запись уже существует
+            if not created and (not obj.reason_kz or not obj.reason_en):
+                obj.reason_kz = reason_kz
+                obj.reason_en = reason_en
+                obj.save()
     
 import uuid
 from django.db import models
@@ -1132,7 +1157,10 @@ def complaint_image_upload_path(instance, filename):
 
 class ComplaintImage(models.Model):
     complaint = models.ForeignKey(RentalComplaint, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to=complaint_image_upload_path)
+    image = models.ImageField(
+        upload_to=complaint_image_upload_path,
+        validators=[validate_image_file]  # ✅ Валидация изображений (макс 10MB)
+    )
     
     def save(self, *args, **kwargs):
         # ✅ Оптимизация: автоматически сжимаем изображение перед сохранением
@@ -1440,3 +1468,133 @@ class FCMToken(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.get_device_type_display()} ({self.token[:20]}...)"
+
+
+class AuditLog(models.Model):
+    """
+    Audit Trail для отслеживания доступа к чувствительным данным.
+    
+    Логирует все важные действия:
+    - Просмотр профилей
+    - Доступ к документам
+    - Изменение данных
+    - Экспорт данных
+    - Удаление данных
+    """
+    ACTION_CHOICES = [
+        ('view_profile', 'Просмотр профиля'),
+        ('view_document', 'Просмотр документа'),
+        ('edit_profile', 'Изменение профиля'),
+        ('download_document', 'Скачивание документа'),
+        ('export_data', 'Экспорт данных (GDPR)'),
+        ('delete_data', 'Удаление данных (GDPR)'),
+        ('login', 'Вход в систему'),
+        ('logout', 'Выход из системы'),
+        ('failed_login', 'Неудачная попытка входа'),
+        ('register', 'Регистрация'),
+        ('password_change', 'Смена пароля'),
+        ('view_complaint', 'Просмотр жалобы'),
+        ('create_complaint', 'Создание жалобы'),
+        ('view_rental', 'Просмотр аренды'),
+    ]
+    
+    # Кто выполнил действие (может быть NULL если неавторизованный)
+    user = models.ForeignKey(
+        'CustomUser', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='audit_actions'
+    )
+    
+    # Над чьими данными было выполнено действие
+    target_user = models.ForeignKey(
+        'CustomUser', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='audit_targets'
+    )
+    
+    # Тип действия
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES, db_index=True)
+    
+    # IP адрес пользователя
+    ip_address = models.GenericIPAddressField()
+    
+    # User Agent (браузер/устройство)
+    user_agent = models.CharField(max_length=255, blank=True)
+    
+    # Timestamp
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    # Дополнительные данные (JSON)
+    details = models.JSONField(default=dict, blank=True)
+    
+    # Успешность действия
+    success = models.BooleanField(default=True)
+    
+    # Сообщение об ошибке (если не успешно)
+    error_message = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = "Audit Log"
+        verbose_name_plural = "Audit Logs"
+        indexes = [
+            models.Index(fields=['user', '-timestamp']),
+            models.Index(fields=['target_user', '-timestamp']),
+            models.Index(fields=['action', '-timestamp']),
+            models.Index(fields=['ip_address', '-timestamp']),
+            models.Index(fields=['-timestamp']),  # Для общей выборки по дате
+        ]
+    
+    def __str__(self):
+        if self.user:
+            return f"{self.timestamp} | {self.user.username} | {self.get_action_display()}"
+        else:
+            return f"{self.timestamp} | Anonymous | {self.get_action_display()}"
+    
+    @classmethod
+    def log_action(cls, action, request=None, user=None, target_user=None, details=None, success=True, error_message=None):
+        """
+        Утилита для создания audit log записи.
+        
+        Использование:
+        ```python
+        AuditLog.log_action(
+            action='view_profile',
+            request=request,
+            target_user=profile_user,
+            details={'profile_id': profile_user.id}
+        )
+        ```
+        """
+        # Получаем IP адрес
+        if request:
+            ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
+            if ip_address:
+                ip_address = ip_address.split(',')[0]
+            else:
+                ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
+            
+            user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
+            
+            # Если user не указан, берем из request
+            if not user and hasattr(request, 'user') and request.user.is_authenticated:
+                user = request.user
+        else:
+            ip_address = '0.0.0.0'
+            user_agent = ''
+        
+        # Создаем запись
+        return cls.objects.create(
+            user=user,
+            target_user=target_user,
+            action=action,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            details=details or {},
+            success=success,
+            error_message=error_message
+        )

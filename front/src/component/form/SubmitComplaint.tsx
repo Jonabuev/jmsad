@@ -8,6 +8,8 @@ import styles from "./SubmitComplaint.module.scss";
 interface ComplaintReason {
   id: number;
   reason: string;
+  reason_kz?: string;
+  reason_en?: string;
   type: string;
 }
 
@@ -49,20 +51,42 @@ const SubmitComplaintForm: React.FC = () => {
 
   const router = useRouter();
 
-  // Загрузка причин
+  // Хелпер для получения переведенного текста причины
+  const getReasonText = (reason: ComplaintReason): string => {
+    const locale = router.locale || 'ru';
+    if (locale === 'kz' && reason.reason_kz) return reason.reason_kz;
+    if (locale === 'en' && reason.reason_en) return reason.reason_en;
+    return reason.reason;
+  };
+
+  // Загрузка причин (загружаем ВСЕ причины без фильтрации по type)
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token) return;
-    fetchComplaintReasons(token)
+    if (!token) {
+      console.warn("No token found for loading complaint reasons");
+      return;
+    }
+    const locale = router.locale || 'ru';
+    console.log("Loading complaint reasons with locale:", locale);
+    // НЕ передаем type - загружаем все причины
+    fetchComplaintReasons(token, locale, undefined)
       .then((res) => {
+        console.log("Complaint reasons loaded:", res.data);
         if (Array.isArray(res.data)) {
           setComplaintReasons(res.data);
+          console.log(`Total reasons loaded: ${res.data.length}`);
+          console.log(`Tenant reasons: ${res.data.filter(r => r.type === 'tenant').length}`);
+          console.log(`Landlord reasons: ${res.data.filter(r => r.type === 'landlord').length}`);
         } else {
+          console.error("Invalid data format:", res.data);
           setErrorMessage(t("Scomplaint.invalidDataFormat"));
         }
       })
-      .catch(() => setErrorMessage(t("Scomplaint.loadReasonsError")));
-  }, [t]);
+      .catch((error) => {
+        console.error("Error loading complaint reasons:", error);
+        setErrorMessage(t("Scomplaint.loadReasonsError"));
+      });
+  }, [router.locale, t]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -428,7 +452,7 @@ const SubmitComplaintForm: React.FC = () => {
                         className={styles.reasonCheckbox}
                       />
                       <span className={styles.reasonText}>
-                        {t(`Scomplaint.reason.${reason.reason}`)}
+                        {getReasonText(reason)}
                       </span>
                     </label>
                   ))}

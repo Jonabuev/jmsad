@@ -135,25 +135,3 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .adminPage,
-  .loadingContainer,
-  .accessDeniedContainer {
-    background-color: #1f2937;
-  }
-
-  .loadingText,
-  .accessDeniedMessage {
-    color: #d1d5db;
-  }
-
-  .accessDeniedTitle {
-    color: #f9fafb;
-  }
-
-  .debugInfo {
-    background-color: #374151;
-    color: #e5e7eb;
-  }
-}

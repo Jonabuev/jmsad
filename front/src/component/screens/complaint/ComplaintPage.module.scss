@@ -352,30 +352,3 @@
   }
 }
 
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .complaintPage {
-    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  }
-
-  .headerSection {
-    background-color: #374151;
-    color: #f9fafb;
-  }
-
-  .headerTitle {
-    color: #f9fafb;
-  }
-
-  .createdDate {
-    color: #d1d5db;
-  }
-
-  .notFoundTitle {
-    color: #f9fafb;
-  }
-
-  .notFoundDescription {
-    color: #d1d5db;
-  }
-}

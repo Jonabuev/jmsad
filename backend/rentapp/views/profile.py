@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from django.shortcuts import get_object_or_404
-from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification, UserViolation
+from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification, UserViolation, AuditLog
 from rentapp.serializers import CustomUserSerializer, HouseSerializer, RentalSerializer, RentalComplaintSerializer, ComplaintRegistrySerializer
 from rest_framework.views import APIView
 from django.db import transaction, IntegrityError
@@ -37,13 +37,16 @@ def profile(request):
     """
     try:
         user = request.user
-        print(f"User: {user.username}, ID: {user.id}")  # Логируем пользователя
-
-        # Убираем рейтинг (вычисление репутации и среднего рейтинга)
-        # reputation = Reputation.objects.filter(tenant_identifier=user)
-        # print(f"Reputation count: {reputation.count()}")  # Логируем количество рейтингов
-        # average_rating = user.objects.aggregate(Avg('rating'))['rating__avg']
-        # print(f"Average user rating: {average_rating}")
+        # БЕЗОПАСНОСТЬ: НЕ логируем детали пользователя через print()
+        # Используем security_logger для важных событий
+        
+        # ✅ Audit Trail: Логируем просмотр профиля
+        AuditLog.log_action(
+            action='view_profile',
+            request=request,
+            target_user=user,
+            details={'profile_id': user.id, 'role': user.role}
+        )
 
         # ✅ Оптимизация: используем select_related и prefetch_related
         # Жалобы
@@ -104,12 +107,15 @@ def profile(request):
             'admin_complaints': RentalComplaintSerializer(admin_complaints, many=True).data,
             'rentals_all':RentalSerializer(rentals_all, many=True).data
         }
-        #print(f"Final response data: {data}")  # Логируем финальные данные
+        # БЕЗОПАСНОСТЬ: НЕ логируем response data через print()
 
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
         import traceback
-        print(traceback.format_exc())
+        import logging
+        # Используем logger вместо print()
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in profile view: {str(e)}\n{traceback.format_exc()}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -154,6 +160,17 @@ def edit_profile(request):
             user.avatar = request.FILES['avatar']
 
         serializer.save()
+        
+        # ✅ Audit Trail: Логируем изменение профиля
+        AuditLog.log_action(
+            action='edit_profile',
+            request=request,
+            target_user=user,
+            details={
+                'profile_id': user.id,
+                'changed_fields': list(request.data.keys())[:10]  # Первые 10 изменённых полей
+            }
+        )
 
         # 🔍 Проверка обновлённой даты документа
         passport_expiry = serializer.validated_data.get("passport_expiry")
@@ -170,8 +187,11 @@ def edit_profile(request):
             'user': CustomUserSerializer(user).data,
         }
         return Response(data, status=status.HTTP_200_OK)
-
-    print(serializer.errors)
+    
+    # БЕЗОПАСНОСТЬ: Логируем через logger вместо print()
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.warning(f"Serializer errors: {serializer.errors}")
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -198,6 +218,8 @@ class PublicUserProfileView(APIView):
     Возвращает публичную информацию о пользователе по username.
     Включает дома, аренды и жалобы пользователя.
     
+    БЕЗОПАСНОСТЬ: Чувствительные данные (phone, email, identifier) маскируются.
+    
     URL Parameters:
         - username: Имя пользователя для просмотра профиля
     
@@ -205,7 +227,21 @@ class PublicUserProfileView(APIView):
         - Доступно всем пользователям
     """
     def get(self, request, username):
+        from rentapp.serializers import PublicUserSerializer
+        
         user = get_object_or_404(CustomUser, username=username)
+        
+        # ✅ Audit Trail: Логируем просмотр публичного профиля
+        AuditLog.log_action(
+            action='view_profile',
+            request=request,
+            target_user=user,
+            details={
+                'profile_id': user.id,
+                'profile_username': username,
+                'viewer_authenticated': request.user.is_authenticated
+            }
+        )
         
         # Получение всех домов арендодателя
         houses = House.objects.filter(owner=user) if user.role == "landlord" else []
@@ -219,17 +255,13 @@ class PublicUserProfileView(APIView):
         # Жалобы, отправленные этим пользователем
         complaints_rental = RentalComplaint.objects.filter(complainant=user)
 
+        # Используем PublicUserSerializer для безопасного отображения данных
+        # Чувствительные данные (phone, email, identifier) будут маскированы
+        user_data = PublicUserSerializer(user).data
+        user_data["is_banned"] = hasattr(user, "blacklist")
+        
         data = {
-            "id": user.id, 
-            "username": user.username,
-            "identifier": user.identifier,
-            "role": user.role,
-            #"rating": user.rating,
-            "phone_number": user.phone_number,
-            "email": user.email,
-            "is_banned": hasattr(user, "blacklist"),
-            "email_confirmed": user.email_confirmed,
-            "avatar": user.avatar.url if user.avatar else None,
+            **user_data,  # Безопасные данные пользователя (phone/email маскированы)
             "houses": [
                 {
                     "id": house.id,
@@ -279,18 +311,14 @@ class IssueViolationAPIView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request):
-        print("USER:", request.user)
-        print("IS AUTH:", request.user.is_authenticated)
-        print("IS SUPERUSER:", request.user.is_superuser)
-        print("DATA:", request.data)
-
+        # БЕЗОПАСНОСТЬ: НЕ логируем данные через print()
+        
         user_id = request.data.get("user_id")
         reason = request.data.get("reason", "")
 
         try:
             user = CustomUser.objects.get(id=user_id)
         except CustomUser.DoesNotExist:
-            print("FULL BODY:", request.data)
             return Response({"error": "Пользователь не найден"}, status=404)
 
         UserViolation.objects.create(
@@ -368,13 +396,11 @@ def verification_status(request):
         - Требуется аутентификация
     """
     user = request.user
-    print(f"DEBUG: verification_status called for user {user.username}")
-    print(f"DEBUG: user.email_confirmed = {user.email_confirmed}")
+    # БЕЗОПАСНОСТЬ: НЕ логируем через print()
     
     response_data = {
         "email_confirmed": user.email_confirmed,
     }
-    print(f"DEBUG: Returning response data: {response_data}")
     
     return Response(response_data)
 
@@ -396,13 +422,12 @@ def verify_identity(request):
     """
     try:
         id_doc = request.FILES.get('id_document')
-        print(f"DEBUG: verify_identity called for user {request.user.username}")
-        print(f"DEBUG: Before setting email_confirmed: {request.user.email_confirmed}")
+        # БЕЗОПАСНОСТЬ: НЕ логируем через print() в production
         
         with transaction.atomic():
             request.user.email_confirmed = True
             request.user.save()
-            print(f"DEBUG: After setting email_confirmed: {request.user.email_confirmed}")
+            # БЕЗОПАСНОСТЬ: НЕ логируем через print()
             
             # Создаем запись о верификации, если документ загружен
             if id_doc:
@@ -414,7 +439,7 @@ def verify_identity(request):
                     verification.id_document = id_doc
                     verification.verified = True
                     verification.save()
-                print(f"DEBUG: Verification record updated, verified = {verification.verified}")
+                # БЕЗОПАСНОСТЬ: НЕ логируем через print()
             
             send_mail(
                 'Email confirmation successful',
@@ -474,9 +499,7 @@ class TenantRegistryView(generics.ListAPIView):
         if start_date and end_date:
             queryset = queryset.filter(created_at__range=[start_date, end_date])
 
-        # Отладочная информация
-        for complaint in queryset:
-            print(f"[DEBUG] Complaint #{complaint.id}: FROM {complaint.complainant.username} ({complaint.complainant.role}) → TO {complaint.accused.username} ({complaint.accused.role})")
+        # БЕЗОПАСНОСТЬ: НЕ логируем через print()
 
         return queryset
 

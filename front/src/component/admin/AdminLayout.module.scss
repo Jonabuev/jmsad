@@ -40,10 +40,3 @@
     padding: 1rem 0 0;
   }
 }
-
-// Dark mode support (if needed in future)
-@media (prefers-color-scheme: dark) {
-  .adminLayout {
-    background-color: #1f2937;
-  }
-}
