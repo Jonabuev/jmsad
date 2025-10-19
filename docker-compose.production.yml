@@ -168,6 +168,7 @@ services:
   nginx:
     image: nginx:alpine
     container_name: jmsad_nginx_prod
+    command: /bin/sh -c "rm -f /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
     ports:
       - "80:80"
       - "443:443"
