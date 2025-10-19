@@ -13,7 +13,7 @@ import styles from "./SearchPage.module.scss";
 
 interface IComplaintReason {
   id: number;
-  reason_text: string;
+  reason: string;
   type: string;
   order: number;
 }
@@ -307,7 +307,7 @@ const TenantRegistry: React.FC = () => {
                     onChange={() => toggleReason(reason.id)}
                     className={styles.checkbox}
                   />
-                  <span className={styles.reasonText}>{reason.reason_text}</span>
+                  <span className={styles.reasonText}>{reason.reason}</span>
                 </label>
               ))}
             </div>
