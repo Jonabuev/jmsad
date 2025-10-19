@@ -181,7 +181,7 @@ services:
       - jmsad-network
     restart: unless-stopped
     depends_on:
-      - jmsad_backend_prod # <--- обязательно
+      - backend # <--- обязательно
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
