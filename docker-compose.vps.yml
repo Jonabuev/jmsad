@@ -1,89 +1,135 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  # PostgreSQL для тестового окружения
   postgres:
     image: postgres:16.9-alpine
-    container_name: jmsad_postgres_dev
+    container_name: jmsad_postgres_test
     environment:
-      POSTGRES_DB: jmsad_db
-      POSTGRES_USER: jmsad_user
-      POSTGRES_PASSWORD: jmsad_password
+      POSTGRES_DB: jmsad_db_test
+      POSTGRES_USER: jmsad_user_test
+      POSTGRES_PASSWORD: jmsad_password_test
     ports:
-      - "5432:5432"
+      - "15432:5432" # отличающийся порт
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_test:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
     networks:
-      - jmsad-network
+      - jmsad-test-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U jmsad_user -d jmsad_db"]
+      test: ["CMD-SHELL", "pg_isready -U jmsad_user_test -d jmsad_db_test"]
       interval: 30s
       timeout: 10s
       retries: 3
 
+  # Backend (Django)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: jmsad_backend_dev
+    container_name: jmsad_backend_test
     ports:
-      - "8000:8000"
+      - "18000:8000" # свой порт
     env_file:
       - .env.test
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=True
-      - DB_NAME=jmsad_db
-      - DB_USER=jmsad_user
-      - DB_PASSWORD=jmsad_password
+      - DB_NAME=jmsad_db_test
+      - DB_USER=jmsad_user_test
+      - DB_PASSWORD=jmsad_password_test
       - DB_HOST=postgres
       - DB_PORT=5432
-      - ALLOWED_HOSTS=dev.arno.kz,localhost,127.0.0.1
+      - ALLOWED_HOSTS=dev.arno.kz,api.dev.arno.kz,localhost,127.0.0.1
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
-      - backend_static:/app/staticfiles
-      - backend_media:/app/media
+      - backend_static_test:/app/staticfiles
+      - backend_media_test:/app/media
     restart: unless-stopped
     networks:
-      - jmsad-network
+      - jmsad-test-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
 
+  # Frontend (Next.js)
   frontend:
     build:
       context: ./front
       dockerfile: Dockerfile
-    container_name: jmsad_frontend_dev
+    container_name: jmsad_frontend_test
     ports:
-      - "3000:3000"
+      - "13000:3000" # свой порт
     env_file:
       - front/.env.local
     environment:
-      - NEXT_PUBLIC_API_URL=http://dev.arno.kz/api
+      - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - jmsad-network
+      - jmsad-test-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
 
+  # Nginx для dev.arno.kz и api.dev.arno.kz
+  nginx:
+    image: nginx:alpine
+    container_name: jmsad_nginx_test
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx_full.conf:/etc/nginx/nginx.conf:ro
+      - backend_static_test:/app/staticfiles:ro
+      - backend_media_test:/app/media:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./nginx/logs_test:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - jmsad-test-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Certbot (автообновление SSL)
+  certbot:
+    image: certbot/certbot
+    container_name: jmsad_certbot_test
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - jmsad-test-network
+
 volumes:
-  postgres_data:
-  backend_static:
-  backend_media:
+  postgres_data_test:
+  backend_static_test:
+  backend_media_test:
 
 networks:
-  jmsad-network:
+  jmsad-test-network:
     driver: bridge
