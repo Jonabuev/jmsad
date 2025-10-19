@@ -177,6 +177,15 @@ services:
       - ./media:/app/media:rw
       - ./certbot/www:/var/www/certbot:rw
       - ./nginx/snippets:/etc/nginx/snippets:ro
+    networks:
+      - jmsad-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Certbot для SSL сертификатов
   certbot:
     image: certbot/certbot
