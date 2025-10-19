@@ -1,7 +1,7 @@
 # Production Docker Compose с полной безопасностью
 # ===================================================
 
-version: '3.8'
+version: "3.8"
 
 services:
   # Redis для кеширования и rate limiting
@@ -10,7 +10,7 @@ services:
     container_name: jmsad_redis_prod
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     ports:
-      - "127.0.0.1:6379:6379"  # Только локальный доступ
+      - "127.0.0.1:6379:6379" # Только локальный доступ
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -34,11 +34,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     ports:
-      - "127.0.0.1:5432:5432"  # Только локальный доступ
+      - "127.0.0.1:5432:5432" # Только локальный доступ
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./backups:/backups  # Для резервных копий
+      - ./backups:/backups # Для резервных копий
     restart: unless-stopped
     networks:
       - jmsad-network
@@ -53,22 +53,22 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 1G
 
   # Бэкенд Django
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
       args:
         - ENVIRONMENT=production
     container_name: jmsad_backend_prod
     ports:
-      - "127.0.0.1:8000:8000"  # Только через nginx
+      - "127.0.0.1:8000:8000" # Только через nginx
     env_file:
       - .env
     environment:
@@ -102,7 +102,13 @@ services:
     networks:
       - jmsad-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -112,15 +118,15 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 1G
 
   # Фронтенд Next.js
   frontend:
-    build: 
+    build:
       context: ./front
       dockerfile: Dockerfile
       args:
@@ -128,7 +134,7 @@ services:
         - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     container_name: jmsad_frontend_prod
     ports:
-      - "127.0.0.1:3000:3000"  # Только через nginx
+      - "127.0.0.1:3000:3000" # Только через nginx
     env_file:
       - front/.env.production
     environment:
@@ -152,10 +158,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 1G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
 
   # Nginx reverse proxy
@@ -168,13 +174,13 @@ services:
     volumes:
       - ./nginx/conf.d/app.conf:/etc/nginx/conf.d/app.conf:ro
       - ./nginx/certs:/etc/letsencrypt
-      - ./nginx_full.conf:/etc/nginx/nginx.conf:ro 
+      - ./nginx_full.conf:/etc/nginx/nginx.conf:ro
       - backend_static:/app/staticfiles:ro
       - backend_media:/app/media:ro
       - ./certbot/conf:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot:ro
       - ./nginx/logs:/var/log/nginx
-      - ./nginx/snippets:/etc/nginx/snippets:ro 
+      - ./nginx/snippets:/etc/nginx/snippets:ro
     depends_on:
       - backend
       - frontend
@@ -191,7 +197,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 512M
 
   # Certbot для SSL сертификатов
@@ -237,7 +243,6 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/16
-
 # Запуск:
 # docker-compose -f docker-compose.production.yml up -d
 #
