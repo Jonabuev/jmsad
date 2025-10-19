@@ -166,6 +166,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - ./nginx/conf.d/app.conf:/etc/nginx/conf.d/app.conf:ro
+      - ./nginx/certs:/etc/letsencrypt
       - ./nginx_full.conf:/etc/nginx/nginx.conf:ro 
       - backend_static:/app/staticfiles:ro
       - backend_media:/app/media:ro
