@@ -167,7 +167,7 @@ services:
   # Nginx reverse proxy
   nginx:
     image: nginx:alpine
-    container_name: jmsad_nginx_prod
+    container_name: jmsad_nginx
     command: nginx -g 'daemon off;'
     ports:
       - "80:80"
