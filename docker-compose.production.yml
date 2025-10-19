@@ -164,40 +164,6 @@ services:
           cpus: "0.5"
           memory: 512M
 
-  # Nginx reverse proxy
-  nginx:
-    image: nginx:alpine
-    container_name: jmsad_nginx
-    command: nginx -g 'daemon off;'
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx_full.conf:/etc/nginx/nginx.conf:ro
-      - backend_static:/app/staticfiles:ro
-      - backend_media:/app/media:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
-      - ./nginx/logs:/var/log/nginx
-      - ./nginx/snippets:/etc/nginx/snippets:ro
-    depends_on:
-      - backend
-      - frontend
-    restart: unless-stopped
-    networks:
-      - jmsad-network
-    healthcheck:
-      test: ["CMD", "nginx", "-t"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
 
   nginx_prod:
     image: nginx:latest
