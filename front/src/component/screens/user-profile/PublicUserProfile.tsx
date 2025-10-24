@@ -48,11 +48,19 @@ const PublicUserProfile: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddComment = async () => {
-    if (!profileData || !currentUserProfile) return;
+    if (!profileData || !currentUserProfile?.user) {
+      setErrorMessage(t("profile.connectionError"));
+      return;
+    }
 
     // клиентская проверка: нельзя писать себе
     if (profileData.id === currentUserProfile.user.id) {
       setErrorMessage(t("profile.selfError"));
+      return;
+    }
+
+    if (!newComment.trim()) {
+      setErrorMessage(t("validation.required"));
       return;
     }
 
@@ -67,16 +75,24 @@ const PublicUserProfile: FC = () => {
         },
       });
 
-      const freshComments = await resCheck.json();
+      if (!resCheck.ok) {
+        console.error("Failed to fetch comments:", resCheck.status);
+        // Продолжаем без проверки лимита, если не удалось загрузить комментарии
+      } else {
+        const freshComments = await resCheck.json();
 
-      const alreadyWritten = freshComments.filter(
-        (c: any) => c.author === currentUserProfile.user.id
-      );
+        // Проверяем что получили массив
+        if (Array.isArray(freshComments)) {
+          const alreadyWritten = freshComments.filter(
+            (c: any) => c.author === currentUserProfile.user.id
+          );
 
-      if (alreadyWritten.length >= 2) {
-        setErrorMessage(t("profile.limitError"));
-        setIsSubmitting(false);
-        return;
+          if (alreadyWritten.length >= 2) {
+            setErrorMessage(t("profile.limitError"));
+            setIsSubmitting(false);
+            return;
+          }
+        }
       }
 
       // теперь можно постить
@@ -93,16 +109,17 @@ const PublicUserProfile: FC = () => {
 
       if (!res.ok) {
         const data = await res.json();
-        setErrorMessage(data.non_field_errors?.[0] || t("profile.submitError"));
+        setErrorMessage(data.non_field_errors?.[0] || data.detail || t("profile.submitError"));
         return;
       }
 
       setNewComment("");
       setShowAddComment(false);
+      setErrorMessage("");
       fetchComments(); // обновим список
     } catch (err) {
+      console.error("Error adding comment:", err);
       setErrorMessage(t("profile.connectionError"));
-      console.error(err);
     } finally {
       setIsSubmitting(false);
     }

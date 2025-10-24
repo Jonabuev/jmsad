@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status, generics, filters
 from rest_framework.pagination import PageNumberPagination
@@ -791,6 +791,7 @@ class FAQDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ComplaintReasonListView(generics.ListCreateAPIView):
     """
     API endpoint для получения списка причин жалоб и создания новых причин.
+    Поддерживает мультиязычность через параметр locale.
     """
     serializer_class = ComplaintReasonSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
@@ -802,6 +803,12 @@ class ComplaintReasonListView(generics.ListCreateAPIView):
     def get_queryset(self):
         from rentapp.models import ComplaintReason
         return ComplaintReason.objects.all()
+    
+    def get_serializer_context(self):
+        """Передаем locale в контекст сериализатора"""
+        context = super().get_serializer_context()
+        context['locale'] = self.request.GET.get('locale', 'ru')
+        return context
     
     def perform_create(self, serializer):
         reason = serializer.save()
@@ -821,6 +828,7 @@ class ComplaintReasonListView(generics.ListCreateAPIView):
 class ComplaintReasonDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     API endpoint для получения, обновления и удаления конкретной причины жалобы.
+    Поддерживает мультиязычность через параметр locale.
     """
     serializer_class = ComplaintReasonSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
@@ -828,6 +836,12 @@ class ComplaintReasonDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         from rentapp.models import ComplaintReason
         return ComplaintReason.objects.all()
+    
+    def get_serializer_context(self):
+        """Передаем locale в контекст сериализатора"""
+        context = super().get_serializer_context()
+        context['locale'] = self.request.GET.get('locale', 'ru')
+        return context
     
     def perform_update(self, serializer):
         reason = serializer.save()
@@ -894,9 +908,11 @@ class AdminActivityLogListView(generics.ListAPIView):
 # ==================== PUBLIC FAQ API ====================
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_public_faq(request):
     """
     API для получения FAQ для пользовательской страницы с поддержкой переводов.
+    Доступно без авторизации.
     """
     from django.db.models import Q
     from rentapp.models import FAQ
@@ -923,9 +939,11 @@ def get_public_faq(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_public_complaint_reasons(request):
     """
     API для получения причин жалоб для пользовательской страницы с поддержкой переводов.
+    Доступно без авторизации.
     """
     from rentapp.models import ComplaintReason
     from rentapp.serializers import PublicComplaintReasonSerializer

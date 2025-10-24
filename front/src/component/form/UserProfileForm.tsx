@@ -2,13 +2,14 @@
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useApi } from "../hooks/useApi";
 import { IProfileData } from "../type/users.interface";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
 import { fetchUserProfile } from "../store/auth/authSlice";
+import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
 import styles from "./UserProfileForm.module.scss";
 
 
@@ -39,6 +40,8 @@ const UserProfileForm = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
   const { fetchData: updateProfile, loading: updateLoading } = useApi<IProfileData>('/profile/edit/', {
     method: 'PATCH',
   }, { manual: true });
@@ -57,6 +60,15 @@ const UserProfileForm = () => {
     }
   }, [profileData, reset]);
   const docType = watch("document_type");
+
+  const handleAvatarChange = (files: File[]) => {
+    if (files.length > 0) {
+      setAvatarFile(files[0]);
+    } else {
+      setAvatarFile(null);
+    }
+  };
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const formPayload = new FormData();
     
@@ -66,8 +78,8 @@ const UserProfileForm = () => {
     if (data.email?.trim()) formPayload.append("email", data.email);
     formPayload.append("clear_avatar", String(data.clearAvatar));
 
-    if (data.avatar && data.avatar.length > 0) {
-      formPayload.append("avatar", data.avatar[0]);
+    if (avatarFile) {
+      formPayload.append("avatar", avatarFile);
     }
 
      if (data.document_type) formPayload.append("document_type", data.document_type);
@@ -223,14 +235,17 @@ const UserProfileForm = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              {t("editProfile.uploadNew")}:
-            </label>
-            <input 
-              type="file" 
-              accept="image/*" 
-              {...register("avatar")}
-              className={styles.fileInput}
+            <FileUploadDropzone
+              accept="image/*"
+              multiple={false}
+              maxFiles={1}
+              maxSizeMB={5}
+              onFilesChange={handleAvatarChange}
+              currentFiles={avatarFile ? [avatarFile] : []}
+              label={t("editProfile.uploadNew")}
+              hint="PNG, JPG, GIF до 5MB"
+              showPreview={true}
+              previewType="image"
             />
           </div>
 

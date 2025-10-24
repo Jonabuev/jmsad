@@ -107,7 +107,7 @@ const TenantRegistry: React.FC = () => {
       }
     };
     fetchReasons();
-  }, [activeTab]);
+  }, [activeTab, router.locale]);
 
   const toggleReason = (id: number) => {
     setSelectedReasons((prev) =>

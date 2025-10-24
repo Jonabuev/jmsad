@@ -1,6 +1,5 @@
 {
   "_comment": "OPTIMIZED VERSION - Removed duplicates, added common sections",
-  
   "common": {
     "loading": "Loading...",
     "error": "Error",
@@ -12,7 +11,6 @@
     "yes": "Yes",
     "no": "No"
   },
-  
   "actions": {
     "submit": "Submit",
     "cancel": "Cancel",
@@ -36,7 +34,6 @@
     "login": "Login",
     "register": "Register"
   },
-  
   "statuses": {
     "pending": "Pending",
     "active": "Active",
@@ -53,7 +50,6 @@
     "banned": "Banned",
     "expired": "Expired"
   },
-  
   "validation": {
     "required": "This field is required",
     "invalidEmail": "Invalid email",
@@ -62,16 +58,13 @@
     "passwordMismatch": "Passwords do not match",
     "iinTooLong": "IIN cannot exceed 12 characters"
   },
-
   "welcome": "Welcome",
-  
   "header": {
     "home": "Home",
     "about": "About",
     "services": "Services",
     "contact": "Contact"
   },
-  
   "footer": {
     "aboutUs": "About Us",
     "aboutDescription": "ARNO - a platform for a transparent and responsible rental market",
@@ -90,7 +83,6 @@
     "socialMedia": "We are on social media:",
     "copyright": "©2025 ARNO.KZ ALL RIGHTS RESERVED"
   },
-  
   "navigation": {
     "registry": "Registry",
     "faq": "FAQ",
@@ -102,14 +94,71 @@
     "catalog": "Catalog",
     "admin": "Admin Panel"
   },
-  
   "languages": {
     "ru": "Russian",
     "en": "English",
     "kz": "Kazakh"
   },
-  
   "profile": {
+    "info": "Information",
+    "complaints": "Complaints",
+    "comments": "Comments",
+    "apartments": {
+      "myApartments": "My Apartments",
+      "addProperty": "Add Property",
+      "house": "House",
+      "apartment": "Apartment",
+      "rooms": "Rooms",
+      "rentalStatus": "Rental Status",
+      "noAddedHomes": "No added homes"
+    },
+    "confirmed": "Confirmed",
+    "notConfirmed": "Not confirmed",
+    "noPhone": "Phone not specified",
+    "noIIN": "IIN not specified",
+    "tenant": "Tenant",
+    "landlord": "Landlord",
+    "administrator": "Administrator",
+    "document": "Document",
+    "until": "Until",
+    "expired": "Expired",
+    "sentComplaintsCount": "Sent complaints",
+    "receivedComplaintsCount": "Received complaints",
+    "approvedCount": "approved",
+    "underReview": "under review",
+    "verificationStatus": "Verification status",
+    "fullAccess": "Full access",
+    "limitedAccess": "Limited access",
+    "generalInfo": "General information",
+    "basicProfileInfo": "Basic profile information",
+    "accountInfo": "Account information",
+    "contactInfo": "Contact information",
+    "username": "Username",
+    "role": "Role",
+    "email": "Email",
+    "phone": "Phone",
+    "iin": "IIN",
+    "active": "Active",
+    "showComments": "Show comments",
+    "hideComments": "Hide comments",
+    "noComments": "No comments",
+    "noCommentsDescription": "No comments yet",
+    "addComment": "Add comment",
+    "newComment": "New comment",
+    "leaveFeedback": "Leave feedback about the user",
+    "commentText": "Comment text",
+    "commentPlaceholder": "Write your review about the user...",
+    "characters": "characters",
+    "cancel": "Cancel",
+    "send": "Send",
+    "sending": "Sending...",
+    "limitError": "You have already left 2 comments for this user",
+    "selfError": "You cannot leave a comment for yourself",
+    "submitError": "Error adding comment",
+    "connectionError": "Server connection error",
+    "edit": "Edit profile",
+    "changePassword": "Change password",
+    "logout": "Logout",
     "sections": {
       "info": "Info",
       "complaints": "Complaints",
@@ -154,47 +203,9 @@
       "visa": "Visa",
       "unknown": "Not specified"
     },
-    "apartments": {
-      "myApartments": "My Apartments",
-      "addProperty": "Add Property",
-      "house": "House",
-      "apartment": "Apartment",
-      "rooms": "Rooms",
-      "rentalStatus": "Rental Status",
-      "noAddedHomes": "No added homes"
-    },
-    "complaints": {
-      "title": "Complaints",
-      "adminComplaints": "Admin Complaints",
-      "sentComplaints": "Sent Complaints",
-      "receivedComplaints": "Received Complaints",
-      "complaintsSentByYou": "Complaints you sent",
-      "complaintsReceivedAboutYou": "Complaints received about you",
-      "addComplaint": "Add Complaint",
-      "noComplaints": "No complaints",
-      "noComplaintsDescription": "This user has no complaints yet",
-      "noComplaintsFound": "No complaints",
-      "sentComplaintsCount": "Sent complaints",
-      "receivedComplaintsCount": "Received complaints",
-      "approvedCount": "approved",
-      "underReview": "under review",
-      "complaintManagement": "Complaint Management"
-    },
-    "comments": {
-      "title": "Comments",
-      "hideComments": "Hide Comments",
-      "showComments": "View all comments",
-      "toggleComments": "Hide comments",
-      "commentPlaceholder": "Write your review about the user...",
-      "commentText": "Comment text",
-      "characters": "characters",
-      "noComments": "No comments yet",
-      "noCommentsDescription": "No comments yet. Be the first!",
-      "addComment": "Add comment",
-      "newComment": "New comment",
-      "leaveFeedback": "Leave feedback about the user",
-      "sending": "Sending..."
-    },
+    "description": "Description",
+    "status": "Status",
+    "date": "Date",
     "actions": {
       "dispute": "Dispute",
       "details": "Details",
@@ -263,11 +274,10 @@
       }
     }
   },
-  
   "verify": {
-    "identityVerification": "Identity verification"
+    "identityVerification": "Identity verification",
+    "uploadDocument": "Document Upload"
   },
-  
   "rentalTable": {
     "rentalRequests": "Rental requests (incoming)",
     "noRequests": "No rental requests.",
@@ -285,7 +295,6 @@
       "cancelled": "Cancelled"
     }
   },
-  
   "dispute": {
     "disputeTitle": "Dispute the Complaint",
     "disputeExplanation": "Explanation",
@@ -302,7 +311,6 @@
     "uploadEvidenceFormats": "PDF, JPG, JPEG, PNG (optional)",
     "fileChosen": "✓ File chosen:"
   },
-  
   "complaint": {
     "title": "Complaint",
     "description": "Description",
@@ -332,7 +340,6 @@
       "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
     }
   },
-  
   "form": {
     "title": "New Property",
     "address": "Address (Street)",
@@ -344,7 +351,9 @@
     "room": "Room",
     "submit": "Add Property"
   },
-  
+  "property": {
+    "photos": "Apartment Photos"
+  },
   "registration": {
     "registration1": "Registration",
     "user_type": "User type",
@@ -384,7 +393,6 @@
     "done": "Done",
     "submitting": "Registering..."
   },
-  
   "Scomplaint": {
     "title": "Submit a Complaint",
     "selectRental": "Select a Rental",
@@ -418,6 +426,7 @@
     "submitedit": "Submit Changes",
     "editTitle": "Edit Complaint",
     "additionalPhotos": "Photos",
+    "selectedImages": "Selected photos",
     "damageCost": "Court Decision",
     "descriptionedit": "To dispute the complaint, you need to modify its content",
     "photoerror": "Maximum of 10 images can be uploaded",
@@ -445,7 +454,15 @@
     "uploadDocument": "Upload document",
     "uploadFormats": "PDF, DOC, DOCX, images"
   },
-  
+  "fileUpload": {
+    "clickToUpload": "Click to upload",
+    "orDragDrop": "or drag and drop files here",
+    "selectedFiles": "Selected files",
+    "removeFile": "Remove file",
+    "tooManyFiles": "Too many files. Maximum: {{max}}",
+    "fileTooLarge": "File too large. Maximum: {{max}}MB",
+    "invalidFileType": "Invalid file type"
+  },
   "editProfile": {
     "fullName": "Full Name",
     "iin": "IIN",
@@ -468,7 +485,6 @@
     "loading": "Loading profile...",
     "doc_expired": "Document has expired"
   },
-
   "rentalCatalog": {
     "title": "Housing Catalog",
     "find": "Find",
@@ -498,7 +514,6 @@
     "objects": "objects",
     "loading": "Loading..."
   },
-  
   "search": {
     "placeholder": "Search by IIN or username",
     "address_placeholder": "Enter address",
@@ -531,7 +546,6 @@
     "landlords": "Landlords",
     "complaint_dates": "Complaint Dates"
   },
-  
   "forum": {
     "title": "Complaints Forum",
     "commentLimitReached": "You have already posted 2 comments for this complaint.",
@@ -555,7 +569,6 @@
     "addComment": "Add a comment...",
     "send": "Send"
   },
-  
   "analytics": {
     "title": "Tenant Reliability Analytics",
     "username": "Username",
@@ -564,7 +577,6 @@
     "prediction": "Prediction",
     "logreg_chart": "Unreliability probability by rating"
   },
-  
   "model_predictions": {
     "title": "BERT Model Predictions",
     "accuracy": "Model Accuracy",
@@ -576,7 +588,6 @@
     "unreliable": "Unreliable",
     "loading": "Loading..."
   },
-  
   "cta": {
     "register_message_part1": "Sign up to get",
     "register_message_part2": "full access!",
@@ -584,19 +595,16 @@
     "already_registered": "Already registered?",
     "login_link": "Log in"
   },
-  
   "hero": {
     "free_and_available": "FREE & AVAILABLE",
     "check_potential_tenant": "Check potential tenant",
     "start_checking": "Start checking"
   },
-  
   "about": {
     "title": "About us",
     "description1": "Our site is an open registry for tenants and landlords, created to increase transparency and reliability in the rental market for housing and commercial real estate. We collect and systematically organize data on complaints, court decisions and reviews, so that each party to the transaction can make more informed decisions.",
     "description2": "Our goal is to reduce the number of conflict situations and create a safe space for rental. We provide convenient search tools so that you can quickly check the honesty of a tenant or landlord."
   },
-  
   "features": {
     "title": "Our Services",
     "subtitle": "Choose the service you need to work with our platform",
@@ -609,13 +617,11 @@
     "go_to": "Go to",
     "rules": "Rules"
   },
-
   "_comment_partners": "Partners section left for future use",
   "partners": {
     "title": "Our Partners",
     "logo": "Logo"
   },
-  
   "termsPolicy": {
     "title": "Terms and Policy",
     "section1": {
@@ -667,11 +673,15 @@
       "title": "3. Respectful Communication and Ethics",
       "prohibited": {
         "title": "What is prohibited:",
-        "items": ["Profanity, threats, bullying, and extortion."]
+        "items": [
+          "Profanity, threats, bullying, and extortion."
+        ]
       },
       "allowed": {
         "title": "What is encouraged:",
-        "items": ["Constructive criticism and objective presentation of facts."]
+        "items": [
+          "Constructive criticism and objective presentation of facts."
+        ]
       },
       "sanctions": {
         "title": "Sanctions:",
@@ -690,7 +700,9 @@
       "title": "5. Prohibition of Advertising, Spam, and Self-Promotion",
       "prohibited": {
         "title": "What is prohibited:",
-        "items": ["Advertising links, referral codes, spam."]
+        "items": [
+          "Advertising links, referral codes, spam."
+        ]
       },
       "allowed": {
         "title": "Exceptions:",
@@ -775,7 +787,6 @@
       }
     }
   },
-  
   "password": {
     "change": {
       "title": "Change Password",
@@ -804,7 +815,6 @@
       "go_to_login": "Go to Login"
     }
   },
-  
   "_comment_admin": "NOTE: Admin section is very large and unchanged to avoid risks",
   "admin": {
     "pdfCheck": "Check PDF",
@@ -1101,7 +1111,7 @@
         "error_updating": "Error updating complaint reason",
         "not_found": "Complaint reason not found",
         "russian": "Russian",
-        "kazakh": "Kazakh", 
+        "kazakh": "Kazakh",
         "english": "English",
         "settings": "Settings",
         "update": "Update",
@@ -1141,7 +1151,6 @@
       }
     }
   },
-  
   "login": {
     "title": "Login",
     "noAccount": "Don't have an account?",
@@ -1153,7 +1162,6 @@
     "forgotPassword": "Forgot password?",
     "submit": "Login"
   },
-  
   "userProfile": {
     "info": "Information",
     "complaints": "Complaints",
@@ -1174,7 +1182,6 @@
       "removeBanError": "Error removing ban"
     }
   },
-  
   "faq": {
     "hero": {
       "title": "Get answers to all your questions!",
@@ -1189,7 +1196,6 @@
       "no_faq_description": "The administrator will add questions and answers soon"
     }
   },
-  
   "complaints": {
     "title": "Complaint Management",
     "subtitle": "View and moderate all complaints in the system",
@@ -1257,7 +1263,6 @@
       "error": "Error moderating complaint"
     }
   },
-  
   "notifications": {
     "bell": {
       "aria_label": "Notifications"
@@ -1363,7 +1368,6 @@
       "later": "Later"
     }
   },
-  
   "pdfCheck": {
     "pageTitle": "PDF Court Decision Verification",
     "pageSubtitle": "Upload a PDF file with a court decision for automatic analysis and complaint creation",
@@ -1389,4 +1393,3 @@
     "errorSubmit": "Submit error"
   }
 }
-

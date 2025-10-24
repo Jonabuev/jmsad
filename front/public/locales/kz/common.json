@@ -1,6 +1,5 @@
 {
   "_comment": "OPTIMIZED VERSION - Removed duplicates, added common sections",
-  
   "common": {
     "loading": "Жүктелуде...",
     "error": "Қате",
@@ -12,7 +11,6 @@
     "yes": "Иә",
     "no": "Жоқ"
   },
-  
   "actions": {
     "submit": "Жіберу",
     "cancel": "Болдырмау",
@@ -36,7 +34,6 @@
     "login": "Кіру",
     "register": "Тіркелу"
   },
-  
   "statuses": {
     "pending": "Қарастырылуда",
     "active": "Белсенді",
@@ -53,7 +50,6 @@
     "banned": "Блокталған",
     "expired": "Мерзімі өтті"
   },
-  
   "validation": {
     "required": "Бұл өріс міндетті түрде толтырылуы тиіс",
     "invalidEmail": "Жарамсыз email",
@@ -62,16 +58,13 @@
     "passwordMismatch": "Құпия сөздер сәйкес келмейді",
     "iinTooLong": "ЖСН 12 таңбадан аспауы керек"
   },
-
   "welcome": "Қош келдіңіз",
-  
   "header": {
     "home": "Басты бет",
     "about": "Біз туралы",
     "services": "Қызметтер",
     "contact": "Байланыс"
   },
-  
   "footer": {
     "aboutUs": "Біз туралы ақпарат",
     "aboutDescription": "ARNO - ашық және жауапкершілікті жалдау нарығының платформасы",
@@ -90,7 +83,6 @@
     "socialMedia": "Біз әлеуметтік желілерде:",
     "copyright": "©2025 ARNO.KZ БАРЛЫҚ ҚҰҚЫҚТАР ҚОРҒАЛҒАН"
   },
-  
   "navigation": {
     "registry": "Тіркеу",
     "faq": "FAQ",
@@ -102,14 +94,71 @@
     "catalog": "Каталог",
     "admin": "Әкімші панелі"
   },
-  
   "languages": {
     "ru": "Орыс",
     "en": "Ағылшын",
     "kz": "Қазақ"
   },
-  
   "profile": {
+    "info": "Ақпарат",
+    "complaints": "Шағымдар",
+    "comments": "Пікірлер",
+    "apartments": {
+      "myApartments": "Менің пәтерлерім",
+      "addProperty": "Мүлік қосу",
+      "house": "үй",
+      "apartment": "пәтер",
+      "rooms": "Бөлме саны",
+      "rentalStatus": "Жалдау күйі",
+      "noAddedHomes": "Қосылған үйлер жоқ"
+    },
+    "confirmed": "Расталған",
+    "notConfirmed": "Расталмаған",
+    "noPhone": "Телефон көрсетілмеген",
+    "noIIN": "ЖСН көрсетілмеген",
+    "tenant": "Жалдаушы",
+    "landlord": "Үй иесі",
+    "administrator": "Әкімші",
+    "document": "Құжат",
+    "until": "Дейін",
+    "expired": "Мерзімі өтті",
+    "sentComplaintsCount": "Жіберілген шағымдар",
+    "receivedComplaintsCount": "Алынған шағымдар",
+    "approvedCount": "мақұлданған",
+    "underReview": "қарастырылуда",
+    "verificationStatus": "Верификация күйі",
+    "fullAccess": "Толық қол жеткізу",
+    "limitedAccess": "Шектеулі қол жеткізу",
+    "generalInfo": "Жалпы ақпарат",
+    "basicProfileInfo": "Профиль туралы негізгі ақпарат",
+    "accountInfo": "Аккаунт туралы ақпарат",
+    "contactInfo": "Байланыс ақпараты",
+    "username": "Пайдаланушы аты",
+    "role": "Рөлі",
+    "email": "Email",
+    "phone": "Телефон",
+    "iin": "ЖСН",
+    "active": "Белсенді",
+    "showComments": "Пікірлерді көрсету",
+    "hideComments": "Пікірлерді жасыру",
+    "noComments": "Пікірлер жоқ",
+    "noCommentsDescription": "Әзірше пікірлер жоқ",
+    "addComment": "Пікір қосу",
+    "newComment": "Жаңа пікір",
+    "leaveFeedback": "Пайдаланушы туралы пікір қалдырыңыз",
+    "commentText": "Пікір мәтіні",
+    "commentPlaceholder": "Пайдаланушы туралы пікіріңізді жазыңыз...",
+    "characters": "таңба",
+    "cancel": "Болдырмау",
+    "send": "Жіберу",
+    "sending": "Жіберілуде...",
+    "limitError": "Сіз бұл пайдаланушыға 2 пікір қалдырдыңыз",
+    "selfError": "Өзіңізге пікір қалдыра алмайсыз",
+    "submitError": "Пікір қосу кезінде қате",
+    "connectionError": "Серверге қосылу қатесі",
+    "edit": "Профильді өңдеу",
+    "changePassword": "Құпия сөзді өзгерту",
+    "logout": "Шығу",
     "sections": {
       "info": "Ақпарат",
       "complaints": "Шағымдар",
@@ -154,47 +203,9 @@
       "visa": "Виза",
       "unknown": "Көрсетілмеген"
     },
-    "apartments": {
-      "myApartments": "Менің пәтерлерім",
-      "addProperty": "Мүлік қосу",
-      "house": "үй",
-      "apartment": "пәтер",
-      "rooms": "Бөлме саны",
-      "rentalStatus": "Жалдау күйі",
-      "noAddedHomes": "Қосылған үйлер жоқ"
-    },
-    "complaints": {
-      "title": "Шағымдар",
-      "adminComplaints": "Әкімші шағымдары",
-      "sentComplaints": "Жіберілген шағымдар",
-      "receivedComplaints": "Алынған шағымдар",
-      "complaintsSentByYou": "Сіз жіберген шағымдар",
-      "complaintsReceivedAboutYou": "Сізге қатысты алынған шағымдар",
-      "addComplaint": "Шағым қосу",
-      "noComplaints": "Шағымдар жоқ",
-      "noComplaintsDescription": "Бұл пайдаланушыда әлі шағым жоқ",
-      "noComplaintsFound": "Шағымдар жоқ",
-      "sentComplaintsCount": "Жіберілген шағымдар",
-      "receivedComplaintsCount": "Алынған шағымдар",
-      "approvedCount": "мақұлданған",
-      "underReview": "қарастырылуда",
-      "complaintManagement": "Шағымдарды басқару"
-    },
-    "comments": {
-      "title": "Пікірлер",
-      "hideComments": "Пікірлерді жасыру",
-      "showComments": "Барлық пікірлерді көру",
-      "toggleComments": "Пікірлерді жасыру",
-      "commentPlaceholder": "Пайдаланушы туралы пікіріңізді жазыңыз...",
-      "commentText": "Пікір мәтіні",
-      "characters": "таңба",
-      "noComments": "Әзірге пікірлер жоқ",
-      "noCommentsDescription": "Әлі пікірлер жоқ. Бірінші болыңыз!",
-      "addComment": "Пікір қосу",
-      "newComment": "Жаңа пікір",
-      "leaveFeedback": "Пайдаланушы туралы пікір қалдырыңыз",
-      "sending": "Жіберілуде..."
-    },
+    "description": "Сипаттама",
+    "status": "Күйі",
+    "date": "Күні",
     "actions": {
       "dispute": "Қарсылық білдіру",
       "details": "Толығырақ",
@@ -263,11 +274,10 @@
       }
     }
   },
-  
   "verify": {
-    "identityVerification": "Жеке басын растау"
+    "identityVerification": "Жеке басын растау",
+    "uploadDocument": "Құжатты жүктеу"
   },
-  
   "rentalTable": {
     "rentalRequests": "Жалға алу сұраныстары (кіріс)",
     "noRequests": "Жалға алу сұраныстары жоқ.",
@@ -285,7 +295,6 @@
       "cancelled": "Болдырылмаған"
     }
   },
-  
   "dispute": {
     "disputeTitle": "Шағымға қарсылық білдіру",
     "disputeExplanation": "Түсініктеме",
@@ -302,7 +311,6 @@
     "uploadEvidenceFormats": "PDF, JPG, JPEG, PNG (міндетті емес)",
     "fileChosen": "✓ Таңдалған файл:"
   },
-  
   "complaint": {
     "title": "Шағым",
     "description": "Сипаттама",
@@ -332,7 +340,6 @@
       "Самовольное выселение или отказ освободить помещение": "Өз бетінше шығару немесе босатудан бас тарту"
     }
   },
-  
   "form": {
     "title": "Жаңа мүлік",
     "address": "Мекенжай (Көше)",
@@ -344,7 +351,9 @@
     "room": "Бөлме",
     "submit": "Мүлікті қосу"
   },
-  
+  "property": {
+    "photos": "Пәтер фотосуреттері"
+  },
   "registration": {
     "registration1": "Тіркеу",
     "user_type": "Пайдаланушы түрі",
@@ -384,7 +393,6 @@
     "done": "Дайын",
     "submitting": "Тіркелуде..."
   },
-  
   "Scomplaint": {
     "title": "Шағым беру",
     "selectRental": "Жалға алуды таңдаңыз",
@@ -418,6 +426,7 @@
     "submitedit": "Өзгерістерді сақтау",
     "editTitle": "Шағымды өзгерту",
     "additionalPhotos": "Фотосуреттер",
+    "selectedImages": "Таңдалған фотосуреттер",
     "damageCost": "Сот шешімі",
     "descriptionedit": "Шағымға қарсылық білдіру үшін оның мазмұнын өзгерту қажет",
     "photoerror": "Ең көбі 10 сурет жүктеуге болады",
@@ -445,7 +454,15 @@
     "uploadDocument": "Құжатты жүктеу",
     "uploadFormats": "PDF, DOC, DOCX, суреттер"
   },
-  
+  "fileUpload": {
+    "clickToUpload": "Жүктеу үшін басыңыз",
+    "orDragDrop": "немесе файлдарды осында сүйреңіз",
+    "selectedFiles": "Таңдалған файлдар",
+    "removeFile": "Файлды жою",
+    "tooManyFiles": "Тым көп файл. Максимум: {{max}}",
+    "fileTooLarge": "Файл тым үлкен. Максимум: {{max}}MB",
+    "invalidFileType": "Жарамсыз файл түрі"
+  },
   "editProfile": {
     "fullName": "Толық аты-жөні",
     "iin": "ЖСН",
@@ -468,7 +485,6 @@
     "loading": "Профиль жүктелуде...",
     "doc_expired": "Құжаттың мерзімі өтіп кеткен"
   },
-
   "rentalCatalog": {
     "title": "Тұрғын үй каталогы",
     "find": "Іздеу",
@@ -498,7 +514,6 @@
     "objects": "объект",
     "loading": "Жүктелуде..."
   },
-  
   "search": {
     "placeholder": "ИИН немесе пайдаланушы аты бойынша іздеу",
     "address_placeholder": "Мекен-жай енгізіңіз",
@@ -531,7 +546,6 @@
     "landlords": "Төлем алушылар",
     "complaint_dates": "Шағым даталары"
   },
-  
   "forum": {
     "title": "Шағымдар форумы",
     "commentLimitReached": "Сіз бұл шағымға 2 пікір қалдырдыңыз.",
@@ -555,7 +569,6 @@
     "addComment": "Пікір қосыңыз...",
     "send": "Жіберу"
   },
-  
   "analytics": {
     "title": "Арендаторовдың сенімділігін талдау",
     "username": "Пайдаланушы аты",
@@ -564,7 +577,6 @@
     "prediction": "Болжау",
     "logreg_chart": "Рейтингке байланысты сенімсіздік ықтималдығы"
   },
-  
   "model_predictions": {
     "title": "BERT Моделінің болжаулары",
     "accuracy": "Модельдің дәлдігі",
@@ -576,7 +588,6 @@
     "unreliable": "Сенімсіз",
     "loading": "Жүктелуде..."
   },
-  
   "cta": {
     "register_message_part1": "Тіркеліп, алыңыз",
     "register_message_part2": "толық қолжетімділік!",
@@ -584,19 +595,16 @@
     "already_registered": "Қ already тіркелдіңіз бе?",
     "login_link": "Кіру"
   },
-  
   "hero": {
     "free_and_available": "ТЕГІН & ҚОЛЖЕТІМДІ",
     "check_potential_tenant": "Мүмкін арендатормен тексеріңіз",
     "start_checking": "Тексеруді бастау"
   },
-  
   "about": {
     "title": "Біз туралы",
     "description1": "Біздің сайтымыз адал жалдау алушылар және жалдау берушілер үшін ашық реестр болып, жалдау нарығындағы ақпараттың ашықтығын және нақтылығын арттыру мақсатында құрылған. Біз жалобалар, сот шешімдері және пікірлер деректерін жинап, әрбір сатып алушы және сатып алушы үшін нақты шешім қабылдауға мүмкіндік береді.",
     "description2": "Біздің мақсатымыз - көпшіліктен шыққан күрес және жалдау үшін қауіпсіз орта құру. Біз іздеу құралдарын ұсынып, сіз жалдау алушының немесе жалдау берушінің байланыстылығын тексеруге болады."
   },
-  
   "features": {
     "title": "Біздің қызметтер",
     "subtitle": "Біздің платформамен жұмыс істеу үшін қажетті қызметті таңдаңыз",
@@ -609,13 +617,11 @@
     "go_to": "Өту",
     "rules": "Ережелер"
   },
-
   "_comment_partners": "Partners section left for future use",
   "partners": {
     "title": "Біздің серіктестер",
     "logo": "Логотип"
   },
-  
   "termsPolicy": {
     "title": "Шарттар мен Саясат",
     "section1": {
@@ -667,11 +673,15 @@
       "title": "3. Құрметті қарым-қатынас және этика",
       "prohibited": {
         "title": "Не тыйым салынған:",
-        "items": ["Әдепсіз сөздер, қорқыту, буллинг және бопсалау."]
+        "items": [
+          "Әдепсіз сөздер, қорқыту, буллинг және бопсалау."
+        ]
       },
       "allowed": {
         "title": "Не ұсынылады:",
-        "items": ["Құрылымдық сын және фактілерді объективті түрде баяндау."]
+        "items": [
+          "Құрылымдық сын және фактілерді объективті түрде баяндау."
+        ]
       },
       "sanctions": {
         "title": "Жазалар:",
@@ -690,7 +700,9 @@
       "title": "5. Жарнама, спам және өзін-өзі жарнамалау тыйымдары",
       "prohibited": {
         "title": "Не тыйым салынған:",
-        "items": ["Жарнамалық сілтемелер, реферальдық кодтар, спам."]
+        "items": [
+          "Жарнамалық сілтемелер, реферальдық кодтар, спам."
+        ]
       },
       "allowed": {
         "title": "Көңіл бөлу:",
@@ -775,7 +787,6 @@
       }
     }
   },
-  
   "password": {
     "change": {
       "title": "Құпия сөзді өзгерту",
@@ -804,7 +815,6 @@
       "go_to_login": "Кіру бетіне өту"
     }
   },
-  
   "_comment_admin": "NOTE: Admin section is very large and unchanged to avoid risks",
   "admin": {
     "pdfCheck": "PDF көру",
@@ -1141,7 +1151,6 @@
       }
     }
   },
-  
   "login": {
     "title": "Кіру",
     "noAccount": "Тіркелгіңіз жоқ па?",
@@ -1153,7 +1162,6 @@
     "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
     "submit": "Кіру"
   },
-  
   "userProfile": {
     "info": "Ақпарат",
     "complaints": "Шағымдар",
@@ -1174,7 +1182,6 @@
       "removeBanError": "Тыйымды алып тастау кезінде қате"
     }
   },
-  
   "faq": {
     "hero": {
       "title": "Барлық сұрақтарыңызға жауап алыңыз!",
@@ -1189,7 +1196,6 @@
       "no_faq_description": "Әкімші жақын арада сұрақтар мен жауаптарды қосады"
     }
   },
-  
   "complaints": {
     "title": "Шағымдарды басқару",
     "subtitle": "Жүйедегі барлық шағымдарды көру және модерировать ету",
@@ -1257,7 +1263,6 @@
       "error": "Шағымды модерировать ету кезінде қате"
     }
   },
-  
   "notifications": {
     "bell": {
       "aria_label": "Хабарландырулар"
@@ -1363,7 +1368,6 @@
       "later": "Кейінірек"
     }
   },
-  
   "pdfCheck": {
     "pageTitle": "PDF Сот шешімдерін тексеру",
     "pageSubtitle": "Автоматты талдау және шағым жасау үшін сот шешімі бар PDF файлын жүктеңіз",
@@ -1389,4 +1393,3 @@
     "errorSubmit": "Жіберу қатесі"
   }
 }
-

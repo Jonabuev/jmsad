@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { fetchRentalComplaintByUuid, disputeRentalComplaint } from "@/api/complaintsApi";
 import { getCookie } from "@/utils/cookieUtils";
+import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
 import styles from "./DisputeComplaint.module.scss";
 
 export default function DisputeComplaintPage() {
@@ -174,32 +175,23 @@ export default function DisputeComplaintPage() {
                 <h3 className={styles.formCardTitle}>{t("dispute.disputeEvidence") || "Документ / Изображение (необязательно)"}</h3>
               </div>
               
-              <div className={styles.evidenceUploadArea}>
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setEvidence(file);
-                  }}
-                  className={styles.evidenceUploadInput}
-                  id="evidence-upload"
-                />
-                <label htmlFor="evidence-upload" className={styles.evidenceUploadLabel}>
-                  <svg className={styles.evidenceUploadIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p className={styles.evidenceUploadText}>
-                    <span className={styles.evidenceUploadTextLink}>{t("dispute.uploadEvidence")}</span>
-                  </p>
-                  <p className={styles.evidenceUploadHint}>{t("dispute.uploadEvidenceFormats")}</p>
-                  {evidence && (
-                    <p className={styles.evidenceFileChosen}>
-                      {t("dispute.fileChosen")} {evidence.name}
-                    </p>
-                  )}
-                </label>
-              </div>
+              <FileUploadDropzone
+                accept=".pdf,.jpg,.jpeg,.png,image/*"
+                multiple={false}
+                maxFiles={1}
+                maxSizeMB={10}
+                onFilesChange={(files) => {
+                  if (files.length > 0) {
+                    setEvidence(files[0]);
+                  } else {
+                    setEvidence(null);
+                  }
+                }}
+                currentFiles={evidence ? [evidence] : []}
+                hint={t("dispute.uploadEvidenceFormats")}
+                showPreview={true}
+                previewType="document"
+              />
             </div>
 
             {/* Submit Button */}

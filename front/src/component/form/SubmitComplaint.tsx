@@ -47,7 +47,7 @@ const SubmitComplaintForm: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeRole, setActiveRole] = useState<"tenant" | "landlord">("tenant");
-  
+  const [isDragging, setIsDragging] = useState(false);
 
   const router = useRouter();
 
@@ -147,6 +147,45 @@ const SubmitComplaintForm: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
       setFormData((prev) => ({ ...prev, evidence: e.target.files![0] }));
+    }
+  };
+
+  // Обработчики drag and drop для фотографий
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+
+    if (imageFiles.length > 10) {
+      setErrorMessage(t("Scomplaint.photoerror"));
+      return;
+    }
+
+    if (imageFiles.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        evidenceImages: imageFiles,
+      }));
     }
   };
 
@@ -470,7 +509,13 @@ const SubmitComplaintForm: React.FC = () => {
                 <h3 className={styles.sectionTitle}>{t("Scomplaint.additionalPhotos")}</h3>
               </div>
               
-              <div className={styles.uploadArea}>
+              <div 
+                className={`${styles.uploadArea} ${isDragging ? styles.uploadAreaDragging : ''}`}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
                 <input
                   type="file"
                   accept="image/*"
@@ -501,6 +546,40 @@ const SubmitComplaintForm: React.FC = () => {
                   <p className={styles.uploadHint}>{t("Scomplaint.uploadHint")}</p>
                 </label>
               </div>
+
+              {/* Preview uploaded images */}
+              {formData.evidenceImages.length > 0 && (
+                <div className={styles.imagePreview}>
+                  <p className={styles.imagePreviewTitle}>
+                    {t("Scomplaint.selectedImages")}: {formData.evidenceImages.length}
+                  </p>
+                  <div className={styles.imagePreviewGrid}>
+                    {formData.evidenceImages.map((file, index) => (
+                      <div key={index} className={styles.imagePreviewItem}>
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${index + 1}`}
+                          className={styles.imagePreviewImg}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              evidenceImages: prev.evidenceImages.filter((_, i) => i !== index),
+                            }));
+                          }}
+                          className={styles.imagePreviewRemove}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Court Case */}

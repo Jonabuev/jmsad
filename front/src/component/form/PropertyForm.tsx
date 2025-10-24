@@ -7,6 +7,7 @@ import Script from "next/script";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { createProperty } from "@/api/propertyApi";
+import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
 import styles from "./PropertyForm.module.scss";
 
 interface PropertyFormInputs {
@@ -77,12 +78,8 @@ const PropertyForm: FC = () => {
     setSuggestions([]);
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      setSelectedFiles(fileArray);
-    }
+  const handleFilesChange = (files: File[]) => {
+    setSelectedFiles(files);
   };
 
   const onSubmit = async (data: PropertyFormInputs) => {
@@ -301,28 +298,20 @@ const PropertyForm: FC = () => {
 
           {/* Загрузка изображений */}
           <div className={styles.fileUploadGroup}>
-            <label className={styles.formLabel}>Фотографии апартамента</label>
-            <input
-              type="file"
-              multiple
+            <FileUploadDropzone
               accept="image/*"
-              onChange={handleFileChange}
-              className={styles.fileInput}
+              multiple={true}
+              maxFiles={10}
+              maxSizeMB={10}
+              onFilesChange={handleFilesChange}
+              currentFiles={selectedFiles}
+              label={t("property.photos")}
+              hint="PNG, JPG, GIF до 10MB (максимум 10 файлов)"
+              showPreview={true}
+              previewType="image"
+              error={errorMessage || ""}
+              onError={setErrorMessage}
             />
-            {selectedFiles.length > 0 && (
-              <div className={styles.filePreview}>
-                <p className={styles.fileCount}>
-                  Выбрано файлов: {selectedFiles.length}
-                </p>
-                <div className={styles.fileGrid}>
-                  {selectedFiles.map((file, index) => (
-                    <div key={index} className={styles.fileItem}>
-                      {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           <button

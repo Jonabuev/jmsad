@@ -3,6 +3,7 @@ import { IProfile } from "@/component/type/users.interface";
 import { useTranslation } from "next-i18next";
 import { fetchUserProfile, verifyIdentity } from "@/api/userApi";
 import { getCookie } from "@/utils/cookieUtils";
+import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
 import styles from "./VerifyIdentityForm.module.scss";
 
 const VerifyIdentityForm: React.FC = () => {
@@ -13,9 +14,11 @@ const VerifyIdentityForm: React.FC = () => {
   const [profile, setProfile] = useState<IProfile | null>(null);
   const { t } = useTranslation("common");
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+  const handleFilesChange = (files: File[]) => {
+    if (files.length > 0) {
+      setFile(files[0]);
+    } else {
+      setFile(null);
     }
   };
 
@@ -186,37 +189,22 @@ const VerifyIdentityForm: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className={styles.uploadTitle}>Загрузка документа</h3>
+                <h3 className={styles.uploadTitle}>{t("verify.uploadDocument")}</h3>
               </div>
               
-              <div className={styles.uploadArea}>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={handleFileChange}
-                  className={styles.uploadInput}
-                  id="document-upload"
-                />
-                <label htmlFor="document-upload" className={styles.uploadLabel}>
-                  <svg className={styles.uploadIconLarge} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p className={styles.uploadText}>
-                    <span className={styles.uploadTextLink}>Нажмите для загрузки</span> или перетащите файл сюда
-                  </p>
-                  <p className={styles.uploadSubtext}>PNG, JPG, JPEG, PDF до 10MB</p>
-                  {file && (
-                    <div className={styles.uploadFileInfo}>
-                      <p className={styles.uploadFileName}>
-                        ✓ Выбран файл: {file.name}
-                      </p>
-                      <p className={styles.uploadFileSize}>
-                        Размер: {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                    </div>
-                  )}
-                </label>
-              </div>
+              <FileUploadDropzone
+                accept="image/*,.pdf"
+                multiple={false}
+                maxFiles={1}
+                maxSizeMB={10}
+                onFilesChange={handleFilesChange}
+                currentFiles={file ? [file] : []}
+                hint="PNG, JPG, JPEG, PDF до 10MB"
+                showPreview={true}
+                previewType="document"
+                error={error || ""}
+                onError={setError}
+              />
             </div>
 
             {/* Instructions */}

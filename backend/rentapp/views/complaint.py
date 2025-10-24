@@ -394,9 +394,9 @@ def all_complaint_reasons(request):
         filtered_count = reasons.count()
         logger.info(f"Filtered reasons by type '{reason_type}': {filtered_count}")
     
-    # Используем ComplaintReasonSerializer чтобы вернуть все поля переводов
-    serializer = ComplaintReasonSerializer(reasons, many=True)
-    logger.info(f"Returning {len(serializer.data)} reasons")
+    # Используем ComplaintReasonSerializer с передачей locale в контекст
+    serializer = ComplaintReasonSerializer(reasons, many=True, context={'locale': locale})
+    logger.info(f"Returning {len(serializer.data)} reasons for locale '{locale}'")
     
     return Response(serializer.data)
 
@@ -407,12 +407,14 @@ def default_complaint_reasons(request):
     """
     API endpoint для получения только дефолтных причин жалоб.
     Возвращает причины, отсортированные по типу и порядку.
+    Поддерживает мультиязычность через параметр locale.
     """
     # Убеждаемся, что дефолтные причины существуют
     ComplaintReason.ensure_default_reasons_exist()
     
+    locale = request.GET.get('locale', 'ru')
     reasons = ComplaintReason.objects.filter(is_default=True)
-    serializer = ComplaintReasonSerializer(reasons, many=True)
+    serializer = ComplaintReasonSerializer(reasons, many=True, context={'locale': locale})
     return Response(serializer.data)
 
 
@@ -424,6 +426,12 @@ class ComplaintReasonListTenant(generics.ListAPIView):
     filterset_fields = ['type']
     search_fields = ['reason']
     ordering_fields = ['id', 'reason']
+    
+    def get_serializer_context(self):
+        """Передаем locale в контекст сериализатора"""
+        context = super().get_serializer_context()
+        context['locale'] = self.request.GET.get('locale', 'ru')
+        return context
 
 
 class ComplaintReasonListLandlord(generics.ListAPIView):
@@ -434,6 +442,12 @@ class ComplaintReasonListLandlord(generics.ListAPIView):
     filterset_fields = ['type']
     search_fields = ['reason']
     ordering_fields = ['id', 'reason']
+    
+    def get_serializer_context(self):
+        """Передаем locale в контекст сериализатора"""
+        context = super().get_serializer_context()
+        context['locale'] = self.request.GET.get('locale', 'ru')
+        return context
 
 
 class ComplaintDetailListView(generics.ListAPIView):

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { getCookie } from "@/utils/cookieUtils";
 import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint } from "@/api/complaintsApi";
+import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
 import styles from "./EditComplaintForm.module.scss";
 
 interface ComplaintReason {
@@ -139,9 +140,15 @@ const EditComplaintForm: React.FC = () => {
     }
   };
 
-  const handleCourtDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) {
-      setFormData((prev) => ({ ...prev, courtDocument: e.target.files![0] }));
+  const handleEvidenceImagesChange = (files: File[]) => {
+    setFormData((prev) => ({ ...prev, evidenceImages: files }));
+  };
+
+  const handleCourtDocumentChange = (files: File[]) => {
+    if (files.length > 0) {
+      setFormData((prev) => ({ ...prev, courtDocument: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, courtDocument: null }));
     }
   };
 
@@ -333,36 +340,19 @@ const EditComplaintForm: React.FC = () => {
                 </div>
                 <h3 className={styles.formCardTitle}>{t("Scomplaint.additionalPhotos")}</h3>
               </div>
-              <div className={styles.uploadArea}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (!files) return;
-                    if (files.length > 10) {
-                      setErrorMessage(t("Scomplaint.photoerror"));
-                      return;
-                    }
-                    setFormData((prev) => ({
-                      ...prev,
-                      evidenceImages: Array.from(files).slice(0, 10),
-                    }));
-                  }}
-                  className={styles.uploadInput}
-                  id="photo-upload"
-                />
-                <label htmlFor="photo-upload" className={styles.uploadLabel}>
-                  <svg className={styles.uploadIcon} stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <p className={styles.uploadText}>
-                    <span className={styles.uploadTextLink}>{t("Scomplaint.uploadClick")}</span> {t("Scomplaint.uploadOrDrag")}
-                  </p>
-                  <p className={styles.uploadHint}>{t("Scomplaint.uploadHint")}</p>
-                </label>
-              </div>
+              <FileUploadDropzone
+                accept="image/*"
+                multiple={true}
+                maxFiles={10}
+                maxSizeMB={10}
+                onFilesChange={handleEvidenceImagesChange}
+                currentFiles={formData.evidenceImages}
+                hint={t("Scomplaint.uploadHint")}
+                showPreview={true}
+                previewType="image"
+                error={errorMessage}
+                onError={setErrorMessage}
+              />
             </div>
 
             {/* Court Case Card */}
@@ -406,27 +396,18 @@ const EditComplaintForm: React.FC = () => {
                   </div>
 
                   <div className={styles.courtCaseField}>
-                    <label className={styles.courtCaseFieldLabel}>
-                      {t("Scomplaint.evidence")}
-                    </label>
-                    <div className={styles.courtCaseUploadArea}>
-                      <input
-                        type="file"
-                        accept=".pdf,.doc,.docx,image/*"
-                        onChange={handleCourtDocumentChange}
-                        className={styles.courtCaseUploadInput}
-                        id="court-document-upload"
-                      />
-                      <label htmlFor="court-document-upload" className={styles.courtCaseUploadLabel}>
-                        <svg className={styles.courtCaseUploadIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <p className={styles.courtCaseUploadText}>
-                          <span className={styles.courtCaseUploadTextLink}>{t("Scomplaint.uploadDocument")}</span>
-                        </p>
-                        <p className={styles.courtCaseUploadHint}>{t("Scomplaint.uploadFormats")}</p>
-                      </label>
-                    </div>
+                    <FileUploadDropzone
+                      accept=".pdf,.doc,.docx,image/*"
+                      multiple={false}
+                      maxFiles={1}
+                      maxSizeMB={10}
+                      onFilesChange={handleCourtDocumentChange}
+                      currentFiles={formData.courtDocument ? [formData.courtDocument] : []}
+                      label={t("Scomplaint.evidence")}
+                      hint={t("Scomplaint.uploadFormats")}
+                      showPreview={true}
+                      previewType="document"
+                    />
                   </div>
                 </div>
               )}

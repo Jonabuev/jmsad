@@ -369,6 +369,25 @@ class ComplaintReasonSerializer(serializers.ModelSerializer):
             'id', 'reason', 'reason_kz', 'reason_en', 
             'type', 'is_default', 'order'
         ]
+    
+    def to_representation(self, instance):
+        """
+        Переопределяем метод для возврата переведенного значения в поле reason
+        в зависимости от locale, переданного через контекст.
+        """
+        representation = super().to_representation(instance)
+        
+        # Получаем locale из контекста (если передан)
+        locale = self.context.get('locale', 'ru')
+        
+        # Выбираем правильное поле в зависимости от языка
+        if locale == 'kz' and instance.reason_kz:
+            representation['reason'] = instance.reason_kz
+        elif locale == 'en' and instance.reason_en:
+            representation['reason'] = instance.reason_en
+        # Иначе оставляем оригинальное значение (русский)
+        
+        return representation
 
 
 class ComplaintImageSerializer(serializers.ModelSerializer):
