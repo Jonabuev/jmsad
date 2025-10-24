@@ -36,6 +36,27 @@ const Profile: FC = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [showComments, setShowComments] = useState(false);
 
+  // Action menu state
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isActionMenuOpen && !target.closest('[data-action-menu]')) {
+        setIsActionMenuOpen(false);
+      }
+    };
+
+    if (isActionMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isActionMenuOpen]);
+
   // БЕЗОПАСНОСТЬ: НЕ логируем данные пользователя в console
 
   const handleLogout = () => {
@@ -170,10 +191,69 @@ const Profile: FC = () => {
 
   return (
     <div className={styles.profile}>
-      {/* Hero Section */}
-      <div className={styles.heroSection}>
-        <div className={styles.heroOverlay}></div>
-        <div className={styles.heroContent}>
+       {/* Hero Section */}
+       <div className={styles.heroSection}>
+         <div className={styles.heroOverlay}></div>
+         
+         {/* Mobile Menu Button - Top Right */}
+         <div className={styles.mobileMenuButton} data-action-menu>
+           <button
+             onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
+             className={styles.actionMenuButton}
+             aria-label="Action menu"
+           >
+             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+               <circle cx="12" cy="5" r="2"/>
+               <circle cx="12" cy="12" r="2"/>
+               <circle cx="12" cy="19" r="2"/>
+             </svg>
+           </button>
+           
+           {/* Mobile Dropdown Menu */}
+           {isActionMenuOpen && (
+             <div className={`${styles.mobileActionDropdown} absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50`}>
+               <button
+                 onClick={() => {
+                   router.push("/profile/edit-profile");
+                   setIsActionMenuOpen(false);
+                 }}
+                 className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+               >
+                 <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                 </svg>
+                 {t("profile.edit")}
+               </button>
+               <button
+                 onClick={() => {
+                   router.push("/reset-password");
+                   setIsActionMenuOpen(false);
+                 }}
+                 className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+               >
+                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z" />
+                 </svg>
+                 {t("profile.changePassword")}
+               </button>
+               <div className="border-t border-gray-100 my-1"></div>
+               <button
+                 onClick={() => {
+                   handleLogout();
+                   setIsActionMenuOpen(false);
+                 }}
+                 className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center gap-3 text-red-600 transition-colors"
+               >
+                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                 </svg>
+                 {t("profile.logout")}
+               </button>
+             </div>
+           )}
+         </div>
+         
+         <div className={styles.heroContent}>
           <div className={styles.heroLayout}>
             {/* Profile Info */}
             <div className={styles.profileInfo}>
@@ -242,8 +322,68 @@ const Profile: FC = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+             {/* Action Buttons */}
+             <div className="relative" data-action-menu>
+               {/* Desktop: Menu with three dots */}
+               <div className="hidden md:block">
+                <button
+                  onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
+                  className={styles.actionMenuButton}
+                  aria-label="Action menu"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                  </svg>
+                </button>
+                
+                {/* Dropdown Menu */}
+                {isActionMenuOpen && (
+                  <div className={`${styles.actionDropdown} absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50`}>
+                    <button
+                      onClick={() => {
+                        router.push("/profile/edit-profile");
+                        setIsActionMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      {t("profile.edit")}
+                    </button>
+                    <button
+                      onClick={() => {
+                        router.push("/reset-password");
+                        setIsActionMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z" />
+                      </svg>
+                      {t("profile.changePassword")}
+                    </button>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsActionMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center gap-3 text-red-600 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {t("profile.logout")}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile & Tablet: Traditional buttons */}
+              <div className="hidden flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => router.push("/profile/edit-profile")}
                 className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 border border-white/30 hover:border-white/50 flex items-center gap-2"
@@ -271,6 +411,7 @@ const Profile: FC = () => {
                 </svg>
                 {t("profile.logout")}
               </button>
+              </div>
             </div>
           </div>
         </div>

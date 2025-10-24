@@ -240,21 +240,21 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                     onClick={() => changeLanguage("ru")}
                     className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
-                    Русский
+                    {t("languages.ru")}
                   </button>
                   <div className="border-t border-gray-100"></div>
                   <button 
                     onClick={() => changeLanguage("en")}
                     className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
-                    English
+                    {t("languages.en")}
                   </button>
                   <div className="border-t border-gray-100"></div>
                   <button 
                     onClick={() => changeLanguage("kz")}
                     className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
-                    Қазақша
+                    {t("languages.kz")}
                   </button>
                 </div>
               )}

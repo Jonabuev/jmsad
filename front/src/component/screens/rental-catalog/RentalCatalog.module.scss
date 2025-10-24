@@ -13,6 +13,28 @@
   overflow-y: auto;
   height: 100%;
   transition: all 0.3s ease;
+  
+  // Desktop: fixed sidebar
+  @media (min-width: 1024px) {
+    width: 20rem;
+    position: relative;
+  }
+  
+  // Mobile & Tablet: overlay modal
+  @media (max-width: 1023px) {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 85vw;
+    max-width: 400px;
+    z-index: 50;
+    height: 100vh;
+    transition: left 0.3s ease;
+    
+    &.mobileOpen {
+      left: 0;
+    }
+  }
 }
 
 .backButton {
@@ -205,6 +227,54 @@
   margin-top: 1rem;
   font-size: 0.875rem;
   color: #4b5563;
+}
+
+.mobileSidebarToggle {
+  display: none;
+  
+  @media (max-width: 1023px) {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 60;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #1d4ed8;
+    }
+  }
+}
+
+.mobileBackdrop {
+  display: none;
+  
+  @media (max-width: 1023px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    
+    &.mobileOpen {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 }
 
 .mapContainer {

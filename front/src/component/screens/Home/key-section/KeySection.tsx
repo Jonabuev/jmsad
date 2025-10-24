@@ -14,10 +14,10 @@ const FeaturesSection: FC = () => {
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className={styles.title}>
-            Наши услуги
+            {t("features.title")}
           </h2>
           <p className={styles.subtitle}>
-            Выберите нужную вам услугу для работы с нашей платформой
+            {t("features.subtitle")}
           </p>
         </div>
         
@@ -30,14 +30,14 @@ const FeaturesSection: FC = () => {
               link="/search"
             />
           </div>
-          <div className={styles.cardWrapper}>
+          {/* <div className={styles.cardWrapper}>
             <FeatureCard
               imageSrc="url('/home/maps.png')"
               title={t("features.maps")}
               description={t("features.maps_description")}
               link="/rental-catalog"
             />
-          </div>
+          </div> */}
           <div className={styles.cardWrapper}>
             <FeatureCard
               imageSrc="url('/home/help.png')"

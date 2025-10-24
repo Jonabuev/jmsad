@@ -18,6 +18,15 @@
 .container {
   max-width: 80rem;
   margin: 0 auto;
+  padding: 0 1rem;
+  
+  @media (min-width: 640px) {
+    padding: 0 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    padding: 0 2rem;
+  }
 }
 
 .header {
@@ -46,11 +55,30 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  justify-content: center;
+  
+  // Mobile: одна карточка, адаптивная ширина
+  grid-template-columns: minmax(min(300px, 100%), 450px);
+  
+  // Tablet (768px-1023px): 2 карточки, адаптивная ширина
+  @media (min-width: 768px) and (max-width: 1023px) {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 100%;
+  }
+  
+  // Desktop (1024px-1439px): 2 карточки, адаптивная ширина
+  @media (min-width: 1024px) and (max-width: 1439px) {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 100%;
+  }
+  
+  // Большие экраны (1440px+): 3 карточки по 450px
+  @media (min-width: 1440px) {
+    grid-template-columns: repeat(3, 450px);
+    gap: 2rem;
   }
 }
 

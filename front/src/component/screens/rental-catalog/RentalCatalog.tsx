@@ -37,6 +37,8 @@ export default function RentalCatalog() {
   const [selectedHouse, setSelectedHouse] = useState<IHouse | null>(null);
   // Индекс главного изображения
   const [mainImgIdx, setMainImgIdx] = useState(0);
+  // Мобильное меню
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMainImgIdx(0);
@@ -79,8 +81,22 @@ export default function RentalCatalog() {
 
   return (
     <div className={styles.rentalCatalog}>
+      {/* Мобильная кнопка для открытия sidebar */}
+      <button 
+        className={styles.mobileSidebarToggle}
+        onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+      >
+        🏠 Фильтры
+      </button>
+
+      {/* Мобильный backdrop */}
+      <div 
+        className={`${styles.mobileBackdrop} ${isMobileSidebarOpen ? styles.mobileOpen : ''}`}
+        onClick={() => setIsMobileSidebarOpen(false)}
+      />
+
       {/* Левая панель: фильтры или карточка */}
-      <div className={styles.sidebar}>
+      <div className={`${styles.sidebar} ${isMobileSidebarOpen ? styles.mobileOpen : ''}`}>
         {selectedHouse ? (
           <div>
             <button

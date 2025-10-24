@@ -1,12 +1,77 @@
 {
+  "_comment": "OPTIMIZED VERSION - Removed duplicates, added common sections",
+  
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "notFound": "Not found",
+    "notSpecified": "Not specified",
+    "avatar": "Avatar",
+    "configError": "Configuration error",
+    "yes": "Yes",
+    "no": "No"
+  },
+  
+  "actions": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "confirm": "Confirm",
+    "reject": "Reject",
+    "approve": "Approve",
+    "send": "Send",
+    "add": "Add",
+    "update": "Update",
+    "back": "Back",
+    "close": "Close",
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "search": "Search",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  
+  "statuses": {
+    "pending": "Pending",
+    "active": "Active",
+    "inactive": "Inactive",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "reviewed": "Reviewed",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "declined": "Declined",
+    "ended": "Ended",
+    "verified": "Verified",
+    "notVerified": "Not verified",
+    "banned": "Banned",
+    "expired": "Expired"
+  },
+  
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "invalidPhone": "Invalid phone",
+    "invalidIIN": "Enter a valid IIN (12 characters)",
+    "passwordMismatch": "Passwords do not match",
+    "iinTooLong": "IIN cannot exceed 12 characters"
+  },
+
   "welcome": "Welcome",
-  "logout": "Logout",
+  
   "header": {
     "home": "Home",
     "about": "About",
     "services": "Services",
     "contact": "Contact"
   },
+  
   "footer": {
     "aboutUs": "About Us",
     "aboutDescription": "ARNO - a platform for a transparent and responsible rental market",
@@ -25,95 +90,136 @@
     "socialMedia": "We are on social media:",
     "copyright": "©2025 ARNO.KZ ALL RIGHTS RESERVED"
   },
+  
   "navigation": {
     "registry": "Registry",
     "faq": "FAQ",
     "analytics": "Analytics",
     "profile": "Profile",
     "register": "Register",
-    "catalog": "Catalog",
     "login": "Login",
     "language": "Language",
+    "catalog": "Catalog",
     "admin": "Admin Panel"
   },
+  
+  "languages": {
+    "ru": "Russian",
+    "en": "English",
+    "kz": "Kazakh"
+  },
+  
   "profile": {
-    "generalInfo": "General Information",
-    "iin": "IIN",
-    "role": "Role",
-    "rating": "Rating",
-    "phone": "Phone",
-    "email": "Email",
-    "verified": "Verified",
-    "myApartments": "My Apartments",
-    "addProperty": "Add Property",
-    "rentalStatus": "Rental Status",
-    "house": "house",
-    "apartment": "apartment",
-    "noPhone": "Not specified",
-    "noIIN": "Not specified",
-    "documentType": "Document Type",
-    "passportExpiry": "Expiry Date",
-    "noExpiryDate": "Not specified",
-    "documentExpired": "Document expired",
-    "adminComplaints": "Admin Complaints",
-    "complaints": "Complaints",
-    "status": "Status",
-    "details": "Details",
-    "action": "Action",
-    "description": "Description",
-    "date": "Date",
-    "sentComplaints": "Sent Complaints",
-    "receivedComplaints": "Received Complaints",
-    "addComplaint": "Add Complaint",
-    "noComplaints": "No complaints",
-    "noComplaintsDescription": "This user has no complaints yet",
-    "accountInfo": "Account Information",
-    "contactInfo": "Contact Information",
-    "noIIN": "Not specified",
-    "noPhone": "Not specified",
-    "viewDetails": "View Details",
-    "comments": "Comments",
-    "hideComments": "Hide Comments",
-    "commentPlaceholder": "Write your review about the user...",
-    "commentText": "Comment text",
-    "characters": "characters",
-    "noCommentsDescription": "No comments yet. Be the first!",
-    "dispute": "Dispute",
-    "pending": "Pending",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "reviewed": "Reviewed",
-    "edit": "Edit",
-    "changePassword": "Change Password",
-    "logout": "Logout",
-    "accountInfo": "Account Information",
-    "contactInfo": "Contact Information",
-    "username": "Username",
-    "verificationStatus": "Verification Status",
-    "confirmed": "Confirmed",
-    "notConfirmed": "Not confirmed",
-    "fullAccess": "Full access",
-    "limitedAccess": "Limited access",
-    "active": "Active",
-    "confirm": "Confirm",
-    "document": "Document",
-    "sentComplaintsCount": "Sent complaints",
-    "receivedComplaintsCount": "Received complaints",
-    "approvedCount": "approved",
-    "underReview": "under review",
-    "administrator": "Administrator",
-    "landlord": "Landlord",
-    "tenant": "Tenant",
-    "complaintManagement": "Complaint Management",
-    "view": "View",
-    "complaintsSentByYou": "Complaints you sent",
-    "complaintsReceivedAboutYou": "Complaints received about you",
-    "noComplaintsFound": "No complaints",
-    "basicProfileInfo": "Basic profile information",
-    "expired": "Expired",
-    "until": "Until",
-    "rooms": "Rooms",
-    "complaints": "Complaints",
+    "sections": {
+      "info": "Info",
+      "complaints": "Complaints",
+      "apartments": "Apartments"
+    },
+    "general": {
+      "generalInfo": "General Information",
+      "basicProfileInfo": "Basic profile information",
+      "accountInfo": "Account Information",
+      "contactInfo": "Contact Information"
+    },
+    "personal": {
+      "fullName": "Full Name",
+      "username": "Username",
+      "iin": "IIN",
+      "phone": "Phone",
+      "email": "Email",
+      "role": "Role",
+      "rating": "Rating",
+      "document": "Document",
+      "documentType": "Document Type",
+      "passportExpiry": "Expiry Date",
+      "documentExpired": "Document expired"
+    },
+    "roles": {
+      "administrator": "Administrator",
+      "landlord": "Landlord",
+      "tenant": "Tenant"
+    },
+    "verification": {
+      "verified": "Verified",
+      "notVerified": "Not Verified",
+      "verificationStatus": "Verification Status",
+      "confirmed": "Confirmed",
+      "notConfirmed": "Not confirmed",
+      "fullAccess": "Full access",
+      "limitedAccess": "Limited access"
+    },
+    "docType": {
+      "id_card": "ID Card",
+      "passport_kz": "KZ Passport",
+      "visa": "Visa",
+      "unknown": "Not specified"
+    },
+    "apartments": {
+      "myApartments": "My Apartments",
+      "addProperty": "Add Property",
+      "house": "House",
+      "apartment": "Apartment",
+      "rooms": "Rooms",
+      "rentalStatus": "Rental Status",
+      "noAddedHomes": "No added homes"
+    },
+    "complaints": {
+      "title": "Complaints",
+      "adminComplaints": "Admin Complaints",
+      "sentComplaints": "Sent Complaints",
+      "receivedComplaints": "Received Complaints",
+      "complaintsSentByYou": "Complaints you sent",
+      "complaintsReceivedAboutYou": "Complaints received about you",
+      "addComplaint": "Add Complaint",
+      "noComplaints": "No complaints",
+      "noComplaintsDescription": "This user has no complaints yet",
+      "noComplaintsFound": "No complaints",
+      "sentComplaintsCount": "Sent complaints",
+      "receivedComplaintsCount": "Received complaints",
+      "approvedCount": "approved",
+      "underReview": "under review",
+      "complaintManagement": "Complaint Management"
+    },
+    "comments": {
+      "title": "Comments",
+      "hideComments": "Hide Comments",
+      "showComments": "View all comments",
+      "toggleComments": "Hide comments",
+      "commentPlaceholder": "Write your review about the user...",
+      "commentText": "Comment text",
+      "characters": "characters",
+      "noComments": "No comments yet",
+      "noCommentsDescription": "No comments yet. Be the first!",
+      "addComment": "Add comment",
+      "newComment": "New comment",
+      "leaveFeedback": "Leave feedback about the user",
+      "sending": "Sending..."
+    },
+    "actions": {
+      "dispute": "Dispute",
+      "details": "Details",
+      "viewDetails": "View Details",
+      "action": "Action",
+      "view": "View",
+      "changePassword": "Change Password"
+    },
+    "dates": {
+      "date": "Date",
+      "until": "Until"
+    },
+    "loading": {
+      "title": "Loading profile..."
+    },
+    "errors": {
+      "title": "Loading error",
+      "message": "An error occurred while loading the profile",
+      "notFound": "Profile not found",
+      "profileNotFound": "Profile not found",
+      "connectionError": "Connection error",
+      "submitError": "Error while submitting",
+      "limitError": "You can leave a maximum of 2 comments",
+      "selfError": "You cannot comment on yourself"
+    },
     "search": {
       "title": "Registry of Dishonest Tenants and Landlords",
       "titleEn": "Registry of Dishonest Tenants and Landlords",
@@ -155,88 +261,13 @@
         "Отказ предоставить документы на жилье": "Refusal to Provide Property Documents",
         "Нарушение конфиденциальности жильцов": "Violation of Tenant Privacy"
       }
-    },
-    "info": "Info",
-    "leaveFeedback": "Leave feedback about the user",
-    "apartments": "Apartments",
-    "notverify": "Not Verified",
-    "active": "Active",
-    "ended": "Ended",
-    "declined": "Declined",
-    "cancelled": "Cancelled",
-    "noAddedHomes": "No added homes",
-    "noComplaints": "You have no complaints",
-    "pending": "Under review",
-    "reviewed": "Reviewed",
-    "rejected": "Rejected",
-    "loading": "Loading profile...",
-    "error": {
-      "title": "Loading error",
-      "message": "An error occurred while loading the profile"
-    },
-    "notFound": "Profile not found",
-    "notSpecified": "Not specified",
-    "adminComplaints": "Complaints for administrator review",
-    "tenant": "Tenant",
-    "confirm": "Confirm",
-    "reject": "Reject",
-    "documentType": "Document Type",
-    "passportExpiry": "Document Expiry Date",
-    "documentExpired": "Your document has expired. Please update your information.",
-    "docType":{
-      "id_card": "ID Card",
-      "passport_kz": "KZ Passport",
-      "visa": "Visa"
-    },
-    "noComments": "No comments yet",
-    "sending": "Sending...",
-    "send": "Send",
-    "cancel": "Cancel",
-    "newComment": "New comment",
-    "addComment": "Add comment",
-    "toggleComments": "Hide comments",
-    "showComments": "View all comments",
-    "profileNotFound": "Profile not found",
-    "loading": "Loading...",
-    "connectionError": "Connection error",
-    "submitError": "Error while submitting",
-    "limitError": "You can leave a maximum of 2 comments",
-    "selfError": "You cannot comment on yourself"
-  },
-  "login": {
-    "title": "Login",
-    "noAccount": "Don't have an account?",
-    "register": "Register",
-    "username": "Username",
-    "usernamePlaceholder": "Enter username",
-    "password": "Password",
-    "passwordPlaceholder": "Enter password",
-    "forgotPassword": "Forgot password?",
-    "submit": "Login"
-  },
-  "userProfile": {
-    "info": "Information",
-    "complaints": "Complaints",
-    "tenant": "Tenant",
-    "warning": {
-      "title": "Be careful!",
-      "message": "This tenant has been repeatedly noticed for non-compliance with contract terms"
-    },
-    "actions": {
-      "addComment": "Add comment",
-      "viewComments": "View all comments"
-    },
-    "adminActions": {
-      "title": "Administrator actions",
-      "removeBan": "Remove ban",
-      "assignViolation": "Assign violation",
-      "cancel": "Cancel",
-      "removeBanError": "Error removing ban"
     }
   },
+  
   "verify": {
     "identityVerification": "Identity verification"
   },
+  
   "rentalTable": {
     "rentalRequests": "Rental requests (incoming)",
     "noRequests": "No rental requests.",
@@ -254,7 +285,8 @@
       "cancelled": "Cancelled"
     }
   },
-  "dispute":{
+  
+  "dispute": {
     "disputeTitle": "Dispute the Complaint",
     "disputeExplanation": "Explanation",
     "disputeEvidence": "Document / Image (optional)",
@@ -270,22 +302,18 @@
     "uploadEvidenceFormats": "PDF, JPG, JPEG, PNG (optional)",
     "fileChosen": "✓ File chosen:"
   },
+  
   "complaint": {
     "title": "Complaint",
     "description": "Description",
     "rating": "Rating",
     "status": "Status",
-    "reviewed": "Reviewed",
-    "rejected": "Rejected",
-    "pending": "Under review",
     "complainant": "Complaint Sender",
     "accused": "Complaint Recipient",
     "property": "Property",
     "reasons": "Reasons",
     "evidence": "Evidence",
     "viewFile": "View file",
-    "approve": "Approve",
-    "reject": "Reject",
     "courtDecision": "Court Decision",
     "attachedImages": "Attached Images",
     "viewEvidence": "View Evidence",
@@ -304,6 +332,7 @@
       "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
     }
   },
+  
   "form": {
     "title": "New Property",
     "address": "Address (Street)",
@@ -315,6 +344,7 @@
     "room": "Room",
     "submit": "Add Property"
   },
+  
   "registration": {
     "registration1": "Registration",
     "user_type": "User type",
@@ -354,6 +384,7 @@
     "done": "Done",
     "submitting": "Registering..."
   },
+  
   "Scomplaint": {
     "title": "Submit a Complaint",
     "selectRental": "Select a Rental",
@@ -384,15 +415,15 @@
       "Просрочка платежей": "Payment delays",
       "Самовольное выселение или отказ освободить помещение": "Unauthorized eviction or refusal to vacate"
     },
-    "additionalPhotos": "Photos",
-    "damageCost": "Court Decision",
     "submitedit": "Submit Changes",
     "editTitle": "Edit Complaint",
+    "additionalPhotos": "Photos",
+    "damageCost": "Court Decision",
     "descriptionedit": "To dispute the complaint, you need to modify its content",
     "photoerror": "Maximum of 10 images can be uploaded",
-    "isCourtCase" : "Court Decision",
-    "iin":"Accused IIN",
-    "iinplace":"Enter IIN (12 characters)",
+    "isCourtCase": "Court Decision",
+    "iin": "Accused IIN",
+    "iinplace": "Enter IIN (12 characters)",
     "invalidIin": "Enter a valid IIN (12 characters)",
     "userNotFound": "User with this IIN was not found",
     "reasonRequired": "At least one complaint reason must be selected",
@@ -414,6 +445,7 @@
     "uploadDocument": "Upload document",
     "uploadFormats": "PDF, DOC, DOCX, images"
   },
+  
   "editProfile": {
     "fullName": "Full Name",
     "iin": "IIN",
@@ -436,6 +468,7 @@
     "loading": "Loading profile...",
     "doc_expired": "Document has expired"
   },
+
   "rentalCatalog": {
     "title": "Housing Catalog",
     "find": "Find",
@@ -465,6 +498,7 @@
     "objects": "objects",
     "loading": "Loading..."
   },
+  
   "search": {
     "placeholder": "Search by IIN or username",
     "address_placeholder": "Enter address",
@@ -497,19 +531,20 @@
     "landlords": "Landlords",
     "complaint_dates": "Complaint Dates"
   },
+  
   "forum": {
     "title": "Complaints Forum",
     "commentLimitReached": "You have already posted 2 comments for this complaint.",
     "filter": {
-      "popular": "Popular",
-      "new": "New",
-      "old": "Old",
       "region": "Region",
       "city": "City",
       "district": "District",
       "address": "Address",
       "all": "All",
-      "addressPlaceholder": "Enter address"
+      "addressPlaceholder": "Enter address",
+      "popular": "Popular",
+      "new": "New",
+      "old": "Old"
     },
     "postedBy": "Posted by",
     "description": "Description",
@@ -520,6 +555,7 @@
     "addComment": "Add a comment...",
     "send": "Send"
   },
+  
   "analytics": {
     "title": "Tenant Reliability Analytics",
     "username": "Username",
@@ -528,6 +564,7 @@
     "prediction": "Prediction",
     "logreg_chart": "Unreliability probability by rating"
   },
+  
   "model_predictions": {
     "title": "BERT Model Predictions",
     "accuracy": "Model Accuracy",
@@ -539,6 +576,7 @@
     "unreliable": "Unreliable",
     "loading": "Loading..."
   },
+  
   "cta": {
     "register_message_part1": "Sign up to get",
     "register_message_part2": "full access!",
@@ -546,23 +584,38 @@
     "already_registered": "Already registered?",
     "login_link": "Log in"
   },
+  
   "hero": {
     "free_and_available": "FREE & AVAILABLE",
     "check_potential_tenant": "Check potential tenant",
     "start_checking": "Start checking"
   },
+  
+  "about": {
+    "title": "About us",
+    "description1": "Our site is an open registry for tenants and landlords, created to increase transparency and reliability in the rental market for housing and commercial real estate. We collect and systematically organize data on complaints, court decisions and reviews, so that each party to the transaction can make more informed decisions.",
+    "description2": "Our goal is to reduce the number of conflict situations and create a safe space for rental. We provide convenient search tools so that you can quickly check the honesty of a tenant or landlord."
+  },
+  
   "features": {
+    "title": "Our Services",
+    "subtitle": "Choose the service you need to work with our platform",
     "registry": "Registry",
-    "registry_description": "Avoid bad tenants with complaints, payment delays, or property damage by checking their history.",
-    "forum": "Forum",
-    "forum_description": "Share experiences and insights with other landlords, and receive support from them.",
-    "analytics": "Analytics",
-    "analytics_description": "Track tenant reliability analysis. View areas with good tenants on the map.",
+    "registry_description": "Avoid bad tenants and landlords with complaints and bad reviews by checking their history.",
+    "maps": "Maps",
+    "maps_description": "Browse available apartments for rent in your desired area in real-time. View property ratings for easy and quick selection.",
     "help": "Help",
-    "help_description": "Have questions about the complaint's validity? Need legal advice? Want to ask a question? Chat with the bot, and our managers will contact you!",
+    "help_description": "Have questions? Then go to the frequently asked questions page and get answers to your questions.",
     "go_to": "Go to",
     "rules": "Rules"
   },
+
+  "_comment_partners": "Partners section left for future use",
+  "partners": {
+    "title": "Our Partners",
+    "logo": "Logo"
+  },
+  
   "termsPolicy": {
     "title": "Terms and Policy",
     "section1": {
@@ -681,7 +734,12 @@
     "warningsSystem": {
       "title": "Warning System",
       "table": {
-        "headers": ["Violation", "First Measure", "Repeat", "Severe Violation"],
+        "headers": [
+          "Violation",
+          "First Measure",
+          "Repeat",
+          "Severe Violation"
+        ],
         "rows": [
           {
             "violation": "False Complaint",
@@ -717,6 +775,7 @@
       }
     }
   },
+  
   "password": {
     "change": {
       "title": "Change Password",
@@ -745,6 +804,8 @@
       "go_to_login": "Go to Login"
     }
   },
+  
+  "_comment_admin": "NOTE: Admin section is very large and unchanged to avoid risks",
   "admin": {
     "pdfCheck": "Check PDF",
     "title": "Admin Panel",
@@ -863,7 +924,6 @@
     "verificationCommentPlaceholder": "Add a comment to the verification decision...",
     "approveVerification": "Approve Verification",
     "rejectVerification": "Reject Verification",
-    "verificationCompleted": "Verification Completed",
     "verificationCompletedMessage": "User documents have been successfully verified",
     "errorFetchingStats": "Error fetching statistics",
     "userBannedSuccessfully": "User successfully banned",
@@ -1022,7 +1082,6 @@
         "reason": "Reason",
         "type": "Type",
         "is_default": "Default",
-        "order": "Order",
         "actions": "Actions",
         "default": "Default",
         "custom": "Custom",
@@ -1041,19 +1100,14 @@
         "error_creating": "Error creating complaint reason",
         "error_updating": "Error updating complaint reason",
         "not_found": "Complaint reason not found",
-        "create_subtitle": "Add a new complaint reason",
-        "edit_subtitle": "Edit existing complaint reason",
-        "back_to_list": "Back to list",
         "russian": "Russian",
         "kazakh": "Kazakh", 
         "english": "English",
         "settings": "Settings",
         "update": "Update",
-        "type": "Type",
         "type_tenant": "Tenant",
         "type_landlord": "Landlord",
         "order": "Order",
-        "is_default": "Default",
         "reason_placeholder": "Enter complaint reason description...",
         "reason_kz_placeholder": "Шағым себебінің сипаттамасын енгізіңіз...",
         "reason_en_placeholder": "Enter complaint reason description...",
@@ -1077,10 +1131,65 @@
           "search_placeholder": "Search reasons...",
           "all_types": "All types",
           "all_defaults": "All defaults"
-        }
+        },
+        "fill_required_fields": "Please fill in required fields",
+        "error_saving": "Error saving reason",
+        "back_to_list": "Back to list",
+        "saving": "Saving...",
+        "create_subtitle": "Creating new reason",
+        "edit_subtitle": "Editing reason"
       }
     }
   },
+  
+  "login": {
+    "title": "Login",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "forgotPassword": "Forgot password?",
+    "submit": "Login"
+  },
+  
+  "userProfile": {
+    "info": "Information",
+    "complaints": "Complaints",
+    "tenant": "Tenant",
+    "warning": {
+      "title": "Be careful!",
+      "message": "This tenant has been repeatedly noticed for non-compliance with contract terms"
+    },
+    "actions": {
+      "addComment": "Add comment",
+      "viewComments": "View all comments"
+    },
+    "adminActions": {
+      "title": "Administrator actions",
+      "removeBan": "Remove ban",
+      "assignViolation": "Assign violation",
+      "cancel": "Cancel",
+      "removeBanError": "Error removing ban"
+    }
+  },
+  
+  "faq": {
+    "hero": {
+      "title": "Get answers to all your questions!",
+      "tenants_tab": "For Tenants",
+      "landlords_tab": "For Landlords"
+    },
+    "questions": {
+      "title": "Frequently Asked Questions",
+      "loading_error": "Error loading FAQ",
+      "loading_error_description": "Please try again later or contact the administrator",
+      "no_faq": "FAQ not added yet",
+      "no_faq_description": "The administrator will add questions and answers soon"
+    }
+  },
+  
   "complaints": {
     "title": "Complaint Management",
     "subtitle": "View and moderate all complaints in the system",
@@ -1110,17 +1219,17 @@
       "by_status": "By Status",
       "user_iin_bin": "User IIN/BIN",
       "user_iin_bin_placeholder": "Enter IIN or BIN",
-        "reason": "Complaint Reason",
-        "all_reasons": "All Reasons",
-        "role_direction": "Complaint Direction",
-        "all_directions": "All Directions",
-        "tenant_to_landlord": "Tenant → Landlord",
-        "landlord_to_tenant": "Landlord → Tenant",
-        "tenant": "Tenant",
-        "landlord": "Landlord",
-        "clear": "Clear",
-        "show_filters": "Show Filters",
-        "hide_filters": "Hide Filters"
+      "reason": "Complaint Reason",
+      "all_reasons": "All Reasons",
+      "role_direction": "Complaint Direction",
+      "all_directions": "All Directions",
+      "tenant_to_landlord": "Tenant → Landlord",
+      "landlord_to_tenant": "Landlord → Tenant",
+      "tenant": "Tenant",
+      "landlord": "Landlord",
+      "clear": "Clear",
+      "show_filters": "Show Filters",
+      "hide_filters": "Hide Filters"
     },
     "table": {
       "title": "Complaints",
@@ -1148,20 +1257,7 @@
       "error": "Error moderating complaint"
     }
   },
-  "faq": {
-    "hero": {
-      "title": "Get answers to all your questions!",
-      "tenants_tab": "For Tenants",
-      "landlords_tab": "For Landlords"
-    },
-    "questions": {
-      "title": "Frequently Asked Questions",
-      "loading_error": "Error loading FAQ",
-      "loading_error_description": "Please try again later or contact the administrator",
-      "no_faq": "FAQ not added yet",
-      "no_faq_description": "The administrator will add questions and answers soon"
-    }
-  },
+  
   "notifications": {
     "bell": {
       "aria_label": "Notifications"
@@ -1255,8 +1351,19 @@
         "daily": "Daily",
         "weekly": "Weekly"
       }
+    },
+    "push_prompt": {
+      "not_supported": "Push notifications are not supported in your browser",
+      "enabled": "Push notifications enabled",
+      "disabled": "Push notifications disabled",
+      "test": "Test",
+      "enable_title": "Enable push notifications",
+      "enable_description": "Receive instant notifications about new complaints, rentals and important events",
+      "enable": "Enable",
+      "later": "Later"
     }
   },
+  
   "pdfCheck": {
     "pageTitle": "PDF Court Decision Verification",
     "pageSubtitle": "Upload a PDF file with a court decision for automatic analysis and complaint creation",
@@ -1282,3 +1389,4 @@
     "errorSubmit": "Submit error"
   }
 }
+

@@ -12,7 +12,7 @@ const HomePage: FC = () => {
       <HeroSection />
       <AboutSection />
       <FeaturesSection />
-      <PartnersSection />
+      {/* <PartnersSection /> */}
       <CtaSection />
     </div>
   );

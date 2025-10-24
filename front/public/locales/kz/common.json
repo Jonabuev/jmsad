@@ -1,12 +1,77 @@
 {
+  "_comment": "OPTIMIZED VERSION - Removed duplicates, added common sections",
+  
+  "common": {
+    "loading": "Жүктелуде...",
+    "error": "Қате",
+    "success": "Сәтті",
+    "notFound": "Табылмады",
+    "notSpecified": "Көрсетілмеген",
+    "avatar": "Аватар",
+    "configError": "Конфигурация қатесі",
+    "yes": "Иә",
+    "no": "Жоқ"
+  },
+  
+  "actions": {
+    "submit": "Жіберу",
+    "cancel": "Болдырмау",
+    "save": "Сақтау",
+    "edit": "Өңдеу",
+    "delete": "Жою",
+    "view": "Көру",
+    "confirm": "Растау",
+    "reject": "Қабылдамау",
+    "approve": "Мақұлдау",
+    "send": "Жіберу",
+    "add": "Қосу",
+    "update": "Жаңарту",
+    "back": "Артқа",
+    "close": "Жабу",
+    "apply": "Қолдану",
+    "reset": "Қалпына келтіру",
+    "clear": "Тазалау",
+    "search": "Іздеу",
+    "logout": "Шығу",
+    "login": "Кіру",
+    "register": "Тіркелу"
+  },
+  
+  "statuses": {
+    "pending": "Қарастырылуда",
+    "active": "Белсенді",
+    "inactive": "Белсенді емес",
+    "approved": "Мақұлданған",
+    "rejected": "Қабылданбады",
+    "reviewed": "Қарастырылған",
+    "completed": "Аяқталды",
+    "cancelled": "Болдырылмаған",
+    "declined": "Қабылданбады",
+    "ended": "Аяқталған",
+    "verified": "Расталған",
+    "notVerified": "Расталмаған",
+    "banned": "Блокталған",
+    "expired": "Мерзімі өтті"
+  },
+  
+  "validation": {
+    "required": "Бұл өріс міндетті түрде толтырылуы тиіс",
+    "invalidEmail": "Жарамсыз email",
+    "invalidPhone": "Жарамсыз телефон",
+    "invalidIIN": "Дұрыс ЖСН енгізіңіз (12 таңба)",
+    "passwordMismatch": "Құпия сөздер сәйкес келмейді",
+    "iinTooLong": "ЖСН 12 таңбадан аспауы керек"
+  },
+
   "welcome": "Қош келдіңіз",
-  "logout": "Шығу",
+  
   "header": {
     "home": "Басты бет",
     "about": "Біз туралы",
     "services": "Қызметтер",
     "contact": "Байланыс"
   },
+  
   "footer": {
     "aboutUs": "Біз туралы ақпарат",
     "aboutDescription": "ARNO - ашық және жауапкершілікті жалдау нарығының платформасы",
@@ -25,96 +90,136 @@
     "socialMedia": "Біз әлеуметтік желілерде:",
     "copyright": "©2025 ARNO.KZ БАРЛЫҚ ҚҰҚЫҚТАР ҚОРҒАЛҒАН"
   },
+  
   "navigation": {
     "registry": "Тіркеу",
     "faq": "FAQ",
     "analytics": "Талдау",
     "profile": "Профиль",
     "register": "Тіркелу",
-    "catalog": "Каталог",
     "login": "Кіру",
     "language": "Тіл",
+    "catalog": "Каталог",
     "admin": "Әкімші панелі"
   },
+  
+  "languages": {
+    "ru": "Орыс",
+    "en": "Ағылшын",
+    "kz": "Қазақ"
+  },
+  
   "profile": {
-    "generalInfo": "Жалпы ақпарат",
-    "leaveFeedback": "Пайдаланушы туралы пікір қалдырыңыз",
-    "iin": "ЖСН",
-    "role": "Рөлі",
-    "rating": "Рейтинг",
-    "phone": "Телефон",
-    "email": "Электрондық пошта",
-    "verified": "Расталған",
-    "myApartments": "Менің пәтерлерім",
-    "addProperty": "Мүлік қосу",
-    "rentalStatus": "Жалдау күйі",
-    "house": "үй",
-    "apartment": "пәтер",
-    "noPhone": "Көрсетілмеген",
-    "noIIN": "Көрсетілмеген",
-    "documentType": "Құжат түрі",
-    "passportExpiry": "Жарамдылық мерзімі",
-    "noExpiryDate": "Көрсетілмеген",
-    "documentExpired": "Құжаттың мерзімі өтті",
-    "adminComplaints": "Әкімші шағымдары",
-    "complaints": "Шағымдар",
-    "status": "Күйі",
-    "details": "Толығырақ",
-    "action": "Әрекет",
-    "description": "Сипаттама",
-    "date": "Күні",
-    "sentComplaints": "Жіберілген шағымдар",
-    "receivedComplaints": "Алынған шағымдар",
-    "addComplaint": "Шағым қосу",
-    "noComplaints": "Шағымдар жоқ",
-    "noComplaintsDescription": "Бұл пайдаланушыда әлі шағым жоқ",
-    "accountInfo": "Тіркелгі туралы ақпарат",
-    "contactInfo": "Байланыс ақпараты",
-    "noIIN": "Көрсетілмеген",
-    "noPhone": "Көрсетілмеген",
-    "viewDetails": "Толығырақ",
-    "comments": "Пікірлер",
-    "hideComments": "Пікірлерді жасыру",
-    "commentPlaceholder": "Пайдаланушы туралы пікіріңізді жазыңыз...",
-    "commentText": "Пікір мәтіні",
-    "characters": "таңба",
-    "noCommentsDescription": "Әлі пікірлер жоқ. Бірінші болыңыз!",
-    "dispute": "Қарсылық білдіру",
-    "pending": "Қарастырылуда",
-    "approved": "Мақұлданған",
-    "rejected": "Болдырмаған",
-    "reviewed": "Қарастырылған",
-    "edit": "Өңдеу",
-    "changePassword": "Құпия сөзді өзгерту",
-    "logout": "Шығу",
-    "accountInfo": "Тіркелгі туралы ақпарат",
-    "contactInfo": "Байланыс ақпараты",
-    "username": "Пайдаланушы аты",
-    "verificationStatus": "Растау күйі",
-    "confirmed": "Расталған",
-    "notConfirmed": "Расталмаған",
-    "fullAccess": "Толық қол жетімділік",
-    "limitedAccess": "Шектеулі қол жетімділік",
-    "active": "Белсенді",
-    "confirm": "Растау",
-    "document": "Құжат",
-    "sentComplaintsCount": "Жіберілген шағымдар",
-    "receivedComplaintsCount": "Алынған шағымдар",
-    "approvedCount": "мақұлданған",
-    "underReview": "қарастырылуда",
-    "administrator": "Әкімші",
-    "landlord": "Жалдау беруші",
-    "tenant": "Жалдау алушы",
-    "complaintManagement": "Шағымдарды басқару",
-    "view": "Көру",
-    "complaintsSentByYou": "Сіз жіберген шағымдар",
-    "complaintsReceivedAboutYou": "Сізге қатысты алынған шағымдар",
-    "noComplaintsFound": "Шағымдар жоқ",
-    "basicProfileInfo": "Профиль туралы негізгі ақпарат",
-    "expired": "Мерзімі өтті",
-    "until": "Дейін",
-    "rooms": "Бөлме саны",
-    "complaints": "Шағымдар",
+    "sections": {
+      "info": "Ақпарат",
+      "complaints": "Шағымдар",
+      "apartments": "Пәтерлер"
+    },
+    "general": {
+      "generalInfo": "Жалпы ақпарат",
+      "basicProfileInfo": "Профиль туралы негізгі ақпарат",
+      "accountInfo": "Тіркелгі туралы ақпарат",
+      "contactInfo": "Байланыс ақпараты"
+    },
+    "personal": {
+      "fullName": "Толық аты-жөні",
+      "username": "Пайдаланушы аты",
+      "iin": "ЖСН",
+      "phone": "Телефон",
+      "email": "Электрондық пошта",
+      "role": "Рөлі",
+      "rating": "Рейтинг",
+      "document": "Құжат",
+      "documentType": "Құжат түрі",
+      "passportExpiry": "Жарамдылық мерзімі",
+      "documentExpired": "Құжаттың мерзімі өтті"
+    },
+    "roles": {
+      "administrator": "Әкімші",
+      "landlord": "Жалдау беруші",
+      "tenant": "Жалдау алушы"
+    },
+    "verification": {
+      "verified": "Расталған",
+      "notVerified": "Расталмаған",
+      "verificationStatus": "Растау күйі",
+      "confirmed": "Расталған",
+      "notConfirmed": "Расталмаған",
+      "fullAccess": "Толық қол жетімділік",
+      "limitedAccess": "Шектеулі қол жетімділік"
+    },
+    "docType": {
+      "id_card": "Жеке куәлік",
+      "passport_kz": "ҚР төлқұжаты",
+      "visa": "Виза",
+      "unknown": "Көрсетілмеген"
+    },
+    "apartments": {
+      "myApartments": "Менің пәтерлерім",
+      "addProperty": "Мүлік қосу",
+      "house": "үй",
+      "apartment": "пәтер",
+      "rooms": "Бөлме саны",
+      "rentalStatus": "Жалдау күйі",
+      "noAddedHomes": "Қосылған үйлер жоқ"
+    },
+    "complaints": {
+      "title": "Шағымдар",
+      "adminComplaints": "Әкімші шағымдары",
+      "sentComplaints": "Жіберілген шағымдар",
+      "receivedComplaints": "Алынған шағымдар",
+      "complaintsSentByYou": "Сіз жіберген шағымдар",
+      "complaintsReceivedAboutYou": "Сізге қатысты алынған шағымдар",
+      "addComplaint": "Шағым қосу",
+      "noComplaints": "Шағымдар жоқ",
+      "noComplaintsDescription": "Бұл пайдаланушыда әлі шағым жоқ",
+      "noComplaintsFound": "Шағымдар жоқ",
+      "sentComplaintsCount": "Жіберілген шағымдар",
+      "receivedComplaintsCount": "Алынған шағымдар",
+      "approvedCount": "мақұлданған",
+      "underReview": "қарастырылуда",
+      "complaintManagement": "Шағымдарды басқару"
+    },
+    "comments": {
+      "title": "Пікірлер",
+      "hideComments": "Пікірлерді жасыру",
+      "showComments": "Барлық пікірлерді көру",
+      "toggleComments": "Пікірлерді жасыру",
+      "commentPlaceholder": "Пайдаланушы туралы пікіріңізді жазыңыз...",
+      "commentText": "Пікір мәтіні",
+      "characters": "таңба",
+      "noComments": "Әзірге пікірлер жоқ",
+      "noCommentsDescription": "Әлі пікірлер жоқ. Бірінші болыңыз!",
+      "addComment": "Пікір қосу",
+      "newComment": "Жаңа пікір",
+      "leaveFeedback": "Пайдаланушы туралы пікір қалдырыңыз",
+      "sending": "Жіберілуде..."
+    },
+    "actions": {
+      "dispute": "Қарсылық білдіру",
+      "details": "Толығырақ",
+      "viewDetails": "Толығырақ",
+      "action": "Әрекет",
+      "view": "Көру",
+      "changePassword": "Құпия сөзді өзгерту"
+    },
+    "dates": {
+      "date": "Күні",
+      "until": "Дейін"
+    },
+    "loading": {
+      "title": "Профиль жүктелуде..."
+    },
+    "errors": {
+      "title": "Жүктеу қатесі",
+      "message": "Профильді жүктеу кезінде қате орын алды",
+      "notFound": "Профиль табылмады",
+      "profileNotFound": "Профиль табылмады",
+      "connectionError": "Қосылу қатесі",
+      "submitError": "Жіберу кезінде қате",
+      "limitError": "Ең көп дегенде 2 пікір қалдыруға болады",
+      "selfError": "Өзіңізге пікір қалдыра алмайсыз"
+    },
     "search": {
       "title": "Сенімсіз жалдау алушылар мен жалдау берушілердің тіркелімі",
       "titleEn": "Registry of Dishonest Tenants and Landlords",
@@ -156,56 +261,13 @@
         "Отказ предоставить документы на жилье": "Тұрғын үй құжаттарын беруге бас тарту",
         "Нарушение конфиденциальности жильцов": "Тұрғындардың құпиялылығын бұзу"
       }
-    },
-    "info": "Ақпарат",
-    "apartments": "Пәтерлер",
-    "notverify": "Расталған емес",
-    "active": "Белсенді",
-    "ended": "Аяқталған",
-    "declined": "Қабылданбады",
-    "cancelled": "Болдырылмаған",
-    "noAddedHomes": "Қосылған үйлер жоқ",
-    "noComplaints": "Сізде шағымдар жоқ",
-    "pending": "Тексерілуде",
-    "reviewed": "Тексерілді",
-    "rejected": "Қабылданбады",
-    "loading": "Профиль жүктелуде...",
-    "error": {
-      "title": "Жүктеу қатесі",
-      "message": "Профильді жүктеу кезінде қате орын алды"
-    },
-    "notFound": "Профиль табылмады",
-    "notSpecified": "Көрсетілмеген",
-    "adminComplaints": "Әкімші тексеретін шағымдар",
-    "confirm": "Қабылдау",
-    "reject": "Қабылдамау",
-    "tenant": "Жалға алушы",
-    "documentType": "Құжат түрі",
-    "passportExpiry": "Құжаттың жарамдылық мерзімі",
-    "documentExpired": "Құжатыңыздың мерзімі өтіп кеткен. Ақпаратыңызды жаңартыңыз.",
-    "docType":{
-      "id_card": "Жеке куәлік",
-      "passport_kz": "ҚР төлқұжаты",
-      "visa": "Виза"
-    },
-    "noComments": "Әзірге пікірлер жоқ",
-    "sending": "Жіберілуде...",
-    "send": "Жіберу",
-    "cancel": "Бас тарту",
-    "newComment": "Жаңа пікір",
-    "addComment": "Пікір қосу",
-    "toggleComments": "Пікірлерді жасыру",
-    "showComments": "Барлық пікірлерді көру",
-    "profileNotFound": "Профиль табылмады",
-    "loading": "Жүктелуде...",
-    "connectionError": "Қосылу қатесі",
-    "submitError": "Жіберу кезінде қате",
-    "limitError": "Ең көп дегенде 2 пікір қалдыруға болады",
-    "selfError": "Өзіңізге пікір қалдыра алмайсыз"
+    }
   },
+  
   "verify": {
     "identityVerification": "Жеке басын растау"
   },
+  
   "rentalTable": {
     "rentalRequests": "Жалға алу сұраныстары (кіріс)",
     "noRequests": "Жалға алу сұраныстары жоқ.",
@@ -223,7 +285,8 @@
       "cancelled": "Болдырылмаған"
     }
   },
-  "dispute":{
+  
+  "dispute": {
     "disputeTitle": "Шағымға қарсылық білдіру",
     "disputeExplanation": "Түсініктеме",
     "disputeEvidence": "Құжат / Сурет (міндетті емес)",
@@ -239,22 +302,18 @@
     "uploadEvidenceFormats": "PDF, JPG, JPEG, PNG (міндетті емес)",
     "fileChosen": "✓ Таңдалған файл:"
   },
+  
   "complaint": {
     "title": "Шағым",
     "description": "Сипаттама",
     "rating": "Рейтинг",
     "status": "Мәртебе",
-    "reviewed": "Қаралды",
-    "rejected": "Қабылданбады",
-    "pending": "Қаралуда",
     "complainant": "Жалға беруші",
     "accused": "Жалға алушы",
     "property": "Мүлік",
     "reasons": "Себептері",
     "evidence": "Дәлелдер",
     "viewFile": "Файлды көру",
-    "approve": "Мақұлдау",
-    "reject": "Қабылдамау",
     "courtDecision": "Сот шешімі",
     "attachedImages": "Тіркелген суреттер",
     "viewEvidence": "Дәлелдемені көру",
@@ -273,6 +332,7 @@
       "Самовольное выселение или отказ освободить помещение": "Өз бетінше шығару немесе босатудан бас тарту"
     }
   },
+  
   "form": {
     "title": "Жаңа мүлік",
     "address": "Мекенжай (Көше)",
@@ -284,6 +344,7 @@
     "room": "Бөлме",
     "submit": "Мүлікті қосу"
   },
+  
   "registration": {
     "registration1": "Тіркеу",
     "user_type": "Пайдаланушы түрі",
@@ -323,6 +384,7 @@
     "done": "Дайын",
     "submitting": "Тіркелуде..."
   },
+  
   "Scomplaint": {
     "title": "Шағым беру",
     "selectRental": "Жалға алуды таңдаңыз",
@@ -353,15 +415,15 @@
       "Просрочка платежей": "Төлемді кешіктіру",
       "Самовольное выселение или отказ освободить помещение": "Өз бетінше шығару немесе босатудан бас тарту"
     },
-    "additionalPhotos": "Фотосуреттер",
-    "damageCost": "Сот шешімі",
     "submitedit": "Өзгерістерді сақтау",
     "editTitle": "Шағымды өзгерту",
+    "additionalPhotos": "Фотосуреттер",
+    "damageCost": "Сот шешімі",
     "descriptionedit": "Шағымға қарсылық білдіру үшін оның мазмұнын өзгерту қажет",
     "photoerror": "Ең көбі 10 сурет жүктеуге болады",
     "isCourtCase": "Сот шешімі",
     "iin": "Айыпталушының ЖСН-і",
-    "iinplace":"ЖСН енгізіңіз (12 таңба)",
+    "iinplace": "ЖСН енгізіңіз (12 таңба)",
     "invalidIin": "Дұрыс ЖСН енгізіңіз (12 таңба)",
     "userNotFound": "Бұл ЖСН бойынша пайдаланушы табылмады",
     "reasonRequired": "Кемінде бір шағым себебін таңдау қажет",
@@ -383,6 +445,7 @@
     "uploadDocument": "Құжатты жүктеу",
     "uploadFormats": "PDF, DOC, DOCX, суреттер"
   },
+  
   "editProfile": {
     "fullName": "Толық аты-жөні",
     "iin": "ЖСН",
@@ -405,6 +468,7 @@
     "loading": "Профиль жүктелуде...",
     "doc_expired": "Құжаттың мерзімі өтіп кеткен"
   },
+
   "rentalCatalog": {
     "title": "Тұрғын үй каталогы",
     "find": "Іздеу",
@@ -434,6 +498,7 @@
     "objects": "объект",
     "loading": "Жүктелуде..."
   },
+  
   "search": {
     "placeholder": "ИИН немесе пайдаланушы аты бойынша іздеу",
     "address_placeholder": "Мекен-жай енгізіңіз",
@@ -466,19 +531,20 @@
     "landlords": "Төлем алушылар",
     "complaint_dates": "Шағым даталары"
   },
+  
   "forum": {
     "title": "Шағымдар форумы",
     "commentLimitReached": "Сіз бұл шағымға 2 пікір қалдырдыңыз.",
     "filter": {
-      "popular": "Популярлы",
-      "new": "Жаңа",
-      "old": "Ескі",
       "region": "Облыс",
       "city": "Қала",
       "district": "Аудан",
       "address": "Мекенжай",
       "all": "Барлығы",
-      "addressPlaceholder": "Мекенжайды енгізіңіз"
+      "addressPlaceholder": "Мекенжайды енгізіңіз",
+      "popular": "Популярлы",
+      "new": "Жаңа",
+      "old": "Ескі"
     },
     "postedBy": "Жариялаған",
     "description": "Сипаттама",
@@ -489,6 +555,7 @@
     "addComment": "Пікір қосыңыз...",
     "send": "Жіберу"
   },
+  
   "analytics": {
     "title": "Арендаторовдың сенімділігін талдау",
     "username": "Пайдаланушы аты",
@@ -497,6 +564,7 @@
     "prediction": "Болжау",
     "logreg_chart": "Рейтингке байланысты сенімсіздік ықтималдығы"
   },
+  
   "model_predictions": {
     "title": "BERT Моделінің болжаулары",
     "accuracy": "Модельдің дәлдігі",
@@ -508,6 +576,7 @@
     "unreliable": "Сенімсіз",
     "loading": "Жүктелуде..."
   },
+  
   "cta": {
     "register_message_part1": "Тіркеліп, алыңыз",
     "register_message_part2": "толық қолжетімділік!",
@@ -515,23 +584,38 @@
     "already_registered": "Қ already тіркелдіңіз бе?",
     "login_link": "Кіру"
   },
+  
   "hero": {
     "free_and_available": "ТЕГІН & ҚОЛЖЕТІМДІ",
     "check_potential_tenant": "Мүмкін арендатормен тексеріңіз",
     "start_checking": "Тексеруді бастау"
   },
+  
+  "about": {
+    "title": "Біз туралы",
+    "description1": "Біздің сайтымыз адал жалдау алушылар және жалдау берушілер үшін ашық реестр болып, жалдау нарығындағы ақпараттың ашықтығын және нақтылығын арттыру мақсатында құрылған. Біз жалобалар, сот шешімдері және пікірлер деректерін жинап, әрбір сатып алушы және сатып алушы үшін нақты шешім қабылдауға мүмкіндік береді.",
+    "description2": "Біздің мақсатымыз - көпшіліктен шыққан күрес және жалдау үшін қауіпсіз орта құру. Біз іздеу құралдарын ұсынып, сіз жалдау алушының немесе жалдау берушінің байланыстылығын тексеруге болады."
+  },
+  
   "features": {
+    "title": "Біздің қызметтер",
+    "subtitle": "Біздің платформамен жұмыс істеу үшін қажетті қызметті таңдаңыз",
     "registry": "Тіркеу",
     "registry_description": "Жалға алушылардың шағымдары, төлемдерінде кешіктірулер немесе мүлікті бүлдіруі бар жаман жалға алушыларды олардың тарихын тексеру арқылы болдырмаңыз.",
-    "forum": "Форум",
-    "forum_description": "Басқа жалға берушілермен тәжірибе мен пікірлермен бөлісіңіз және олардан қолдау алыңыз.",
-    "analytics": "Аналитика",
-    "analytics_description": "Жалға алушылардың сенімділігін бақылаңыз. Картадан жақсы жалға алушылар тұратын аудандарды көріңіз.",
+    "maps": "Карты",
+    "maps_description": "Бірінші режимде қалаған аумақта жалға берілетін қолжетімді пәтерлерді шолыңыз. Оңай және жылдам таңдау үшін жылжымайтын мүлік рейтингтерін қараңыз.",
     "help": "Көмек",
     "help_description": "Шағымның дұрыстығы туралы сұрақтарыңыз бар ма? Заңгерлік кеңес қажет пе? Сұрақ қоюғыңыз келе ме? Чат-ботқа жазыңыз, біздің менеджерлер сізбен байланысады!",
     "go_to": "Өту",
     "rules": "Ережелер"
   },
+
+  "_comment_partners": "Partners section left for future use",
+  "partners": {
+    "title": "Біздің серіктестер",
+    "logo": "Логотип"
+  },
+  
   "termsPolicy": {
     "title": "Шарттар мен Саясат",
     "section1": {
@@ -691,6 +775,7 @@
       }
     }
   },
+  
   "password": {
     "change": {
       "title": "Құпия сөзді өзгерту",
@@ -719,15 +804,17 @@
       "go_to_login": "Кіру бетіне өту"
     }
   },
+  
+  "_comment_admin": "NOTE: Admin section is very large and unchanged to avoid risks",
   "admin": {
     "pdfCheck": "PDF көру",
     "title": "Әкімші панелі",
     "dashboard": "Басқару панелі",
     "dashboardSubtitle": "Жүйе көрінісі және басқару",
-          "users": "Пайдаланушылар",
-          "complaints": "Шағымдар",
-          "activityTitle": "Белсенділік журналы",
-          "settingsMenu": "Баптаулар",
+    "users": "Пайдаланушылар",
+    "complaints": "Шағымдар",
+    "activityTitle": "Белсенділік журналы",
+    "settingsMenu": "Баптаулар",
     "profile": "Профиль",
     "logout": "Шығу",
     "welcome": "Әкімші панеліне қош келдіңіз",
@@ -926,135 +1013,136 @@
       }
     },
     "settings": {
-        "title": "Жүйелік параметрлер",
-        "overview": "Платформа параметрлерін, ЖҚС және шағым себептерін басқару",
-        "statistics": "Статистика",
-        "faq": {
-          "title": "ЖҚС басқаруы",
-          "subtitle": "Жиі қойылатын сұрақтарды қосу, өңдеу және жою",
-          "create": "ЖҚС жасау",
-          "edit": "Өңдеу",
-          "delete": "Жою",
-          "question": "Сұрақ",
-          "answer": "Жауап",
-          "category": "Санат",
-          "user_type": "Пайдаланушы түрі",
-          "is_active": "Күй",
-          "order": "Тәртіп",
-          "actions": "Әрекеттер",
-          "active": "Белсенді",
-          "inactive": "Белсенді емес",
-          "user_type_both": "Барлығына",
-          "user_type_tenants": "Жалдаушыларға",
-          "user_type_landlords": "Жалдау берушілерге",
-          "categories": {
-            "general": "Жалпы сұрақтар",
-            "rental": "Жалдау",
-            "complaints": "Шағымдар",
-            "verification": "Тексеру",
-            "payments": "Төлемдер"
-          },
-          "loading": "ЖҚС жүктелуде...",
-          "no_faq": "ЖҚС табылмады",
-          "no_faq_description": "Тізімде көрсету үшін бірінші ЖҚС жасаңыз",
-          "error_loading": "ЖҚС жүктеу қатесі",
-          "deleted_successfully": "ЖҚС сәтті жойылды",
-          "error_deleting": "ЖҚС жою қатесі",
-          "confirm_delete": "Бұл ЖҚС жойғыңыз келетініне сенімдісіз бе?",
-          "filters": {
-            "title": "Сүзгілер",
-            "show": "Сүзгілерді көрсету",
-            "hide": "Сүзгілерді жасыру",
-            "apply": "Қолдану",
-            "clear": "Тазалау",
-            "search_placeholder": "Сұрақтар мен жауаптар бойынша іздеу...",
-            "all_categories": "Барлық санаттар",
-            "all_user_types": "Барлық пайдаланушы түрлері",
-            "all_statuses": "Барлық күйлер"
-          },
-          "russian": "Орыс",
-          "kazakh": "Қазақ",
-          "english": "Ағылшын",
-          "settings": "Параметрлер",
-          "fill_required_fields": "Міндетті өрістерді толтырыңыз",
-          "created_successfully": "ЖҚС сәтті жасалды",
-          "updated_successfully": "ЖҚС сәтті жаңартылды",
-          "error_saving": "ЖҚС сақтау қатесі",
-          "back_to_list": "Тізімге оралу",
-          "cancel": "Болдырмау",
-          "saving": "Сақталуда...",
-          "update": "Жаңарту",
-          "create_subtitle": "Жаңа ЖҚС жасау",
-          "edit_subtitle": "ЖҚС өңдеу"
+      "title": "Жүйелік параметрлер",
+      "overview": "Платформа параметрлерін, ЖҚС және шағым себептерін басқару",
+      "statistics": "Статистика",
+      "faq": {
+        "title": "ЖҚС басқаруы",
+        "subtitle": "Жиі қойылатын сұрақтарды қосу, өңдеу және жою",
+        "create": "ЖҚС жасау",
+        "edit": "Өңдеу",
+        "delete": "Жою",
+        "question": "Сұрақ",
+        "answer": "Жауап",
+        "category": "Санат",
+        "user_type": "Пайдаланушы түрі",
+        "is_active": "Күй",
+        "order": "Тәртіп",
+        "actions": "Әрекеттер",
+        "active": "Белсенді",
+        "inactive": "Белсенді емес",
+        "user_type_both": "Барлығына",
+        "user_type_tenants": "Жалдаушыларға",
+        "user_type_landlords": "Жалдау берушілерге",
+        "categories": {
+          "general": "Жалпы сұрақтар",
+          "rental": "Жалдау",
+          "complaints": "Шағымдар",
+          "verification": "Тексеру",
+          "payments": "Төлемдер"
         },
-        "complaintReasons": {
-          "title": "Шағым себептерін басқару",
-          "subtitle": "Шағым себептерін қосу, өңдеу және жою",
-          "create": "Себеп жасау",
-          "edit": "Өңдеу",
-          "delete": "Жою",
-          "reason": "Себеп",
-          "type": "Түр",
-          "is_default": "Әдепкі",
-          "order": "Тәртіп",
-          "actions": "Әрекеттер",
-          "default": "Әдепкі",
-          "custom": "Пайдаланушы",
-          "types": {
-            "tenant": "Жалдаушы",
-            "landlord": "Жалдау беруші"
-          },
-          "loading": "Себептер жүктелуде...",
-          "no_reasons": "Себептер табылмады",
-          "no_reasons_description": "Тізімде көрсету үшін бірінші себеп жасаңыз",
-          "error_loading": "Себептер жүктеу қатесі",
-          "deleted_successfully": "Себеп сәтті жойылды",
-          "error_deleting": "Себеп жою қатесі",
-          "created_successfully": "Шағым себебі сәтті жасалды",
-          "updated_successfully": "Шағым себебі сәтті жаңартылды",
-          "error_creating": "Шағым себебін жасау қатесі",
-          "error_updating": "Шағым себебін жаңарту қатесі",
-          "not_found": "Шағым себебі табылмады",
-          "create_subtitle": "Шағымдарға жаңа себеп қосыңыз",
-          "edit_subtitle": "Мөлдір шағым себебін өңдеңіз",
-          "back_to_list": "Тізімге оралу",
-          "russian": "Орыс",
-          "kazakh": "Қазақ", 
-          "english": "Ағылшын",
-          "settings": "Баптаулар",
-          "update": "Жаңарту",
-          "type": "Түрі",
-          "type_tenant": "Жалдаушы",
-          "type_landlord": "Жалдаушы",
-          "order": "Тәртіп",
-          "is_default": "Әдепкі",
-          "reason_placeholder": "Шағым себебінің сипаттамасын енгізіңіз...",
-          "reason_kz_placeholder": "Шағым себебінің сипаттамасын енгізіңіз...",
-          "reason_en_placeholder": "Enter complaint reason description...",
-          "reason_help": "Шағым себебінің қысқа және түсінікті сипаттамасы",
-          "auto_translate": "Автоматты аударма",
-          "auto_translate_help": "ЖИ көмегімен басқа тілдерге автоматты аударма",
-          "cancel": "Болдырмау",
-          "save": "Сақтау",
-          "creating": "Жасалуда...",
-          "updating": "Жаңартылуда...",
-          "confirm_delete": "Бұл себеп жойғыңыз келетініне сенімдісіз бе?",
-          "validation": {
-            "reason_required": "Себеп сипаттамасы міндетті"
-          },
-          "filters": {
-            "title": "Сүзгілер",
-            "show": "Сүзгілерді көрсету",
-            "hide": "Сүзгілерді жасыру",
-            "apply": "Қолдану",
-            "clear": "Тазалау",
-            "search_placeholder": "Себептер бойынша іздеу...",
-            "all_types": "Барлық түрлер",
-            "all_defaults": "Барлық әдепкілер"
-          }
-        }
+        "loading": "ЖҚС жүктелуде...",
+        "no_faq": "ЖҚС табылмады",
+        "no_faq_description": "Тізімде көрсету үшін бірінші ЖҚС жасаңыз",
+        "error_loading": "ЖҚС жүктеу қатесі",
+        "deleted_successfully": "ЖҚС сәтті жойылды",
+        "error_deleting": "ЖҚС жою қатесі",
+        "confirm_delete": "Бұл ЖҚС жойғыңыз келетініне сенімдісіз бе?",
+        "filters": {
+          "title": "Сүзгілер",
+          "show": "Сүзгілерді көрсету",
+          "hide": "Сүзгілерді жасыру",
+          "apply": "Қолдану",
+          "clear": "Тазалау",
+          "search_placeholder": "Сұрақтар мен жауаптар бойынша іздеу...",
+          "all_categories": "Барлық санаттар",
+          "all_user_types": "Барлық пайдаланушы түрлері",
+          "all_statuses": "Барлық күйлер"
+        },
+        "russian": "Орыс",
+        "kazakh": "Қазақ",
+        "english": "Ағылшын",
+        "settings": "Параметрлер",
+        "fill_required_fields": "Міндетті өрістерді толтырыңыз",
+        "created_successfully": "ЖҚС сәтті жасалды",
+        "updated_successfully": "ЖҚС сәтті жаңартылды",
+        "error_saving": "ЖҚС сақтау қатесі",
+        "back_to_list": "Тізімге оралу",
+        "cancel": "Болдырмау",
+        "saving": "Сақталуда...",
+        "update": "Жаңарту",
+        "create_subtitle": "Жаңа ЖҚС жасау",
+        "edit_subtitle": "ЖҚС өңдеу"
+      },
+      "complaintReasons": {
+        "title": "Шағым себептерін басқару",
+        "subtitle": "Шағым себептерін қосу, өңдеу және жою",
+        "create": "Себеп жасау",
+        "edit": "Өңдеу",
+        "delete": "Жою",
+        "reason": "Себеп",
+        "type": "Түр",
+        "is_default": "Әдепкі",
+        "actions": "Әрекеттер",
+        "default": "Әдепкі",
+        "custom": "Пайдаланушы",
+        "types": {
+          "tenant": "Жалдаушы",
+          "landlord": "Жалдау беруші"
+        },
+        "loading": "Себептер жүктелуде...",
+        "no_reasons": "Себептер табылмады",
+        "no_reasons_description": "Тізімде көрсету үшін бірінші себеп жасаңыз",
+        "error_loading": "Себептер жүктеу қатесі",
+        "deleted_successfully": "Себеп сәтті жойылды",
+        "error_deleting": "Себеп жою қатесі",
+        "created_successfully": "Шағым себебі сәтті жасалды",
+        "updated_successfully": "Шағым себебі сәтті жаңартылды",
+        "error_creating": "Шағым себебін жасау қатесі",
+        "error_updating": "Шағым себебін жаңарту қатесі",
+        "not_found": "Шағым себебі табылмады",
+        "russian": "Орыс",
+        "kazakh": "Қазақ",
+        "english": "Ағылшын",
+        "settings": "Баптаулар",
+        "update": "Жаңарту",
+        "type_tenant": "Жалдаушы",
+        "type_landlord": "Жалдаушы",
+        "order": "Тәртіп",
+        "reason_placeholder": "Шағым себебінің сипаттамасын енгізіңіз...",
+        "reason_kz_placeholder": "Шағым себебінің сипаттамасын енгізіңіз...",
+        "reason_en_placeholder": "Enter complaint reason description...",
+        "reason_help": "Шағым себебінің қысқа және түсінікті сипаттамасы",
+        "auto_translate": "Автоматты аударма",
+        "auto_translate_help": "ЖИ көмегімен басқа тілдерге автоматты аударма",
+        "cancel": "Болдырмау",
+        "save": "Сақтау",
+        "creating": "Жасалуда...",
+        "updating": "Жаңартылуда...",
+        "confirm_delete": "Бұл себеп жойғыңыз келетініне сенімдісіз бе?",
+        "validation": {
+          "reason_required": "Себеп сипаттамасы міндетті"
+        },
+        "filters": {
+          "title": "Сүзгілер",
+          "show": "Сүзгілерді көрсету",
+          "hide": "Сүзгілерді жасыру",
+          "apply": "Қолдану",
+          "clear": "Тазалау",
+          "search_placeholder": "Себептер бойынша іздеу...",
+          "all_types": "Барлық түрлер",
+          "all_defaults": "Барлық әдепкілер"
+        },
+        "fill_required_fields": "Міндетті өрістерді толтырыңыз",
+        "error_saving": "Себеп сақтау қатесі",
+        "back_to_list": "Тізімге оралу",
+        "saving": "Сақталуда...",
+        "create_subtitle": "Жаңа себеп жасау",
+        "edit_subtitle": "Себепті өңдеу"
       }
+    }
   },
+  
   "login": {
     "title": "Кіру",
     "noAccount": "Тіркелгіңіз жоқ па?",
@@ -1066,6 +1154,7 @@
     "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
     "submit": "Кіру"
   },
+  
   "userProfile": {
     "info": "Ақпарат",
     "complaints": "Шағымдар",
@@ -1086,73 +1175,7 @@
       "removeBanError": "Тыйымды алып тастау кезінде қате"
     }
   },
-  "complaints": {
-      "title": "Шағымдарды басқару",
-      "subtitle": "Жүйедегі барлық шағымдарды көру және модерировать ету",
-      "statistics": {
-        "title": "Шағымдар статистикасы",
-        "total": "Барлық шағымдар",
-        "pending": "Қарауда",
-        "reviewed": "Қаралған",
-        "rejected": "Қабылданбаған",
-        "recent": "Осы аптада",
-        "disputes": "Даулар",
-        "popular_types": "Танымал шағым түрлері",
-        "error_loading": "Статистиканы жүктеу кезінде қате"
-      },
-      "filters": {
-        "title": "Сүзгілер",
-        "search_placeholder": "Сипаттама, шағымдаушы немесе айыпталушы бойынша іздеу...",
-        "status": "Мәртебе",
-        "all_statuses": "Барлық мәртебелер",
-        "pending": "Қарауда",
-        "reviewed": "Қаралған",
-        "rejected": "Қабылданбаған",
-        "ordering": "Сұрыптау",
-        "newest_first": "Жаңалары бірінші",
-        "oldest_first": "Ескілері бірінші",
-        "recently_updated": "Жақында жаңартылған",
-        "by_status": "Мәртебе бойынша",
-        "user_iin_bin": "Пайдаланушының ЖСН/БСН",
-        "user_iin_bin_placeholder": "ЖСН немесе БСН енгізіңіз",
-        "reason": "Шағым себебі",
-        "all_reasons": "Барлық себептер",
-        "role_direction": "Шағым бағыты",
-        "all_directions": "Барлық бағыттар",
-        "tenant_to_landlord": "Жалдаушы → Жалдаушы беруші",
-        "landlord_to_tenant": "Жалдаушы беруші → Жалдаушы",
-        "tenant": "Жалдаушы",
-        "landlord": "Жалдаушы беруші",
-        "clear": "Тазалау",
-        "show_filters": "Сүзгілерді көрсету",
-        "hide_filters": "Сүзгілерді жасыру"
-      },
-      "table": {
-        "title": "Шағымдар",
-        "id": "ID",
-        "complainant_accused": "Шағымдаушы / Айыпталушы",
-        "description": "Сипаттама",
-        "status": "Мәртебе",
-        "created_at": "Жасалған күні",
-        "actions": "Әрекеттер",
-        "view_details": "Толық ақпаратты көру",
-        "approve": "Мақұлдау",
-        "reject": "Қабылдамау",
-        "has_disputes": "Даулар бар",
-        "no_complaints": "Шағымдар табылмады",
-        "no_complaints_subtitle": "Іздеу сүзгілерін өзгертіп көріңіз",
-        "showing": "Көрсетілген",
-        "of": "дан",
-        "previous": "Алдыңғы",
-        "next": "Келесі",
-        "error_loading": "Шағымдарды жүктеу кезінде қате"
-      },
-      "moderation": {
-        "approve_success": "Шағым мақұлданды",
-        "reject_success": "Шағым қабылданбады",
-        "error": "Шағымды модерировать ету кезінде қате"
-      }
-    },
+  
   "faq": {
     "hero": {
       "title": "Барлық сұрақтарыңызға жауап алыңыз!",
@@ -1167,6 +1190,75 @@
       "no_faq_description": "Әкімші жақын арада сұрақтар мен жауаптарды қосады"
     }
   },
+  
+  "complaints": {
+    "title": "Шағымдарды басқару",
+    "subtitle": "Жүйедегі барлық шағымдарды көру және модерировать ету",
+    "statistics": {
+      "title": "Шағымдар статистикасы",
+      "total": "Барлық шағымдар",
+      "pending": "Қарауда",
+      "reviewed": "Қаралған",
+      "rejected": "Қабылданбаған",
+      "recent": "Осы аптада",
+      "disputes": "Даулар",
+      "popular_types": "Танымал шағым түрлері",
+      "error_loading": "Статистиканы жүктеу кезінде қате"
+    },
+    "filters": {
+      "title": "Сүзгілер",
+      "search_placeholder": "Сипаттама, шағымдаушы немесе айыпталушы бойынша іздеу...",
+      "status": "Мәртебе",
+      "all_statuses": "Барлық мәртебелер",
+      "pending": "Қарауда",
+      "reviewed": "Қаралған",
+      "rejected": "Қабылданбаған",
+      "ordering": "Сұрыптау",
+      "newest_first": "Жаңалары бірінші",
+      "oldest_first": "Ескілері бірінші",
+      "recently_updated": "Жақында жаңартылған",
+      "by_status": "Мәртебе бойынша",
+      "user_iin_bin": "Пайдаланушының ЖСН/БСН",
+      "user_iin_bin_placeholder": "ЖСН немесе БСН енгізіңіз",
+      "reason": "Шағым себебі",
+      "all_reasons": "Барлық себептер",
+      "role_direction": "Шағым бағыты",
+      "all_directions": "Барлық бағыттар",
+      "tenant_to_landlord": "Жалдаушы → Жалдаушы беруші",
+      "landlord_to_tenant": "Жалдаушы беруші → Жалдаушы",
+      "tenant": "Жалдаушы",
+      "landlord": "Жалдаушы беруші",
+      "clear": "Тазалау",
+      "show_filters": "Сүзгілерді көрсету",
+      "hide_filters": "Сүзгілерді жасыру"
+    },
+    "table": {
+      "title": "Шағымдар",
+      "id": "ID",
+      "complainant_accused": "Шағымдаушы / Айыпталушы",
+      "description": "Сипаттама",
+      "status": "Мәртебе",
+      "created_at": "Жасалған күні",
+      "actions": "Әрекеттер",
+      "view_details": "Толық ақпаратты көру",
+      "approve": "Мақұлдау",
+      "reject": "Қабылдамау",
+      "has_disputes": "Даулар бар",
+      "no_complaints": "Шағымдар табылмады",
+      "no_complaints_subtitle": "Іздеу сүзгілерін өзгертіп көріңіз",
+      "showing": "Көрсетілген",
+      "of": "дан",
+      "previous": "Алдыңғы",
+      "next": "Келесі",
+      "error_loading": "Шағымдарды жүктеу кезінде қате"
+    },
+    "moderation": {
+      "approve_success": "Шағым мақұлданды",
+      "reject_success": "Шағым қабылданбады",
+      "error": "Шағымды модерировать ету кезінде қате"
+    }
+  },
+  
   "notifications": {
     "bell": {
       "aria_label": "Хабарландырулар"
@@ -1260,8 +1352,19 @@
         "daily": "Күн сайын",
         "weekly": "Апта сайын"
       }
+    },
+    "push_prompt": {
+      "not_supported": "Push хабарландырулары браузеріңізде қолдау көрсетілмейді",
+      "enabled": "Push хабарландырулары қосылды",
+      "disabled": "Push хабарландырулары өшірілді",
+      "test": "Тексеру",
+      "enable_title": "Push хабарландыруларды қосу",
+      "enable_description": "Жаңа шағымдар, жалға алу және маңызды оқиғалар туралы лездік хабарландырулар алыңыз",
+      "enable": "Қосу",
+      "later": "Кейінірек"
     }
   },
+  
   "pdfCheck": {
     "pageTitle": "PDF Сот шешімдерін тексеру",
     "pageSubtitle": "Автоматты талдау және шағым жасау үшін сот шешімі бар PDF файлын жүктеңіз",
@@ -1287,3 +1390,4 @@
     "errorSubmit": "Жіберу қатесі"
   }
 }
+

@@ -9,6 +9,18 @@
   color: white;
 }
 
+.mobileMenuButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 60;
+  display: block;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
 .heroOverlay {
   position: absolute;
   inset: 0;
@@ -35,17 +47,33 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+  }
 
   @media (min-width: 1024px) {
-    flex-direction: row;
+    align-items: center;
+    gap: 3rem;
   }
 }
 
 .profileInfo {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
 }
 
 .avatarContainer {
@@ -53,12 +81,23 @@
 }
 
 .avatar {
-  width: 8rem;
-  height: 8rem;
+  width: 6rem;
+  height: 6rem;
   border-radius: 50%;
   overflow: hidden;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   border: 4px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+
+  @media (min-width: 640px) {
+    width: 7rem;
+    height: 7rem;
+  }
+
+  @media (min-width: 1024px) {
+    width: 8rem;
+    height: 8rem;
+  }
 }
 
 .avatarImage {
@@ -92,9 +131,20 @@
 }
 
 .userName {
-  font-size: 2.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  text-align: center;
+  word-break: break-word;
+
+  @media (min-width: 640px) {
+    font-size: 1.875rem;
+    text-align: left;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 2.25rem;
+  }
 }
 
 .userInfo {
@@ -161,10 +211,25 @@
 .actionButtons {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
+  width: 100%;
+  flex-shrink: 0;
 
   @media (min-width: 640px) {
     flex-direction: row;
+    width: auto;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: column;
+    width: auto;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    gap: 1rem;
   }
 }
 
@@ -185,6 +250,124 @@
   &:hover {
     background-color: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.actionMenuButton {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+
+  @media (min-width: 640px) {
+    min-width: 3rem;
+    min-height: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    min-width: 3.5rem;
+    min-height: 3.5rem;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.actionDropdown {
+  animation: slideDown 0.2s ease-out;
+  width: 280px;
+  right: 0;
+
+  // На мобильных устройствах центрируем меню
+  @media (max-width: 639px) {
+    right: 50%;
+    transform: translateX(50%);
+    width: calc(100vw - 2rem);
+    max-width: 300px;
+    animation: slideDown 0.2s ease-out;
+  }
+
+  @media (min-width: 640px) {
+    width: 320px;
+    right: 0;
+    transform: none;
+    animation: slideDownDesktop 0.2s ease-out;
+  }
+
+  @media (min-width: 1024px) {
+    width: 280px;
+    right: 0;
+    transform: none;
+    animation: slideDownDesktop 0.2s ease-out;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) translateX(50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(50%);
+  }
+}
+
+@keyframes slideDownDesktop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobileActionDropdown {
+  animation: slideDownMobile 0.2s ease-out;
+  width: 280px;
+  right: 0;
+
+  @media (max-width: 639px) {
+    right: 50%;
+    transform: translateX(50%);
+    width: calc(100vw - 2rem);
+    max-width: 300px;
+  }
+
+  @media (min-width: 640px) {
+    width: 320px;
+    right: 0;
+    transform: none;
+  }
+}
+
+@keyframes slideDownMobile {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) translateX(50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(50%);
   }
 }
 
@@ -326,23 +509,51 @@
 .statisticsGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
-  padding: 1.5rem;
+  gap: 1rem;
+  padding: 1rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
   }
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1280px) {
+    gap: 2rem;
+    padding: 2rem;
   }
 }
 
 .statCard {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   border-radius: 0.75rem;
-  padding: 1.5rem;
+  padding: 1rem;
   border: 1px solid #bae6fd;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  @media (min-width: 640px) {
+    padding: 1.25rem;
+    min-height: 140px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 1.5rem;
+    min-height: 160px;
+  }
 }
 
 .statCardGreen {

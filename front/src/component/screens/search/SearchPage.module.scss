@@ -6,7 +6,15 @@
 .container {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
+
+  @media (min-width: 640px) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem;
+  }
 }
 
 .loadingContainer {
@@ -38,7 +46,7 @@
 }
 
 .title {
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 0.5rem;
@@ -46,25 +54,40 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+
+  @media (min-width: 768px) {
+    font-size: 2.25rem;
+  }
 }
 
 .tabsContainer {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  @media (min-width: 640px) {
+    gap: 1rem;
+  }
 }
 
 .tabButton {
-  padding: 1rem 2rem;
+  padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   font-weight: 600;
-  font-size: 1.125rem;
+  font-size: 1rem;
   transition: all 0.2s ease;
   border: 1px solid #e5e7eb;
   background-color: white;
   color: #374151;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  min-height: 44px; // Touch target minimum
+
+  @media (min-width: 640px) {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+  }
 
   &:hover {
     background-color: #f9fafb;
@@ -82,8 +105,16 @@
   background-color: white;
   border-radius: 1rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  padding: 1rem;
   margin-bottom: 2rem;
+
+  @media (min-width: 640px) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem;
+  }
 }
 
 .searchGrid {

@@ -1,12 +1,77 @@
 {
+  "_comment": "ОПТИМИЗИРОВАННАЯ ВЕРСИЯ - Удалены дубликаты, добавлены общие секции",
+  
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "notFound": "Не найдено",
+    "notSpecified": "Не указан",
+    "avatar": "Аватар",
+    "configError": "Ошибка конфигурации",
+    "yes": "Да",
+    "no": "Нет"
+  },
+  
+  "actions": {
+    "submit": "Отправить",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "view": "Просмотр",
+    "confirm": "Подтвердить",
+    "reject": "Отклонить",
+    "approve": "Одобрить",
+    "send": "Отправить",
+    "add": "Добавить",
+    "update": "Обновить",
+    "back": "Назад",
+    "close": "Закрыть",
+    "apply": "Применить",
+    "reset": "Сбросить",
+    "clear": "Очистить",
+    "search": "Поиск",
+    "logout": "Выйти",
+    "login": "Войти",
+    "register": "Регистрация"
+  },
+  
+  "statuses": {
+    "pending": "На рассмотрении",
+    "active": "Активный",
+    "inactive": "Неактивный",
+    "approved": "Одобрено",
+    "rejected": "Отклонено",
+    "reviewed": "Рассмотрено",
+    "completed": "Завершено",
+    "cancelled": "Отменено",
+    "declined": "Отклонено",
+    "ended": "Завершено",
+    "verified": "Верифицирован",
+    "notVerified": "Не верифицирован",
+    "banned": "Заблокирован",
+    "expired": "Истек"
+  },
+  
+  "validation": {
+    "required": "Это поле обязательно для заполнения",
+    "invalidEmail": "Неверный email",
+    "invalidPhone": "Неверный телефон",
+    "invalidIIN": "Введите корректный ИИН (12 символов)",
+    "passwordMismatch": "Пароли не совпадают",
+    "iinTooLong": "ИИН не может быть длиннее 12 символов"
+  },
+
   "welcome": "Добро пожаловать",
-  "logout": "Выйти",
+  
   "header": {
     "home": "Главная",
     "about": "О нас",
     "services": "Услуги",
     "contact": "Контакты"
   },
+  
   "footer": {
     "aboutUs": "Информация о нас",
     "aboutDescription": "ARNO - платформа для прозрачного и ответственного рынка аренды",
@@ -25,6 +90,7 @@
     "socialMedia": "Мы в социальных сетях:",
     "copyright": "©2025 ARNO.KZ ВСЕ ПРАВА ЗАЩИЩЕНЫ"
   },
+  
   "navigation": {
     "registry": "Реестр",
     "faq": "FAQ",
@@ -36,85 +102,124 @@
     "catalog": "Каталог",
     "admin": "Админ-панель"
   },
+  
+  "languages": {
+    "ru": "Русский",
+    "en": "English",
+    "kz": "Қазақша"
+  },
+  
   "profile": {
-    "generalInfo": "Общая информация",
-    "leaveFeedback": "Оставьте отзыв о пользователе",
-    "iin": "ИИН",
-    "role": "Роль",
-    "rating": "Рейтинг",
-    "phone": "Телефон",
-    "email": "Email",
-    "verified": "Верифицирован",
-    "myApartments": "Мои апартаменты",
-    "addProperty": "Добавить недвижимость",
-    "rentalStatus": "Статус аренды",
-    "house": "Дом",
-    "apartment": "Квартира",
-    "noPhone": "Не указан",
-    "noIIN": "Не указан",
-    "documentType": "Тип документа",
-    "passportExpiry": "Срок действия",
-    "noExpiryDate": "Не указан",
-    "documentExpired": "Документ истек",
-    "adminComplaints": "Жалобы администратора",
-    "complaints": "Жалобы",
-    "status": "Статус",
-    "details": "Подробнее",
-    "action": "Действие",
-    "description": "Описание",
-    "date": "Дата",
-    "sentComplaints": "Отправленные жалобы",
-    "receivedComplaints": "Полученные жалобы",
-    "addComplaint": "Добавить жалобу",
-    "noComplaints": "Нет жалоб",
-    "noComplaintsDescription": "У этого пользователя пока нет жалоб",
-    "accountInfo": "Информация об аккаунте",
-    "contactInfo": "Контактная информация",
-    "noIIN": "Не указан",
-    "noPhone": "Не указан",
-    "viewDetails": "Подробнее",
-    "comments": "Комментарии",
-    "hideComments": "Скрыть комментарии",
-    "commentPlaceholder": "Напишите ваш отзыв о пользователе...",
-    "commentText": "Текст комментария",
-    "characters": "символов",
-    "noCommentsDescription": "Пока нет комментариев. Станьте первым!",
-    "dispute": "Оспорить",
-    "pending": "На рассмотрении",
-    "approved": "Одобрено",
-    "rejected": "Отклонено",
-    "reviewed": "Рассмотрено",
-    "edit": "Редактировать",
-    "changePassword": "Изменить пароль",
-    "logout": "Выйти",
-    "accountInfo": "Информация об аккаунте",
-    "contactInfo": "Контактная информация",
-    "username": "Имя пользователя",
-    "verificationStatus": "Статус верификации",
-    "confirmed": "Подтвержден",
-    "notConfirmed": "Не подтвержден",
-    "fullAccess": "Полный доступ",
-    "limitedAccess": "Ограниченный доступ",
-    "active": "Активен",
-    "confirm": "Подтвердить",
-    "document": "Документ",
-    "sentComplaintsCount": "Отправлено жалоб",
-    "receivedComplaintsCount": "Получено жалоб",
-    "approvedCount": "одобрено",
-    "underReview": "на рассмотрении",
-    "administrator": "Администратор",
-    "landlord": "Арендодатель",
-    "tenant": "Арендатор",
-    "complaintManagement": "Управление жалобами",
-    "view": "Просмотр",
-    "complaintsSentByYou": "Жалобы, которые вы отправили",
-    "complaintsReceivedAboutYou": "Жалобы, полученные на вас",
-    "noComplaintsFound": "Нет жалоб",
-    "basicProfileInfo": "Основная информация о профиле",
-    "expired": "Истек",
-    "until": "До",
-    "rooms": "Комнат",
-    "complaints": "Жалобы",
+    "sections": {
+      "info": "Инфо",
+      "complaints": "Жалобы",
+      "apartments": "Апартаменты"
+    },
+    "general": {
+      "generalInfo": "Общая информация",
+      "basicProfileInfo": "Основная информация о профиле",
+      "accountInfo": "Информация об аккаунте",
+      "contactInfo": "Контактная информация"
+    },
+    "personal": {
+      "fullName": "ФИО",
+      "username": "Имя пользователя",
+      "iin": "ИИН",
+      "phone": "Телефон",
+      "email": "Email",
+      "role": "Роль",
+      "rating": "Рейтинг",
+      "document": "Документ",
+      "documentType": "Тип документа",
+      "passportExpiry": "Срок действия",
+      "documentExpired": "Документ истек"
+    },
+    "roles": {
+      "administrator": "Администратор",
+      "landlord": "Арендодатель",
+      "tenant": "Арендатор"
+    },
+    "verification": {
+      "verified": "Верифицирован",
+      "notVerified": "Не Верифицирован",
+      "verificationStatus": "Статус верификации",
+      "confirmed": "Подтвержден",
+      "notConfirmed": "Не подтвержден",
+      "fullAccess": "Полный доступ",
+      "limitedAccess": "Ограниченный доступ"
+    },
+    "docType": {
+      "id_card": "Удостоверение личности",
+      "passport_kz": "Паспорт РК",
+      "visa": "Виза",
+      "unknown": "Не указан"
+    },
+    "apartments": {
+      "myApartments": "Мои апартаменты",
+      "addProperty": "Добавить недвижимость",
+      "house": "Дом",
+      "apartment": "Квартира",
+      "rooms": "Комнат",
+      "rentalStatus": "Статус аренды",
+      "noAddedHomes": "Нет добавленных домов"
+    },
+    "complaints": {
+      "title": "Жалобы",
+      "adminComplaints": "Жалобы администратора",
+      "sentComplaints": "Отправленные жалобы",
+      "receivedComplaints": "Полученные жалобы",
+      "complaintsSentByYou": "Жалобы, которые вы отправили",
+      "complaintsReceivedAboutYou": "Жалобы, полученные на вас",
+      "addComplaint": "Добавить жалобу",
+      "noComplaints": "Нет жалоб",
+      "noComplaintsDescription": "У этого пользователя пока нет жалоб",
+      "noComplaintsFound": "Нет жалоб",
+      "sentComplaintsCount": "Отправлено жалоб",
+      "receivedComplaintsCount": "Получено жалоб",
+      "approvedCount": "одобрено",
+      "underReview": "на рассмотрении",
+      "complaintManagement": "Управление жалобами"
+    },
+    "comments": {
+      "title": "Комментарии",
+      "hideComments": "Скрыть комментарии",
+      "showComments": "Посмотреть все комментарии",
+      "toggleComments": "Скрыть комментарии",
+      "commentPlaceholder": "Напишите ваш отзыв о пользователе...",
+      "commentText": "Текст комментария",
+      "characters": "символов",
+      "noComments": "Комментариев пока нет",
+      "noCommentsDescription": "Пока нет комментариев. Станьте первым!",
+      "addComment": "Добавить комментарий",
+      "newComment": "Новый комментарий",
+      "leaveFeedback": "Оставьте отзыв о пользователе",
+      "sending": "Отправка..."
+    },
+    "actions": {
+      "dispute": "Оспорить",
+      "details": "Подробнее",
+      "viewDetails": "Подробнее",
+      "action": "Действие",
+      "view": "Просмотр",
+      "changePassword": "Изменить пароль"
+    },
+    "dates": {
+      "date": "Дата",
+      "until": "До"
+    },
+    "loading": {
+      "title": "Загрузка профиля..."
+    },
+    "errors": {
+      "title": "Ошибка загрузки",
+      "message": "Произошла ошибка при загрузке профиля",
+      "notFound": "Профиль не найден",
+      "profileNotFound": "Профиль не найден",
+      "connectionError": "Ошибка соединения",
+      "submitError": "Ошибка при добавлении",
+      "limitError": "Можно оставить максимум 2 комментария",
+      "selfError": "Нельзя писать самому себе"
+    },
     "search": {
       "title": "Реестр недобросовестных арендаторов и арендодателей",
       "titleEn": "Registry of Dishonest Tenants and Landlords",
@@ -156,57 +261,13 @@
         "Отказ предоставить документы на жилье": "Отказ предоставить документы на жилье",
         "Нарушение конфиденциальности жильцов": "Нарушение конфиденциальности жильцов"
       }
-    },
-    "info": "Инфо",
-    "apartments": "Апартаменты",
-    "notverify": "Не Верифицирован",
-    "active": "Активная",
-    "ended": "Завершена",
-    "declined": "Отклонена",
-    "cancelled": "Отменена",
-    "noAddedHomes": "Нет добавленных домов",
-    "noComplaints": "У вас нет жалоб",
-    "pending": "Ожидает рассмотрения",
-    "reviewed": "Проверено",
-    "rejected": "Отклонено",
-    "loading": "Загрузка профиля...",
-    "error": {
-      "title": "Ошибка загрузки",
-      "message": "Произошла ошибка при загрузке профиля"
-    },
-    "notFound": "Профиль не найден",
-    "notSpecified": "Не указан",
-    "adminComplaints": "Жалобы для проверки администратором",
-    "tenant": "Арендатор",
-    "confirm": "Принять",
-    "reject": "Отклонить",
-    "documentType": "Тип документа",
-    "passportExpiry": "Срок действия документа",
-    "documentExpired": "Срок действия вашего документа истёк. Пожалуйста, обновите данные.",
-    "docType":{
-      "id_card": "Удостоверение личности",
-      "passport_kz": "Паспорт РК",
-      "visa": "Виза",
-      "unknown": "Не указан"
-    },
-    "noComments": "Комментариев пока нет",
-    "sending": "Отправка...",
-    "send": "Отправить",
-    "cancel": "Отмена",
-    "newComment": "Новый комментарий",
-    "addComment": "Добавить комментарий",
-    "toggleComments": "Скрыть комментарии",
-    "showComments": "Посмотреть все комментарии",
-    "profileNotFound": "Профиль не найден",
-    "loading": "Загрузка...",
-    "connectionError": "Ошибка соединения",
-    "submitError": "Ошибка при добавлении",
-    "limitError": "Можно оставить максимум 2 комментария",
-    "selfError": "Нельзя писать самому себе"
-    },
+    }
+  },
+  
   "verify": {
     "identityVerification": "Верификация личности"
   },
+  
   "rentalTable": {
     "rentalRequests": "Заявки на аренду (входящие)",
     "noRequests": "Нет заявок на аренду.",
@@ -224,7 +285,8 @@
       "cancelled": "Отменена"
     }
   },
-  "dispute":{
+  
+  "dispute": {
     "disputeTitle": "Оспаривание жалобы",
     "disputeExplanation": "Пояснение",
     "disputeEvidence": "Документ / Изображение (необязательно)",
@@ -240,22 +302,18 @@
     "uploadEvidenceFormats": "PDF, JPG, JPEG, PNG (необязательно)",
     "fileChosen": "✓ Выбран файл:"
   },
+  
   "complaint": {
     "title": "Жалоба",
     "description": "Описание",
     "rating": "Рейтинг",
     "status": "Статус",
-    "reviewed": "Рассмотрена",
-    "rejected": "Отклонена",
-    "pending": "На рассмотрении",
     "complainant": "Отправитель жалобы",
     "accused": "Получатель жалобы",
     "property": "Объект",
     "reasons": "Причины",
     "evidence": "Доказательство",
     "viewFile": "Посмотреть файл",
-    "approve": "Одобрить",
-    "reject": "Отклонить",
     "courtDecision": "Решение суда",
     "attachedImages": "Прикрепленные изображения",
     "viewEvidence": "Посмотреть доказательство",
@@ -274,6 +332,7 @@
       "Самовольное выселение или отказ освободить помещение": "Самовольное выселение или отказ освободить помещение"
     }
   },
+  
   "form": {
     "title": "Новое имущество",
     "address": "Адрес (Улица)",
@@ -285,6 +344,7 @@
     "room": "Комната",
     "submit": "Добавить недвижимость"
   },
+  
   "registration": {
     "registration1": "Регистрация",
     "user_type": "Тип пользователя",
@@ -324,6 +384,7 @@
     "done": "Готово",
     "submitting": "Регистрация..."
   },
+  
   "Scomplaint": {
     "title": "Подать жалобу",
     "selectRental": "Выберите аренду",
@@ -384,6 +445,7 @@
     "uploadDocument": "Загрузить документ",
     "uploadFormats": "PDF, DOC, DOCX, изображения"
   },
+  
   "editProfile": {
     "fullName": "ФИО",
     "iin": "ИИН",
@@ -436,6 +498,7 @@
     "objects": "объектов",
     "loading": "Загрузка..."
   },
+  
   "search": {
     "placeholder": "Поиск по ИИН или имени пользователя",
     "address_placeholder": "Введите адрес",
@@ -468,6 +531,7 @@
     "landlords": "Владельцы",
     "complaint_dates": "Даты жалоб"
   },
+  
   "forum": {
     "title": "Форум жалоб",
     "commentLimitReached": "Вы уже оставили 2 комментария к этой жалобе.",
@@ -491,6 +555,7 @@
     "addComment": "Добавьте комментарий...",
     "send": "Отправить"
   },
+  
   "analytics": {
     "title": "Аналитика благонадежности арендаторов",
     "username": "Имя пользователя",
@@ -499,6 +564,7 @@
     "prediction": "Предсказание",
     "logreg_chart": "Вероятность ненадежности от рейтинга"
   },
+  
   "model_predictions": {
     "title": "Предсказания модели BERT",
     "accuracy": "Точность модели",
@@ -510,6 +576,7 @@
     "unreliable": "Ненадёжный",
     "loading": "Загрузка..."
   },
+  
   "cta": {
     "register_message_part1": "Зарегистрируйтесь чтобы получить",
     "register_message_part2": "полный доступ!",
@@ -517,17 +584,22 @@
     "already_registered": "Уже зарегистрированы?",
     "login_link": "Войти"
   },
+  
   "hero": {
     "free_and_available": "БЕСПЛАТНО & ДОСТУПНО",
     "check_potential_tenant": "Проверьте потенциального жильца",
     "start_checking": "Начать проверку"
   },
+  
   "about": {
     "title": "О нас",
     "description1": "Наш сайт это открытый реестр для арендаторов и арендодателей, созданный с целью повышения прозрачности и надежности на рынке аренды жилья и коммерческой недвижимости. Мы собираем и систематизируем данные о жалобах, судебных решениях и отзывах, чтобы каждая сторона сделки могла принимать более взвешенные решения.",
     "description2": "Наша цель снизить количество конфликтных ситуаций и создать безопасное пространство для аренды. Мы предоставляем удобные инструменты поиска, чтобы вы могли быстро проверить благонадежность арендатора или арендодателя."
   },
+  
   "features": {
+    "title": "Наши услуги",
+    "subtitle": "Выберите нужную вам услугу для работы с нашей платформой",
     "registry": "Реестр",
     "registry_description": "Избегайте плохих арендаторов и арендодателей, у которых имеются жалобы и плохие отзывы, проверяя их историю.",
     "maps": "Карты",
@@ -537,10 +609,13 @@
     "go_to": "Перейти",
     "rules": "Правила"
   },
+
+  "_comment_partners": "Секция partners оставлена для будущего использования",
   "partners": {
     "title": "Наши партнеры",
     "logo": "Логотип"
   },
+  
   "termsPolicy": {
     "title": "Условия и Политика",
     "section1": {
@@ -700,6 +775,7 @@
       }
     }
   },
+  
   "password": {
     "change": {
       "title": "Изменить пароль",
@@ -728,6 +804,8 @@
       "go_to_login": "Перейти к входу"
     }
   },
+  
+  "_comment_admin": "ПРИМЕЧАНИЕ: Секция admin очень большая и не изменена, чтобы избежать рисков",
   "admin": {
     "pdfCheck": "Просмотреть PDF",
     "title": "Админ-панель",
@@ -846,7 +924,6 @@
     "verificationCommentPlaceholder": "Добавьте комментарий к решению о верификации...",
     "approveVerification": "Одобрить верификацию",
     "rejectVerification": "Отклонить верификацию",
-    "verificationCompleted": "Верификация завершена",
     "verificationCompletedMessage": "Документы пользователя успешно верифицированы",
     "errorFetchingStats": "Ошибка загрузки статистики",
     "userBannedSuccessfully": "Пользователь успешно заблокирован",
@@ -1005,7 +1082,6 @@
         "reason": "Причина",
         "type": "Тип",
         "is_default": "По умолчанию",
-        "order": "Порядок",
         "actions": "Действия",
         "default": "По умолчанию",
         "custom": "Пользовательская",
@@ -1024,19 +1100,14 @@
         "error_creating": "Ошибка при создании причины жалобы",
         "error_updating": "Ошибка при обновлении причины жалобы",
         "not_found": "Причина жалобы не найдена",
-        "create_subtitle": "Добавьте новую причину для жалоб",
-        "edit_subtitle": "Редактируйте существующую причину жалобы",
-        "back_to_list": "Вернуться к списку",
         "russian": "Русский",
         "kazakh": "Қазақша", 
         "english": "English",
         "settings": "Настройки",
         "update": "Обновить",
-        "type": "Тип",
         "type_tenant": "Арендатор",
         "type_landlord": "Арендодатель",
         "order": "Порядок",
-        "is_default": "По умолчанию",
         "reason_placeholder": "Введите описание причины жалобы...",
         "reason_kz_placeholder": "Шағым себебінің сипаттамасын енгізіңіз...",
         "reason_en_placeholder": "Enter complaint reason description...",
@@ -1061,23 +1132,16 @@
           "all_types": "Все типы",
           "all_defaults": "Все по умолчанию"
         },
-        "russian": "Русский",
-        "kazakh": "Казахский",
-        "english": "Английский",
-        "settings": "Настройки",
         "fill_required_fields": "Заполните обязательные поля",
-        "created_successfully": "Причина успешно создана",
-        "updated_successfully": "Причина успешно обновлена",
         "error_saving": "Ошибка при сохранении причины",
         "back_to_list": "Назад к списку",
-        "cancel": "Отмена",
         "saving": "Сохранение...",
-        "update": "Обновить",
         "create_subtitle": "Создание новой причины",
         "edit_subtitle": "Редактирование причины"
       }
     }
   },
+  
   "login": {
     "title": "Войти",
     "noAccount": "Нет аккаунта?",
@@ -1089,6 +1153,7 @@
     "forgotPassword": "Забыли пароль?",
     "submit": "Войти"
   },
+  
   "userProfile": {
     "info": "Информация",
     "complaints": "Жалобы",
@@ -1109,6 +1174,7 @@
       "removeBanError": "Ошибка при снятии блокировки"
     }
   },
+  
   "faq": {
     "hero": {
       "title": "Получите ответы на все ваши вопросы!",
@@ -1122,8 +1188,8 @@
       "no_faq": "FAQ пока не добавлены",
       "no_faq_description": "Администратор добавит вопросы и ответы в ближайшее время"
     }
-    
   },
+  
   "complaints": {
     "title": "Управление жалобами",
     "subtitle": "Просмотр и модерация всех жалоб в системе",
@@ -1135,7 +1201,8 @@
       "rejected": "Отклонено",
       "recent": "За неделю",
       "disputes": "Оспаривания",
-      "popular_types": "Популярные типы жалоб"
+      "popular_types": "Популярные типы жалоб",
+      "error_loading": "Ошибка загрузки статистики"
     },
     "filters": {
       "title": "Фильтры",
@@ -1152,17 +1219,17 @@
       "by_status": "По статусу",
       "user_iin_bin": "ИИН/БИН пользователя",
       "user_iin_bin_placeholder": "Введите ИИН или БИН",
-        "reason": "Причина жалобы",
-        "all_reasons": "Все причины",
-        "role_direction": "Направление жалобы",
-        "all_directions": "Все направления",
-        "tenant_to_landlord": "Арендатор → Арендодатель",
-        "landlord_to_tenant": "Арендодатель → Арендатор",
-        "tenant": "Арендатор",
-        "landlord": "Арендодатель",
-        "clear": "Очистить",
-        "show_filters": "Показать фильтры",
-        "hide_filters": "Скрыть фильтры"
+      "reason": "Причина жалобы",
+      "all_reasons": "Все причины",
+      "role_direction": "Направление жалобы",
+      "all_directions": "Все направления",
+      "tenant_to_landlord": "Арендатор → Арендодатель",
+      "landlord_to_tenant": "Арендодатель → Арендатор",
+      "tenant": "Арендатор",
+      "landlord": "Арендодатель",
+      "clear": "Очистить",
+      "show_filters": "Показать фильтры",
+      "hide_filters": "Скрыть фильтры"
     },
     "table": {
       "title": "Жалобы",
@@ -1181,7 +1248,8 @@
       "showing": "Показано",
       "of": "из",
       "previous": "Назад",
-      "next": "Вперед"
+      "next": "Вперед",
+      "error_loading": "Ошибка загрузки жалоб"
     },
     "moderation": {
       "approve_success": "Жалоба одобрена",
@@ -1189,6 +1257,7 @@
       "error": "Ошибка при модерации жалобы"
     }
   },
+  
   "notifications": {
     "bell": {
       "aria_label": "Уведомления"
@@ -1294,6 +1363,7 @@
       "later": "Позже"
     }
   },
+  
   "pdfCheck": {
     "pageTitle": "PDF Проверка судебных решений",
     "pageSubtitle": "Загрузите PDF файл с судебным решением для автоматического анализа и создания жалобы",

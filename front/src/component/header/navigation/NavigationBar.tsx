@@ -121,21 +121,21 @@ const NavigationBar: React.FC = () => {
                 onClick={() => changeLanguage("ru")}
                 className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
               >
-                Русский
+                {t("languages.ru")}
               </button>
               <div className="border-t border-gray-100 my-1"></div>
               <button 
                 onClick={() => changeLanguage("en")}
                 className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
               >
-                English
+                {t("languages.en")}
               </button>
               <div className="border-t border-gray-100 my-1"></div>
               <button 
                 onClick={() => changeLanguage("kz")}
                 className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
               >
-                Қазақша
+                {t("languages.kz")}
               </button>
             </div>
           )}
@@ -151,7 +151,7 @@ const NavigationBar: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <Image
               src={user.user.avatar ? mediaUrl(user.user.avatar) : mediaUrl("/media/avatars/def.jpg")}
-              alt="Аватар"
+              alt={t("common.avatar")}
               width={32}
               height={32}
               className="w-8 h-8 rounded-full object-cover object-center cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all duration-200"
