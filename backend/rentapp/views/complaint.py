@@ -186,6 +186,12 @@ def dispute_complaint(request, complaint_id):
 
 
 
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.exceptions import ValidationError
+
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated, IsTenant | IsLandlord])
 @parser_classes([MultiPartParser, FormParser])
@@ -195,73 +201,64 @@ def update_complaint(request, uuid):
     except RentalComplaint.DoesNotExist:
         return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
-    
+    # Проверяем, что пользователь имеет право редактировать жалобу
+    if complaint.complainant != request.user:
+        return Response({"error": "У вас нет прав для редактирования этой жалобы"}, status=status.HTTP_403_FORBIDDEN)
 
     # Обновление текста
     new_description = request.data.get("description")
     if new_description is not None:
         complaint.description = new_description
 
-    # Обновление рейтинга
-    #new_rating = request.data.get("rating")
-    """if new_rating is not None:
-        try:
-            complaint.rating = int(new_rating)
-        except ValueError:
-            return Response({"error": "Некорректное значение рейтинга."}, status=400)"""
-
-    # Обновление стоимости ущерба
-    damage_cost = request.data.get("damage_cost")
-    if damage_cost is not None:
-        try:
-            complaint.court_decision_score = int(damage_cost)
-        except ValueError:
-            return Response({"error": "Некорректная сумма ущерба."}, status=400)
-
     # Обновление причин
     reason_ids = request.data.getlist("reason")
     if not reason_ids:
         reason_ids = request.data.get("reason", [])
         if isinstance(reason_ids, str):
-            # если передано как строка вида "1,2,3"
             reason_ids = reason_ids.split(",")
 
     if reason_ids:
         try:
-            reasons = ComplaintReason.objects.filter(id__in=reason_ids)
+            reasons = ComplaintReason.objects.filter(
+                id__in=reason_ids,
+                type=complaint.accused.role  # Проверяем, что причины соответствуют роли обвиняемого
+            )
+            if len(reasons) != len(reason_ids):
+                return Response({"error": "Одна или несколько причин не соответствуют роли обвиняемого"}, status=status.HTTP_400_BAD_REQUEST)
             complaint.reasons.set(reasons)
         except Exception as e:
-            return Response({"error": "Некорректные причины."}, status=400)
+            return Response({"error": "Некорректные причины"}, status=status.HTTP_400_BAD_REQUEST)
 
-
+    # Обновление court_decision_score
+    court_decision_score = request.data.get("court_decision_score")
+    if court_decision_score is not None and complaint.is_court_case:
+        complaint.court_decision_score = court_decision_score
 
     # Обновление основного файла (доказательства)
-    if "evidence" in request.FILES:
+    if "evidence" in request.FILES and complaint.is_court_case:
         if complaint.evidence:
             complaint.evidence.delete(save=False)
         complaint.evidence = request.FILES["evidence"]
 
-    # Обновление дополнительных фото (если у тебя есть модель)
-    # Например, если у тебя:
-    # evidence_images = models.ManyToManyField('ComplaintImage')
+    # Обработка существующих и новых изображений
+    existing_images = [url.split("/media/")[-1] for url in request.data.getlist("existing_images")]
+    complaint.images.exclude(image__in=existing_images).delete()
 
-    # Удаление старых изображений
-    for img in complaint.images.all():
-        img.image.delete(save=False)
-        img.delete()
 
-    # Добавление новых
+    # Добавление новых изображений
     for img_file in request.FILES.getlist("evidence_images"):
+        if complaint.images.count() + len(existing_images) >= 10:
+            return Response({"error": "Максимум 10 изображений"}, status=status.HTTP_400_BAD_REQUEST)
         ComplaintImage.objects.create(complaint=complaint, image=img_file)
 
-
-
-    # Обновить статус
+    # Сбрасываем статус на pending
     complaint.status = "pending"
-    complaint.save()
+    try:
+        complaint.save()
+    except ValidationError as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({"success": "Жалоба обновлена и отправлена на повторную проверку."})
-
+    return Response({"success": "Жалоба обновлена и отправлена на повторную проверку"}, status=status.HTTP_200_OK)
 
 
 
@@ -269,22 +266,18 @@ def update_complaint(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_complaint_by_uuid(request, uuid):
     try:
-        # ✅ Оптимизация: загружаем связанные объекты за один запрос
         complaint = RentalComplaint.objects.select_related(
-            'complainant',
-            'accused',
-            'moderated_by'
+            'complainant', 'accused', 'moderated_by'
         ).prefetch_related(
-            'reasons',
-            'images',
-            'comments__user',
-            'complaintdispute_set'
+            'reasons', 'images'
         ).get(uuid=uuid)
     except RentalComplaint.DoesNotExist:
-        return Response({"error": "Жалоба не найдена"}, status=404)
+        return Response({"error": "Жалоба не найдена"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": "Ошибка сервера"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    serializer = RentalComplaintSerializer(complaint)
-    return Response(serializer.data)
+    serializer = RentalComplaintSerializer(complaint, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

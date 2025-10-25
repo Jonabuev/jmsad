@@ -404,20 +404,23 @@ class RentalComplaintSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     disputes = ComplaintDisputeSerializer(many=True, read_only=True)
     images = serializers.SerializerMethodField()
+    accused_iin = serializers.CharField(source='accused.identifier', read_only=True)
 
     class Meta:
         model = RentalComplaint
         fields = [
-            'id', 'uuid', 'description', 'support_count', 'status',
+            'id', 'uuid', 'accused_iin', 'description', 'support_count', 'status',
             'complainant', 'accused', 'reasons', 'evidence',
-            'comments', 'created_at', 'user', 'court_decision_score', 'images', 'disputes'
+            'comments', 'created_at', 'user', 'court_decision_score', 'images', 'disputes', 'is_court_case'
         ]
         read_only_fields = [
             'complainant', 'accused', 'created_at', 'user', 'support_count', 'images'
         ]
 
     def get_images(self, obj):
-        return [image.image.url for image in obj.images.all()]
+        request = self.context.get('request')
+        if request:
+            return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
 
     
 
