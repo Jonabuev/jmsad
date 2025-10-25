@@ -8,7 +8,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Устанавливаем зависимости с кэшированием
-RUN npm ci --omit=dev --prefer-offline --no-audit
+# Устанавливаем зависимости с запасом по таймауту
+RUN npm config set registry https://registry.npmmirror.com \
+    && npm set fetch-timeout=600000 \
+    && npm set retry=5 \
+    && npm ci --omit=dev --no-audit
+
 
 # Builder этап
 FROM node:20-alpine AS builder
