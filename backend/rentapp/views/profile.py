@@ -713,8 +713,15 @@ from rest_framework import generics, permissions
 from ..models import UserComment
 from ..serializers import UserCommentSerializer
 
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
 class UserCommentListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = UserCommentSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]  # 👈 Публичный просмотр комментариев
+        return [IsAuthenticated()]  # 👈 Только авторизованные могут писать
 
     def get_queryset(self):
         target_username = self.request.query_params.get("target_user")
@@ -726,6 +733,7 @@ class UserCommentListCreateAPIView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
 
 
 class UserCommentDetailAPIView(generics.RetrieveDestroyAPIView):

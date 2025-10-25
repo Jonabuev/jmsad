@@ -72,8 +72,10 @@ ALLOWED_PATHS_FOR_EXPIRED = [
 import re
 
 def is_path_allowed(path):
+    # Убираем query параметры (всё после ?)
+    path = path.split("?")[0]
+
     for pattern in ALLOWED_PATHS_FOR_EXPIRED:
-        # Преобразуем шаблоны Django в регексы
         regex = pattern
         regex = regex.replace("<int:pk>", r"\d+")
         regex = regex.replace("<int:complaint_id>", r"\d+")
@@ -81,10 +83,10 @@ def is_path_allowed(path):
         regex = regex.replace("<int:thread_id>", r"\d+")
         regex = regex.replace("<uuid:uuid>", r"[0-9a-f\-]+")
         regex = regex.replace("<str:username>", r"[^/]+")
-        # Добавим ^ и $ чтобы было как fullmatch
         if re.fullmatch(rf"^{regex}$", path):
             return True
     return False
+
 
 
 class CustomJWTAuthentication(JWTAuthentication):
@@ -119,8 +121,10 @@ class CustomJWTAuthentication(JWTAuthentication):
             if entry.reason == "violation":
                 raise AuthenticationFailed("Your account is permanently blocked.")
             elif entry.reason == "expired_document":
+                print(f"CHECK PATH: {request.path} | allowed={is_path_allowed(request.path)}")
                 if not is_path_allowed(request.path):
                     raise PermissionDenied("Document expired. Access denied.")
+
 
 
 
