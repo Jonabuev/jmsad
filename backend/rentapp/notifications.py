@@ -60,7 +60,6 @@ def get_notification_specific_context(notification):
         context.update({
             'complaint_id': complaint.id,
             'complaint_description': complaint.description,
-            'complaint_type': complaint.get_type_display(),
             'complainant_name': complaint.complainant.get_full_name() or complaint.complainant.username,
             'complaint_date': complaint.created_at.strftime('%d.%m.%Y %H:%M'),
             'property_address': getattr(complaint.property, 'address', 'Не указан') if complaint.property else None,

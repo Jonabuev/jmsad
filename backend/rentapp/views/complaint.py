@@ -44,15 +44,13 @@ def createRentalComplaint(request):
         complainant=user,
         accused=accused,
         description=request.data.get('description'),
-        court_decision_score=request.data.get('damage_cost'),
-        is_court_case=request.data.get('is_court_case') == "true",  # чекбокс с фронта
+        court_decision_score=request.data.get('court_decision_score'),  # Используем правильный ключ
+        is_court_case=request.data.get('is_court_case') == "true",
     )
-
 
     if 'evidence' in request.FILES:
         complaint.evidence = request.FILES['evidence']
-    if 'damage_cost' in request.FILES:
-        complaint.court_decision_score = request.FILES['damage_cost']
+
     complaint.save()
 
     # Привязываем причины
@@ -63,8 +61,7 @@ def createRentalComplaint(request):
     # Картинки
     images = request.FILES.getlist('evidence_images')
     if len(images) > 10:
-        return Response({'detail': 'Максимум 10 изображений разрешено.'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Максимум 10 изображений разрешено.'}, status=status.HTTP_400_BAD_REQUEST)
 
     for img in images:
         ComplaintImage.objects.create(complaint=complaint, image=img)
@@ -75,7 +72,6 @@ def createRentalComplaint(request):
         {'message': 'Жалоба успешно создана.', 'id': complaint.id},
         status=status.HTTP_201_CREATED
     )
-
 
 
 @api_view(['POST'])

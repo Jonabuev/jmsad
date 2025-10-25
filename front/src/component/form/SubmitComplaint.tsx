@@ -189,7 +189,7 @@ const SubmitComplaintForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
@@ -225,23 +225,21 @@ const SubmitComplaintForm: React.FC = () => {
 
     const data = new FormData();
     data.append("is_court_case", String(formData.isCourtCase));
-    if (formData.isCourtCase) {
-      if (formData.damageCost) {
-        data.append("damage_cost", formData.damageCost);
-      }
-      if (formData.evidence) {
-        data.append("evidence", formData.evidence);
-      }
+    if (formData.damageCost) {
+      data.append("court_decision_score", formData.damageCost)
     }
-
+    // Append courtDocument as evidence if isCourtCase is true, otherwise append evidence
+    if (formData.isCourtCase && formData.courtDocument) {
+      data.append("evidence", formData.courtDocument);
+    } else if (formData.evidence) {
+      data.append("evidence", formData.evidence);
+    }
     data.append("accused_iin", formData.accusedIin);
     data.append("description", formData.description);
     formData.reason.forEach((id) => data.append("reason", String(id)));
-    
     formData.evidenceImages.forEach((file) => {
       data.append("evidence_images", file);
     });
-    
 
     try {
       await submitRentalComplaint(data, token);
@@ -650,7 +648,26 @@ const SubmitComplaintForm: React.FC = () => {
                         <p className={styles.courtUploadHint}>{t("Scomplaint.uploadFormats")}</p>
                       </label>
                     </div>
+
+                    {/* 👇 Добавим это */}
+                    {formData.courtDocument && (
+                      <div className={styles.uploadedFileInfo}>
+                        <p className={styles.uploadedFileName}>
+                          📎 {formData.courtDocument.name}
+                        </p>
+                        <button
+                          type="button"
+                          className={styles.removeFileButton}
+                          onClick={() =>
+                            setFormData((prev) => ({ ...prev, courtDocument: null }))
+                          }
+                        >
+                          ✖
+                        </button>
+                      </div>
+                    )}
                   </div>
+
                 </div>
               )}
             </div>

@@ -125,10 +125,21 @@ def optimize_avatar(image_field):
     )
 
 
+import imghdr
+
 def optimize_house_image(image_field):
     """
     Оптимизирует изображение недвижимости (1920x1080)
     """
+    # Проверяем тип файла
+    try:
+        file_type = imghdr.what(image_field)
+    except Exception:
+        file_type = None
+
+    if not file_type:  # если это не изображение
+        return image_field
+
     return compress_image(
         image_field,
         max_width=1920,
@@ -136,6 +147,7 @@ def optimize_house_image(image_field):
         quality=85,
         format='JPEG'
     )
+
 
 
 def optimize_complaint_image(image_field):

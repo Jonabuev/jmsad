@@ -833,3 +833,26 @@
   }
 }
 
+.uploadedFileInfo {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.05);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.uploadedFileName {
+  flex: 1;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.removeFileButton {
+  background: none;
+  border: none;
+  color: #ff5555;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 8px;
+}

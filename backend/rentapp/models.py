@@ -428,12 +428,12 @@ class CustomUser(AbstractUser):
                     try:
                         original = CustomUser.objects.get(pk=self.pk)
                         if original.avatar != self.avatar:
-                            from rentapp.utils.image_optimization import optimize_avatar
+                            from .utils.image_optimization import optimize_avatar
                             self.avatar = optimize_avatar(self.avatar)
                     except CustomUser.DoesNotExist:
                         pass
                 else:
-                    from rentapp.utils.image_optimization import optimize_avatar
+                    from .utils.image_optimization import optimize_avatar
                     self.avatar = optimize_avatar(self.avatar)
             except Exception as e:
                 import logging
@@ -1166,7 +1166,7 @@ class ComplaintImage(models.Model):
         # ✅ Оптимизация: автоматически сжимаем изображение перед сохранением
         if self.image and not self.pk:  # Только при первом сохранении
             try:
-                from rentapp.utils.image_optimization import optimize_complaint_image
+                from .utils.image_optimization import optimize_complaint_image
                 self.image = optimize_complaint_image(self.image)
             except Exception as e:
                 import logging
