@@ -11,8 +11,8 @@ COPY package*.json ./
 # Устанавливаем зависимости с запасом по таймауту
 RUN npm config set registry https://registry.npmmirror.com \
     && npm set fetch-timeout=600000 \
-    && npm set retry=5 \
     && npm ci --omit=dev --no-audit
+
 
 
 # Builder этап
