@@ -206,6 +206,20 @@
     "description": "Description",
     "status": "Status",
     "date": "Date",
+    "action": "Action",
+    "view": "View",
+    "dispute": "Dispute",
+    "pending": "Pending",
+    "reviewed": "Reviewed",
+    "rejected": "Rejected",
+    "complaintManagement": "Manage your complaints and disputes",
+    "addComplaint": "Add Complaint",
+    "noComplaintsFound": "No complaints found",
+    "noComplaints": "You have no complaints yet",
+    "sentComplaints": "Sent Complaints",
+    "complaintsSentByYou": "Complaints you have sent",
+    "receivedComplaints": "Received Complaints",
+    "complaintsReceivedAboutYou": "Complaints received about you",
     "actions": {
       "dispute": "Dispute",
       "details": "Details",
@@ -219,7 +233,8 @@
       "until": "Until"
     },
     "loading": {
-      "title": "Loading profile..."
+      "title": "Loading profile...",
+      "text": "Loading..."
     },
     "errors": {
       "title": "Loading error",
@@ -229,7 +244,20 @@
       "connectionError": "Connection error",
       "submitError": "Error while submitting",
       "limitError": "You can leave a maximum of 2 comments",
-      "selfError": "You cannot comment on yourself"
+      "selfError": "You cannot comment on yourself",
+      "failedToLoad": "Failed to load profile data",
+      "noAccess": "You don't have access to this page",
+      "loadingError": "Error loading profile",
+      "disputeError": "Error disputing complaint"
+    },
+    "success": {
+      "apartmentAdded": "Apartment successfully added!",
+      "disputeSubmitted": "Complaint submitted for reconsideration"
+    },
+    "verification": {
+      "required": "Verification Required",
+      "requiredText": "To access the user registry, you need to verify your identity. Please upload a document for verification.",
+      "goToVerification": "Go to Verification"
     },
     "search": {
       "title": "Registry of Dishonest Tenants and Landlords",

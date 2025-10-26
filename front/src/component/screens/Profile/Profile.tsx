@@ -93,9 +93,9 @@ const Profile: FC = () => {
         };
       });
 
-      alert("Жалоба отправлена на повторное рассмотрение.");
+      alert(t("profile.success.disputeSubmitted"));
     } catch (err) {
-      alert("Ошибка при оспаривании жалобы.");
+      alert(t("profile.errors.disputeError"));
       console.error(err);
     }
   };
@@ -151,16 +151,16 @@ const Profile: FC = () => {
             setShowVerificationRequired(false);
           }
         } else {
-          setError("Не удалось загрузить данные профиля.");
+          setError(t("profile.errors.failedToLoad"));
         }
         setLoading(false);
       } catch (err: any) {
         // БЕЗОПАСНОСТЬ: НЕ логируем ошибки с данными пользователя
         if (err.response?.status === 403) {
-          setError("У вас нет доступа к этой странице.");
+          setError(t("profile.errors.noAccess"));
           router.push("/login");
         } else {
-          setError("Ошибка при загрузке профиля.");
+          setError(t("profile.errors.loadingError"));
         }
         setLoading(false);
       }
@@ -183,11 +183,11 @@ const Profile: FC = () => {
     }
   }, [showComments, profileData]);
 
-  if (loading) return <div className={styles.loading}>Загрузка...</div>;
+  if (loading) return <div className={styles.loading}>{t("profile.loading.text")}</div>;
   if (error)
     return <div className={styles.error}>{error}</div>;
   if (!profileData)
-    return <div className={styles.notFound}>Профиль не найден.</div>;
+    return <div className={styles.notFound}>{t("profile.errors.profileNotFound")}</div>;
 
   return (
     <div className={styles.profile}>
@@ -430,7 +430,7 @@ const Profile: FC = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-lg font-semibold text-green-800">Апартамент успешно добавлен!</p>
+                  <p className="text-lg font-semibold text-green-800">{t("profile.success.apartmentAdded")}</p>
                 </div>
               </div>
             </div>
@@ -446,16 +446,15 @@ const Profile: FC = () => {
                   </svg>
                 </div>
                 <div className="ml-3 flex-1">
-                  <h3 className="text-lg font-semibold text-amber-800 mb-2">Требуется верификация</h3>
+                  <h3 className="text-lg font-semibold text-amber-800 mb-2">{t("profile.verification.required")}</h3>
                   <p className="text-amber-700 mb-4">
-                    Для доступа к реестру пользователей необходимо пройти верификацию личности. 
-                    Пожалуйста, загрузите документ для верификации.
+                    {t("profile.verification.requiredText")}
                   </p>
                   <button
                     onClick={() => router.push("/profile/verify")}
                     className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
                   >
-                    Пройти верификацию
+                    {t("profile.verification.goToVerification")}
                   </button>
                 </div>
                 <button
@@ -586,7 +585,7 @@ const Profile: FC = () => {
       </div>
 
       {/* Comments Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-12">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="bg-gray-50 rounded-xl p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("profile.comments")}</h2>
