@@ -419,11 +419,19 @@ class GoogleAuthView(APIView):
         if not token:
             return Response({'error': 'No token provided'}, status=400)
 
-        # Проверка токена через Google API
+        # Пробуем проверить как ID token
         google_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
         google_response = requests.get(google_url)
+        
+        # Если не получилось, пробуем как access token
         if google_response.status_code != 200:
-            return Response({'error': 'Invalid token'}, status=400)
+            # Получаем информацию о пользователе через access token
+            userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+            headers = {'Authorization': f'Bearer {token}'}
+            google_response = requests.get(userinfo_url, headers=headers)
+            
+            if google_response.status_code != 200:
+                return Response({'error': 'Invalid token'}, status=400)
 
         google_data = google_response.json()
         email = google_data.get('email')

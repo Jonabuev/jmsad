@@ -36,6 +36,12 @@
   flex-shrink: 0;
 }
 
+.googleButtonText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .googleLoginContainer {
   width: 100%;
 }
