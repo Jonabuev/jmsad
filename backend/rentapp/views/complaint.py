@@ -351,9 +351,9 @@ def complaint_reasons(request):
     serializer = ComplaintReasonSerializer(reasons, many=True)
     return Response(serializer.data)
 
-
+from rest_framework.permissions import AllowAny
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def all_complaint_reasons(request):
     """
     API endpoint для получения всех причин жалоб с поддержкой мультиязычности.
