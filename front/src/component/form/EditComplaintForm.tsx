@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint } from "@/api/complaintsApi";
+import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint, fetchComplaintReasonsByType } from "@/api/complaintsApi";
 import styles from "./SubmitComplaint.module.scss";
 
 interface ComplaintReason {
@@ -96,25 +96,17 @@ const EditComplaintForm: React.FC = () => {
   // Загрузка причин в зависимости от роли обвиняемого
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token || !formData.accusedRole) {
-      setErrorMessage(t("Scomplaint.authRequired"));
-      return;
-    }
+    if (!token || !formData.accusedRole) return;
+
     const locale = router.locale || "ru";
-    fetchComplaintReasons(token, locale, formData.accusedRole)
+    fetchComplaintReasonsByType(token, locale, formData.accusedRole)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setComplaintReasons(res.data);
-        } else {
-          console.error("Invalid data format:", res.data);
-          setErrorMessage(t("Scomplaint.invalidDataFormat"));
         }
       })
-      .catch((error) => {
-        console.error("Error loading complaint reasons:", error);
-        setErrorMessage(t("Scomplaint.loadReasonsError"));
-      });
-  }, [router.locale, formData.accusedRole, t]);
+      .catch((err) => console.error("Error:", err));
+  }, [router.locale, formData.accusedRole]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

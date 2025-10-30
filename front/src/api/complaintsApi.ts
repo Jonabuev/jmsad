@@ -56,3 +56,29 @@ export const searchUsersByIin = (iin: string, token: string) =>
   api.get(`/users/search/?iin=${iin}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+
+  // Получить ВСЕ причины (для SubmitComplaintForm)
+export const fetchAllComplaintReasons = (
+  token: string,
+  locale: string = 'ru'
+) => {
+  const validLocales = ['ru', 'kz', 'en'];
+  const safeLocale = validLocales.includes(locale) ? locale : 'ru';
+  const params = new URLSearchParams({ locale: safeLocale });
+  return api.get(`/all-complaint-reasons/?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Получить причины по типу (для EditComplaintForm)
+export const fetchComplaintReasonsByType = (
+  token: string,
+  locale: string = 'ru',
+  type: 'tenant' | 'landlord'
+) => {
+  const params = new URLSearchParams({ locale, type });
+  return api.get(`/all-complaint-reasons/?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

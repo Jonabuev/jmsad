@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { getCookie } from "@/utils/cookieUtils";
-import { fetchComplaintReasons, submitRentalComplaint, searchUsersByIin } from "@/api/complaintsApi";
+import { fetchComplaintReasons, submitRentalComplaint, searchUsersByIin, fetchAllComplaintReasons } from "@/api/complaintsApi";
 import styles from "./SubmitComplaint.module.scss";
 
 interface ComplaintReason {
@@ -62,30 +62,21 @@ const SubmitComplaintForm: React.FC = () => {
   // Загрузка причин (загружаем ВСЕ причины без фильтрации по type)
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.warn("No token found for loading complaint reasons");
-      return;
-    }
+    if (!token) return;
+
     const locale = router.locale || 'ru';
-    console.log("Loading complaint reasons with locale:", locale);
-    // НЕ передаем type - загружаем все причины
-    fetchComplaintReasons(token, locale)
+    console.log("Loading ALL reasons, locale:", locale);
+
+    fetchAllComplaintReasons(token, locale)  // ← ЧИСТО
       .then((res) => {
-        console.log("Complaint reasons loaded:", res.data);
         if (Array.isArray(res.data)) {
           setComplaintReasons(res.data);
-          console.log(`Total reasons loaded: ${res.data.length}`);
-          console.log(`Tenant reasons: ${res.data.filter(r => r.type === 'tenant').length}`);
-          console.log(`Landlord reasons: ${res.data.filter(r => r.type === 'landlord').length}`);
-        } else {
-          console.error("Invalid data format:", res.data);
-          setErrorMessage(t("Scomplaint.invalidDataFormat"));
+          console.log(`Total: ${res.data.length}`);
+          console.log(`Tenant: ${res.data.filter(r => r.type === 'tenant').length}`);
+          console.log(`Landlord: ${res.data.filter(r => r.type === 'landlord').length}`);
         }
       })
-      .catch((error) => {
-        console.error("Error loading complaint reasons:", error);
-        setErrorMessage(t("Scomplaint.loadReasonsError"));
-      });
+      .catch((err) => console.error("Error:", err));
   }, [router.locale]);
 
   // Обработчик изменения полей
