@@ -69,7 +69,7 @@ const SubmitComplaintForm: React.FC = () => {
     const locale = router.locale || 'ru';
     console.log("Loading complaint reasons with locale:", locale);
     // НЕ передаем type - загружаем все причины
-    fetchComplaintReasons(token, locale, undefined)
+    fetchComplaintReasons(token, locale)
       .then((res) => {
         console.log("Complaint reasons loaded:", res.data);
         if (Array.isArray(res.data)) {
@@ -86,7 +86,7 @@ const SubmitComplaintForm: React.FC = () => {
         console.error("Error loading complaint reasons:", error);
         setErrorMessage(t("Scomplaint.loadReasonsError"));
       });
-  }, [router.locale, t]);
+  }, [router.locale]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
