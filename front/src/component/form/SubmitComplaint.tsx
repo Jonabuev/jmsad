@@ -208,7 +208,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
       setIsSubmitting(false);

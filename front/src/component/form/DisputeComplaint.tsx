@@ -71,7 +71,7 @@ export default function DisputeComplaintPage() {
     }
 
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       await disputeRentalComplaint(uuid as string, formData, token!);
       setMessage(t("dispute.disputeSuccess") || "Успешно отправлено!");
       setTimeout(() => {

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { fetchRentalComplaintByUuid, fetchComplaintReasons, updateRentalComplaint } from "@/api/complaintsApi";
 import styles from "./SubmitComplaint.module.scss";
+import { getCookie } from "@/utils/cookieUtils";
 
 interface ComplaintReason {
   id: number;
@@ -60,7 +61,7 @@ const EditComplaintForm: React.FC = () => {
 
   // Загрузка данных жалобы
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token || typeof uuid !== "string") {
       setErrorMessage(t("Scomplaint.authRequired"));
       setIsLoading(false);
@@ -95,13 +96,8 @@ const EditComplaintForm: React.FC = () => {
 
   // Загрузка причин в зависимости от роли обвиняемого
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token || !formData.accusedRole) {
-      setErrorMessage(t("Scomplaint.authRequired"));
-      return;
-    }
     const locale = router.locale || "ru";
-    fetchComplaintReasons(token, locale, formData.accusedRole)
+    fetchComplaintReasons(locale, formData.accusedRole)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setComplaintReasons(res.data);
@@ -114,7 +110,7 @@ const EditComplaintForm: React.FC = () => {
         console.error("Error loading complaint reasons:", error);
         setErrorMessage(t("Scomplaint.loadReasonsError"));
       });
-  }, [router.locale, formData.accusedRole, t]);
+  }, [router.locale, formData.accusedRole]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -193,7 +189,7 @@ const EditComplaintForm: React.FC = () => {
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
       setIsSubmitting(false);

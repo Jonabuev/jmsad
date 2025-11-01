@@ -37,7 +37,7 @@ const PasswordChangeFlow: FC = () => {
   const handleRequestCode = async () => {
     setError("");
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       const response = await requestPasswordChange(token!);
       setMessage(response.data.success);
       setStep("verifyCode");
@@ -50,7 +50,7 @@ const PasswordChangeFlow: FC = () => {
     e.preventDefault();
     setError("");
     try {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
       const response = await confirmPasswordChange(code, newPassword, token!);
       setMessage(response.data.success);
       setStep("success");

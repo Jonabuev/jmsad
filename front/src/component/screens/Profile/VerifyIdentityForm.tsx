@@ -45,7 +45,7 @@ const VerifyIdentityForm: React.FC = () => {
     setMessage(null);
     setError(null);
 
-    const token = localStorage.getItem("access_token");
+    const token = getCookie("access_token");
     if (!token) {
       setError("Вы не авторизованы.");
       setLoading(false);
