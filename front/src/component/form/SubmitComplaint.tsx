@@ -61,32 +61,24 @@ const SubmitComplaintForm: React.FC = () => {
 
   // Загрузка причин (загружаем ВСЕ причины без фильтрации по type)
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.warn("No token found for loading complaint reasons");
-      return;
-    }
-    const locale = router.locale || 'ru';
-    console.log("Loading complaint reasons with locale:", locale);
-    // НЕ передаем type - загружаем все причины
-    fetchComplaintReasons(token, locale)
-      .then((res) => {
-        console.log("Complaint reasons loaded:", res.data);
-        if (Array.isArray(res.data)) {
-          setComplaintReasons(res.data);
-          console.log(`Total reasons loaded: ${res.data.length}`);
-          console.log(`Tenant reasons: ${res.data.filter(r => r.type === 'tenant').length}`);
-          console.log(`Landlord reasons: ${res.data.filter(r => r.type === 'landlord').length}`);
-        } else {
-          console.error("Invalid data format:", res.data);
-          setErrorMessage(t("Scomplaint.invalidDataFormat"));
+    const fetchReasons = async () => {
+      try {
+        const token = getCookie("access_token");
+        if (!token) {
+          console.error("No token found");
+          return;
         }
-      })
-      .catch((error) => {
-        console.error("Error loading complaint reasons:", error);
-        setErrorMessage(t("Scomplaint.loadReasonsError"));
-      });
-  }, [router.locale]);
+        const locale = router.locale || 'ru';
+        // Запрашиваем причины с фильтрацией по типу на бэкенде
+        const type = activeRole === "tenant" ? "tenant" : "landlord";
+        const res = await fetchComplaintReasons(locale, type);
+        setComplaintReasons(res.data);
+      } catch (error) {
+        console.error("Ошибка загрузки причин жалоб:", error);
+      }
+    };
+    fetchReasons();
+  }, [router.locale, activeRole]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
