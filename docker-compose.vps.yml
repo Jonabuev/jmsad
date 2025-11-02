@@ -55,7 +55,7 @@ services:
     env_file:
       - .env.test
     environment:
-      - SECRET_KEY=${SECRET_KEY_TEST}
+      - SECRET_KEY=${SECRET_KEY}
       - DEBUG=True
       - DB_NAME=jmsad_db_test
       - DB_USER=jmsad_user_test
