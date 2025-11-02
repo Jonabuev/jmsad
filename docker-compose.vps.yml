@@ -62,7 +62,7 @@ services:
       - DB_PASSWORD=jmsad_password_test
       - DB_HOST=postgres
       - DB_PORT=5432
-      - ALLOWED_HOSTS=dev.arno.kz,api.dev.arno.kz,localhost,127.0.0.1
+      - ALLOWED_HOSTS=dev.arno.kz,api.dev.arno.kz,localhost,127.0.0.1,jmsad_backend_test
     depends_on:
       postgres:
         condition: service_healthy
