@@ -125,7 +125,7 @@ services:
       - "8080:80"
       - "8443:443"
     volumes:
-      - ./nginx_full.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx_full_test.conf:/etc/nginx/nginx.conf:ro
       - backend_static_test:/app/staticfiles:ro
       - backend_media_test:/app/media:ro
       - ./certbot/www:/var/www/certbot:rw
