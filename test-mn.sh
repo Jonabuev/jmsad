@@ -24,9 +24,14 @@ check_status() {
 start_app() {
     echo "🚀 Starting JMSAD Test Environment..."
     docker compose -f $COMPOSE_FILE --env-file $ENV_FILE up -d
+
+    echo "⚙️ Applying Django migrations..."
+    docker exec jmsad_backend_test python manage.py migrate --noinput
+
     echo "✅ JMSAD Test started!"
     check_status
 }
+
 
 # --- Остановка ---
 stop_app() {
