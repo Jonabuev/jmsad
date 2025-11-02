@@ -93,7 +93,7 @@ services:
       context: ./front
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
         - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     container_name: jmsad_frontend_test
     ports:
@@ -102,7 +102,7 @@ services:
       - front/.env.local
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     depends_on:
       backend:
