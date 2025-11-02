@@ -50,6 +50,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     'backend',
     'frontend',
+    'jmsad_backend_test',
 ]
 
 
