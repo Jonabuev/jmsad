@@ -2,22 +2,22 @@ version: "3.8"
 
 services:
   # Redis для тестовой среды
-  redis:
-    image: redis:7-alpine
-    container_name: jmsad_redis_test
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD_TEST}
-    ports:
-      - "16379:6379" # тестовый порт
-    volumes:
-      - redis_data_test:/data
-    restart: unless-stopped
-    networks:
-      - jmsad-test-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: jmsad_redis_test
+  #   command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD_TEST}
+  #   ports:
+  #     - "16379:6379" # тестовый порт
+  #   volumes:
+  #     - redis_data_test:/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - jmsad-test-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
 
   # PostgreSQL
   postgres:
@@ -67,8 +67,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
     volumes:
       - backend_static_test:/app/staticfiles
       - backend_media_test:/app/media
@@ -89,7 +89,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend (Next.js)
   frontend:
     build:
       context: ./front
@@ -177,7 +176,7 @@ services:
 
 volumes:
   postgres_data_test:
-  redis_data_test:
+  # redis_data_test:
   backend_static_test:
   backend_media_test:
 
