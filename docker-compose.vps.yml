@@ -36,6 +36,7 @@ services:
     restart: unless-stopped
     networks:
       - jmsad-test-network
+      - jmsad-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jmsad_user_test -d jmsad_db_test"]
       interval: 30s
@@ -75,6 +76,7 @@ services:
     restart: unless-stopped
     networks:
       - jmsad-test-network
+      - jmsad-network
     healthcheck:
       test:
         [
@@ -93,7 +95,7 @@ services:
       context: ./front
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz:8443
+        - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
         - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     container_name: jmsad_frontend_test
     ports:
@@ -102,7 +104,7 @@ services:
       - front/.env.local
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz:8443
+      - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     depends_on:
       backend:
@@ -110,6 +112,7 @@ services:
     restart: unless-stopped
     networks:
       - jmsad-test-network
+      - jmsad-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
@@ -181,6 +184,7 @@ services:
       - postgres
     networks:
       - jmsad-test-network
+      - jmsad-network
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do /scripts/backup_database.sh; sleep 86400 & wait $${!}; done;'"
     restart: unless-stopped
 
@@ -195,6 +199,7 @@ volumes:
 
 networks:
   jmsad-test-network:
+    name: jmsad-test-network
     driver: bridge
     ipam:
       config:

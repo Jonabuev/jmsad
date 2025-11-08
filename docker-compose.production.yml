@@ -179,6 +179,7 @@ services:
       - ./nginx/snippets:/etc/nginx/snippets:ro
     networks:
       - jmsad-network
+      - jmsad-test-network
     restart: unless-stopped
     depends_on:
       frontend:
@@ -234,6 +235,8 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/16
+    jmsad-test-network:
+      external: true
 # Запуск:
 # docker-compose -f docker-compose.production.yml up -d
 #
