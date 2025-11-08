@@ -5,7 +5,28 @@
 
 set -e
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# === ПУТИ К ДИРЕКТОРИЯМ ===
+# Можно переопределить при запуске: PROD_DIR=... TEST_DIR=... NGINX_DIR=... ./jmsad.sh
+PROD_DIR="${PROD_DIR:-~/t_Jmsad}"
+TEST_DIR="${TEST_DIR:-~/test}"
+NGINX_DIR="${NGINX_DIR:-~/test}"  # nginx тоже в test
+
+# Расширяем ~ до полного пути
+PROD_DIR="$(realpath -m "$PROD_DIR")"
+TEST_DIR="$(realpath -m "$TEST_DIR")"
+NGINX_DIR="$(realpath -m "$NGINX_DIR")"
+
+# Проверка существования директорий
+check_dir() {
+    if [ ! -d "$1" ]; then
+        echo -e "${RED}Ошибка: директория не существует: $1${NC}" >&2
+        exit 1
+    fi
+}
+
+check_dir "$PROD_DIR"
+check_dir "$TEST_DIR"
+check_dir "$NGINX_DIR"
 
 # Цвета
 RED='\033[0;31m'
@@ -16,29 +37,36 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Функция выполнения команды в нужной директории
+run_in_dir() {
+    local dir="$1"
+    shift
+    (cd "$dir" && "$@")
+}
+
 echo -e "${MAGENTA}"
 echo "╔════════════════════════════════════════╗"
-echo "║     JMSAD Management System v1.0       ║"
+echo "║     JMSAD Management System v1.1       ║"
 echo "╚════════════════════════════════════════╝"
 echo -e "${NC}"
 
 # --- Проверка всей системы ---
 check_all() {
     echo -e "${CYAN}═══════════════════════════════════════${NC}"
-    echo -e "${YELLOW}📊 SYSTEM STATUS${NC}"
+    echo -e "${YELLOW}СИСТЕМНЫЙ СТАТУС${NC}"
     echo -e "${CYAN}═══════════════════════════════════════${NC}"
     
     echo ""
-    echo -e "${BLUE}🚀 PRODUCTION:${NC}"
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_(backend_prod|frontend_prod|postgres_prod|redis)" || echo "  No production containers running"
+    echo -e "${BLUE}ПРОДАКШН: $PROD_DIR${NC}"
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_(backend_prod|frontend_prod|postgres_prod|redis)" || echo "  Контейнеры продакшена не запущены"
     
     echo ""
-    echo -e "${BLUE}🧪 TEST:${NC}"
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_(backend_test|frontend_test|postgres_test)" || echo "  No test containers running"
+    echo -e "${BLUE}ТЕСТ: $TEST_DIR${NC}"
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_(backend_test|frontend_test|postgres_test)" || echo "  Контейнеры теста не запущены"
     
     echo ""
-    echo -e "${BLUE}🌐 NGINX:${NC}"
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_nginx|jmsad_certbot" || echo "  Nginx not running"
+    echo -e "${BLUE}NGINX: $NGINX_DIR${NC}"
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_nginx|jmsad_certbot" || echo "  Nginx не запущен"
     
     echo ""
     echo -e "${CYAN}═══════════════════════════════════════${NC}"
@@ -46,263 +74,253 @@ check_all() {
 
 # --- Запуск всей системы ---
 start_all() {
-    echo -e "${GREEN}🚀 Starting JMSAD Full Stack...${NC}"
+    echo -e "${GREEN}Запуск JMSAD Full Stack...${NC}"
     echo ""
     
-    echo -e "${BLUE}Step 1/3: Starting Production...${NC}"
-    ./manage_prod.sh start
+    echo -e "${BLUE}Шаг 1/3: Запуск продакшена...${NC}"
+    run_in_dir "$PROD_DIR" ./manage_prod.sh start
     echo ""
     
-    echo -e "${BLUE}Step 2/3: Starting Test...${NC}"
-    ./manage_test.sh start
+    echo -e "${BLUE}Шаг 2/3: Запуск теста...${NC}"
+    run_in_dir "$TEST_DIR" ./manage_test.sh start
     echo ""
     
-    echo -e "${BLUE}Step 3/3: Starting Nginx...${NC}"
-    ./manage_nginx.sh start
+    echo -e "${BLUE}Шаг 3/3: Запуск Nginx...${NC}"
+    run_in_dir "$NGINX_DIR" ./manage_nginx.sh start
     echo ""
     
-    echo -e "${GREEN}✅ Full stack started!${NC}"
+    echo -e "${GREEN}Вся система запущена!${NC}"
     check_all
 }
 
 # --- Остановка всей системы ---
 stop_all() {
-    echo -e "${YELLOW}🛑 Stopping JMSAD Full Stack...${NC}"
+    echo -e "${YELLOW}Остановка JMSAD Full Stack...${NC}"
     echo ""
     
-    echo -e "${BLUE}Step 1/3: Stopping Nginx...${NC}"
-    ./manage_nginx.sh stop
+    echo -e "${BLUE}Шаг 1/3: Остановка Nginx...${NC}"
+    run_in_dir "$NGINX_DIR" ./manage_nginx.sh stop
     echo ""
     
-    echo -e "${BLUE}Step 2/3: Stopping Test...${NC}"
-    ./manage_test.sh stop
+    echo -e "${BLUE}Шаг 2/3: Остановка теста...${NC}"
+    run_in_dir "$TEST_DIR" ./manage_test.sh stop
     echo ""
     
-    echo -e "${BLUE}Step 3/3: Stopping Production...${NC}"
-    ./manage_prod.sh stop
+    echo -e "${BLUE}Шаг 3/3: Остановка продакшена...${NC}"
+    run_in_dir "$PROD_DIR" ./manage_prod.sh stop
     echo ""
     
-    echo -e "${GREEN}✅ Full stack stopped!${NC}"
+    echo -e "${GREEN}Вся система остановлена!${NC}"
 }
 
-# --- Перезапуск всей системы ---
+# --- Перезапуск ---
 restart_all() {
-    echo -e "${YELLOW}🔄 Restarting JMSAD Full Stack...${NC}"
+    echo -e "${YELLOW}Перезапуск JMSAD Full Stack...${NC}"
     stop_all
     sleep 5
     start_all
 }
 
-# --- Быстрый доступ к логам ---
+# --- Логи ---
 logs_menu() {
-    echo -e "${YELLOW}📋 Select logs to view:${NC}"
+    echo -e "${YELLOW}Выберите логи для просмотра:${NC}"
     echo ""
-    echo "  1) Production Backend"
-    echo "  2) Production Frontend"
-    echo "  3) Test Backend"
-    echo "  4) Test Frontend"
-    echo "  5) Nginx Access Logs"
-    echo "  6) Nginx Error Logs"
-    echo "  7) All Production"
-    echo "  8) All Test"
-    echo "  9) Exit"
+    echo "  1) Продакшн: Backend"
+    echo "  2) Продакшн: Frontend"
+    echo "  3) Тест: Backend"
+    echo "  4) Тест: Frontend"
+    echo "  5) Nginx: Access"
+    echo "  6) Nginx: Error"
+    echo "  7) Все продакшн"
+    echo "  8) Все тестовые"
+    echo "  9) Выход"
     echo ""
-    read -p "Choose (1-9): " choice
+    read -p "Выбор (1-9): " choice
     
     case $choice in
         1) docker logs -f jmsad_backend_prod ;;
         2) docker logs -f jmsad_frontend_prod ;;
         3) docker logs -f jmsad_backend_test ;;
         4) docker logs -f jmsad_frontend_test ;;
-        5) ./manage_nginx.sh logs access ;;
-        6) ./manage_nginx.sh logs error ;;
-        7) docker compose -f dc.prod.yml logs -f ;;
-        8) docker compose -f dc.test.yml logs -f ;;
+        5) run_in_dir "$NGINX_DIR" ./manage_nginx.sh logs access ;;
+        6) run_in_dir "$NGINX_DIR" ./manage_nginx.sh logs error ;;
+        7) run_in_dir "$PROD_DIR" docker compose -f dc.prod.yml logs -f ;;
+        8) run_in_dir "$TEST_DIR" docker compose -f dc.test.yml logs -f ;;
         9) exit 0 ;;
-        *) echo "Invalid choice" ;;
+        *) echo "Неверный выбор" ;;
     esac
 }
 
-# --- Backup всех баз ---
+# --- Бэкапы ---
 backup_all() {
-    echo -e "${YELLOW}💾 Creating backups for all databases...${NC}"
+    echo -e "${YELLOW}Создание резервных копий баз...${NC}"
     echo ""
     
-    echo "📦 Production backup..."
-    ./manage_prod.sh backup
+    echo "Продакшн..."
+    run_in_dir "$PROD_DIR" ./manage_prod.sh backup
     echo ""
     
-    echo "📦 Test backup..."
-    ./manage_test.sh backup
+    echo "Тест..."
+    run_in_dir "$TEST_DIR" ./manage_test.sh backup
     echo ""
     
-    echo -e "${GREEN}✅ All backups created!${NC}"
+    echo -e "${GREEN}Все бэкапы созданы!${NC}"
 }
 
-# --- Обновление всей системы ---
+# --- Обновление ---
 update_all() {
-    echo -e "${YELLOW}📦 Updating JMSAD Full Stack...${NC}"
+    echo -e "${YELLOW}Обновление JMSAD Full Stack...${NC}"
     echo ""
     
-    # Backup перед обновлением
-    echo "💾 Creating safety backups..."
+    echo "Создание резервных копий..."
     backup_all
     echo ""
     
-    echo -e "${BLUE}Updating Production...${NC}"
-    ./manage_prod.sh update
+    echo -e "${BLUE}Обновление продакшена...${NC}"
+    run_in_dir "$PROD_DIR" ./manage_prod.sh update
     echo ""
     
-    echo -e "${BLUE}Updating Test...${NC}"
-    ./manage_test.sh update
+    echo -e "${BLUE}Обновление теста...${NC}"
+    run_in_dir "$TEST_DIR" ./manage_test.sh update
     echo ""
     
-    echo -e "${BLUE}Reloading Nginx...${NC}"
-    ./manage_nginx.sh reload
+    echo -e "${BLUE}Перезагрузка Nginx...${NC}"
+    run_in_dir "$NGINX_DIR" ./manage_nginx.sh reload
     echo ""
     
-    echo -e "${GREEN}✅ Full stack updated!${NC}"
+    echo -e "${GREEN}Система обновлена!${NC}"
     check_all
 }
 
-# --- Health check всей системы ---
+# --- Health check ---
 health_all() {
-    echo -e "${YELLOW}🏥 Running full system health check...${NC}"
+    echo -e "${YELLOW}Проверка состояния системы...${NC}"
     echo ""
     
-    echo -e "${BLUE}🚀 Production Health:${NC}"
-    ./manage_prod.sh health
+    echo -e "${BLUE}Продакшн:${NC}"
+    run_in_dir "$PROD_DIR" ./manage_prod.sh health
     echo ""
     
-    echo -e "${BLUE}🧪 Test Health:${NC}"
-    ./manage_test.sh health
+    echo -e "${BLUE}Тест:${NC}"
+    run_in_dir "$TEST_DIR" ./manage_test.sh health
     echo ""
     
-    echo -e "${BLUE}🌐 Nginx Status:${NC}"
-    ./manage_nginx.sh status
+    echo -e "${BLUE}Nginx:${NC}"
+    run_in_dir "$NGINX_DIR" ./manage_nginx.sh status
     echo ""
     
-    echo -e "${BLUE}🌐 Domain Accessibility:${NC}"
-    ./manage_nginx.sh test-domains
+    echo -e "${BLUE}Доступность доменов:${NC}"
+    run_in_dir "$NGINX_DIR" ./manage_nginx.sh test-domains
 }
 
-# --- Мониторинг ресурсов ---
+# --- Мониторинг ---
 monitor_all() {
-    echo -e "${YELLOW}📊 System Resource Monitor${NC}"
-    echo -e "${CYAN}Press Ctrl+C to exit${NC}"
+    echo -e "${YELLOW}Мониторинг ресурсов${NC}"
+    echo -e "${CYAN}Нажмите Ctrl+C для выхода${NC}"
     echo ""
     
     watch -n 2 'docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" | grep jmsad_'
 }
 
-# --- Быстрая перезагрузка frontend (для разработки) ---
+# --- Быстрый ребилд frontend ---
 quick_frontend() {
-    echo -e "${YELLOW}🔄 Quick Frontend Reload${NC}"
+    echo -e "${YELLOW}Быстрая перезагрузка Frontend${NC}"
     echo ""
-    echo "1) Production Frontend"
-    echo "2) Test Frontend"
-    echo "3) Both"
+    echo "1) Продакшн"
+    echo "2) Тест"
+    echo "3) Оба"
     echo ""
-    read -p "Choose (1-3): " choice
+    read -p "Выбор (1-3): " choice
     
     case $choice in
-        1)
-            ./manage_prod.sh rebuild-frontend
-            ;;
-        2)
-            ./manage_test.sh rebuild-frontend
-            ;;
+        1) run_in_dir "$PROD_DIR" ./manage_prod.sh rebuild-frontend ;;
+        2) run_in_dir "$TEST_DIR" ./manage_test.sh rebuild-frontend ;;
         3)
-            ./manage_prod.sh rebuild-frontend
-            ./manage_test.sh rebuild-frontend
+            run_in_dir "$PROD_DIR" ./manage_prod.sh rebuild-frontend
+            run_in_dir "$TEST_DIR" ./manage_test.sh rebuild-frontend
             ;;
-        *)
-            echo "Invalid choice"
-            ;;
+        *) echo "Неверный выбор" ;;
     esac
 }
 
-# --- Быстрая перезагрузка backend ---
+# --- Быстрый ребилд backend ---
 quick_backend() {
-    echo -e "${YELLOW}🔄 Quick Backend Reload${NC}"
+    echo -e "${YELLOW}Быстрая перезагрузка Backend${NC}"
     echo ""
-    echo "1) Production Backend"
-    echo "2) Test Backend"
-    echo "3) Both"
+    echo "1) Продакшн"
+    echo "2) Тест"
+    echo "3) Оба"
     echo ""
-    read -p "Choose (1-3): " choice
+    read -p "Выбор (1-3): " choice
     
     case $choice in
-        1)
-            ./manage_prod.sh rebuild-backend
-            ;;
-        2)
-            ./manage_test.sh rebuild-backend
-            ;;
+        1) run_in_dir "$PROD_DIR" ./manage_prod.sh rebuild-backend ;;
+        2) run_in_dir "$TEST_DIR" ./manage_test.sh rebuild-backend ;;
         3)
-            ./manage_prod.sh rebuild-backend
-            ./manage_test.sh rebuild-backend
+            run_in_dir "$PROD_DIR" ./manage_prod.sh rebuild-backend
+            run_in_dir "$TEST_DIR" ./manage_test.sh rebuild-backend
             ;;
-        *)
-            echo "Invalid choice"
-            ;;
+        *) echo "Неверный выбор" ;;
     esac
 }
 
-# --- Информация о системе ---
+# --- Информация ---
 show_info() {
     echo -e "${CYAN}════════════════════════════════════════${NC}"
-    echo -e "${MAGENTA}📋 JMSAD System Information${NC}"
+    echo -e "${MAGENTA}Информация о системе JMSAD${NC}"
     echo -e "${CYAN}════════════════════════════════════════${NC}"
     echo ""
     
-    echo -e "${YELLOW}🌐 Production URLs:${NC}"
+    echo -e "${YELLOW}ПРОДАКШН: ${PROD_DIR}${NC}"
     echo "  Frontend:  https://arno.kz"
     echo "  Backend:   https://api.arno.kz"
     echo ""
     
-    echo -e "${YELLOW}🧪 Test URLs:${NC}"
+    echo -e "${YELLOW}ТЕСТ: ${TEST_DIR}${NC}"
     echo "  Frontend:  https://dev.arno.kz"
     echo "  Backend:   https://api.dev.arno.kz"
-    echo "  ${RED}(Basic Auth required)${NC}"
+    echo "  ${RED}(Требуется Basic Auth)${NC}"
     echo ""
     
-    echo -e "${YELLOW}📦 Docker Networks:${NC}"
-    docker network ls | grep jmsad
+    echo -e "${YELLOW}NGINX: ${NGINX_DIR}${NC}"
     echo ""
     
-    echo -e "${YELLOW}💾 Docker Volumes:${NC}"
-    docker volume ls | grep -E "postgres_data|redis_data|backend_static|backend_media"
+    echo -e "${YELLOW}Сети Docker:${NC}"
+    docker network ls | grep jmsad || echo "  Нет сетей jmsad"
     echo ""
     
-    echo -e "${YELLOW}🔐 SSL Certificates:${NC}"
-    sudo certbot certificates 2>/dev/null | grep -E "Certificate Name|Domains|Expiry" || echo "  Run: sudo certbot certificates"
+    echo -e "${YELLOW}Тома Docker:${NC}"
+    docker volume ls | grep -E "postgres_data|redis_data|backend_static|backend_media" || echo "  Нет томов"
+    echo ""
+    
+    echo -e "${YELLOW}SSL сертификаты:${NC}"
+    sudo certbot certificates 2>/dev/null | grep -E "Certificate Name|Domains|Expiry" || echo "  Запустите: sudo certbot certificates"
     echo ""
     
     echo -e "${CYAN}════════════════════════════════════════${NC}"
 }
 
-# --- Очистка всей системы ---
+# --- Очистка ---
 cleanup_all() {
-    echo -e "${YELLOW}🧹 Full System Cleanup${NC}"
-    echo -e "${RED}⚠️  WARNING: This will remove unused Docker resources${NC}"
-    read -p "Continue? (yes/no): " confirm
+    echo -e "${YELLOW}Полная очистка системы${NC}"
+    echo -e "${RED}ВНИМАНИЕ: будут удалены неиспользуемые ресурсы Docker${NC}"
+    read -p "Продолжить? (yes/no): " confirm
     
     if [ "$confirm" != "yes" ]; then
-        echo "❌ Cleanup cancelled"
-        exit 0
+        echo "Очистка отменена"
+        return
     fi
     
-    echo "Cleaning Docker system..."
+    echo "Очистка системы Docker..."
     docker system prune -f
     
-    echo "Cleaning volumes..."
+    echo "Очистка томов..."
     docker volume prune -f
     
-    echo "Cleaning images..."
+    echo "Очистка образов..."
     docker image prune -f
     
-    echo -e "${GREEN}✅ Cleanup complete!${NC}"
+    echo -e "${GREEN}Очистка завершена!${NC}"
 }
 
 # --- Интерактивное меню ---
@@ -311,99 +329,71 @@ interactive_menu() {
         clear
         echo -e "${MAGENTA}"
         echo "╔════════════════════════════════════════╗"
-        echo "║     JMSAD Interactive Menu             ║"
+        echo "║        JMSAD Interactive Menu          ║"
         echo "╚════════════════════════════════════════╝"
         echo -e "${NC}"
         echo ""
-        echo -e "${GREEN}System Control:${NC}"
-        echo "  1)  Start All"
-        echo "  2)  Stop All"
-        echo "  3)  Restart All"
-        echo "  4)  Status"
-        echo "  5)  Health Check"
+        echo -e "${GREEN}Управление:${NC}"
+        echo "  1)  Запустить всё"
+        echo "  2)  Остановить всё"
+        echo "  3)  Перезапустить всё"
+        echo "  4)  Статус"
+        echo "  5)  Проверка здоровья"
         echo ""
-        echo -e "${BLUE}Development:${NC}"
-        echo "  6)  Quick Frontend Reload"
-        echo "  7)  Quick Backend Reload"
-        echo "  8)  View Logs"
+        echo -e "${BLUE}Разработка:${NC}"
+        echo "  6)  Пересобрать Frontend"
+        echo "  7)  Пересобрать Backend"
+        echo "  8)  Логи"
         echo ""
-        echo -e "${YELLOW}Maintenance:${NC}"
-        echo "  9)  Backup All"
-        echo "  10) Update All"
-        echo "  11) Monitor Resources"
-        echo "  12) Cleanup System"
+        echo -e "${YELLOW}Обслуживание:${NC}"
+        echo "  9)  Бэкап"
+        echo "  10) Обновить всё"
+        echo "  11) Мониторинг"
+        echo "  12) Очистка"
         echo ""
-        echo -e "${CYAN}Information:${NC}"
-        echo "  13) System Info"
-        echo "  14) SSL Certificates"
+        echo -e "${CYAN}Инфо:${NC}"
+        echo "  13) Информация о системе"
+        echo "  14) SSL сертификаты"
         echo ""
-        echo "  0)  Exit"
+        echo "  0)  Выход"
         echo ""
-        read -p "Choose option: " choice
+        read -p "Выберите опцию: " choice
         
         case $choice in
-            1) start_all; read -p "Press Enter to continue..." ;;
-            2) stop_all; read -p "Press Enter to continue..." ;;
-            3) restart_all; read -p "Press Enter to continue..." ;;
-            4) check_all; read -p "Press Enter to continue..." ;;
-            5) health_all; read -p "Press Enter to continue..." ;;
-            6) quick_frontend; read -p "Press Enter to continue..." ;;
-            7) quick_backend; read -p "Press Enter to continue..." ;;
+            1) start_all; read -p "Нажмите Enter..." ;;
+            2) stop_all; read -p "Нажмите Enter..." ;;
+            3) restart_all; read -p "Нажмите Enter..." ;;
+            4) check_all; read -p "Нажмите Enter..." ;;
+            5) health_all; read -p "Нажмите Enter..." ;;
+            6) quick_frontend; read -p "Нажмите Enter..." ;;
+            7) quick_backend; read -p "Нажмите Enter..." ;;
             8) logs_menu ;;
-            9) backup_all; read -p "Press Enter to continue..." ;;
-            10) update_all; read -p "Press Enter to continue..." ;;
+            9) backup_all; read -p "Нажмите Enter..." ;;
+            10) update_all; read -p "Нажмите Enter..." ;;
             11) monitor_all ;;
-            12) cleanup_all; read -p "Press Enter to continue..." ;;
-            13) show_info; read -p "Press Enter to continue..." ;;
-            14) ./manage_nginx.sh certs; read -p "Press Enter to continue..." ;;
-            0) echo "Goodbye!"; exit 0 ;;
-            *) echo "Invalid choice"; sleep 2 ;;
+            12) cleanup_all; read -p "Нажмите Enter..." ;;
+            13) show_info; read -p "Нажмите Enter..." ;;
+            14) run_in_dir "$NGINX_DIR" ./manage_nginx.sh certs; read -p "Нажмите Enter..." ;;
+            0) echo "До встречи!"; exit 0 ;;
+            *) echo "Неверный выбор"; sleep 2 ;;
         esac
     done
 }
 
-# --- Главное меню ---
+# --- CLI аргументы ---
 case "${1:-menu}" in
-    start)
-        start_all
-        ;;
-    stop)
-        stop_all
-        ;;
-    restart)
-        restart_all
-        ;;
-    status)
-        check_all
-        ;;
-    logs)
-        logs_menu
-        ;;
-    backup)
-        backup_all
-        ;;
-    update)
-        update_all
-        ;;
-    health)
-        health_all
-        ;;
-    monitor)
-        monitor_all
-        ;;
-    frontend)
-        quick_frontend
-        ;;
-    backend)
-        quick_backend
-        ;;
-    info)
-        show_info
-        ;;
-    cleanup)
-        cleanup_all
-        ;;
-    menu|*)
-        interactive_menu
-        ;;
+    start)   start_all ;;
+    stop)    stop_all ;;
+    restart) restart_all ;;
+    status)  check_all ;;
+    logs)    logs_menu ;;
+    backup)  backup_all ;;
+    update)  update_all ;;
+    health)  health_all ;;
+    monitor) monitor_all ;;
+    frontend) quick_frontend ;;
+    backend)  quick_backend ;;
+    info)    show_info ;;
+    cleanup) cleanup_all ;;
+    menu|*)  interactive_menu ;;
 esac
