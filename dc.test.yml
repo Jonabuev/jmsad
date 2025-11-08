@@ -47,8 +47,8 @@ services:
       postgres_test:
         condition: service_healthy
     volumes:
-      - backend_static_test:/app/staticfiles
-      - backend_media_test:/app/media
+      - test_backend_static_test:/app/staticfiles
+      - test_backend_media_test:/app/media
     restart: unless-stopped
     networks:
       - jmsad-network
