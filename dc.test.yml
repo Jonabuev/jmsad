@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: jmsad_user_test
       POSTGRES_PASSWORD: jmsad_password_test
     ports:
-      - "5433:5432"  # ← ВАЖНО: другой внешний порт!
+      - "5433:5432" # ← ВАЖНО: другой внешний порт!
     volumes:
       - postgres_data_test:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -31,7 +31,6 @@ services:
       args:
         - ENVIRONMENT=test
     container_name: jmsad_backend_test
-    # НЕТ ports! Доступ только через nginx
     env_file:
       - .env.test
     environment:
@@ -40,25 +39,32 @@ services:
       - DB_NAME=jmsad_db_test
       - DB_USER=jmsad_user_test
       - DB_PASSWORD=jmsad_password_test
-      - DB_HOST=postgres_test  # ← указываем правильный контейнер
+      - DB_HOST=postgres_test
       - DB_PORT=5432
+      - STATIC_ROOT=/app/staticfiles
+      - MEDIA_ROOT=/app/media
       - ALLOWED_HOSTS=dev.arno.kz,api.dev.arno.kz,localhost,127.0.0.1,jmsad_backend_test
     depends_on:
       postgres_test:
         condition: service_healthy
     volumes:
-      - test_backend_static_test:/app/staticfiles
-      - test_backend_media_test:/app/media
+      - ./staticfiles_test:/app/staticfiles # bind mount
+      - ./media_test:/app/media # bind mount
     restart: unless-stopped
     networks:
       - jmsad-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
   # Frontend TEST (внутренний порт 3000)
   frontend_test:
     build:
