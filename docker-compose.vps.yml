@@ -36,6 +36,7 @@ services:
     restart: unless-stopped
     networks:
       - jmsad-test-network
+      - jmsad-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jmsad_user_test -d jmsad_db_test"]
       interval: 30s
