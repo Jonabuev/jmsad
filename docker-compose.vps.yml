@@ -28,7 +28,7 @@ services:
       POSTGRES_USER: jmsad_user_test
       POSTGRES_PASSWORD: jmsad_password_test
     ports:
-      - "15432:5432" # другой порт
+      - "5432:5432" # другой порт
     volumes:
       - postgres_data_test:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -52,7 +52,7 @@ services:
         - ENVIRONMENT=test
     container_name: jmsad_backend_test
     ports:
-      - "18000:8000"
+      - "8000:8000"
     env_file:
       - .env.test
     environment:
@@ -99,7 +99,7 @@ services:
         - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     container_name: jmsad_frontend_test
     ports:
-      - "13000:3000"
+      - "3000:3000"
     env_file:
       - front/.env.local
     environment:
@@ -136,7 +136,7 @@ services:
     container_name: jmsad_nginx_test
     ports:
       - "8080:80"
-      - "8443:443"
+      - "443:443"
     volumes:
       - ./nginx_full_test.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
