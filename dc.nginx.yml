@@ -15,8 +15,8 @@ services:
       - backend_static:/app/staticfiles:ro
       - backend_media:/app/media:ro
       # Статика TEST
-      - test_backend_static_test:/app/staticfiles_test:ro
-      - test_backend_media_test:/app/media_test:ro
+      - backend_static_test:/app/staticfiles_test:ro
+      - backend_media_test:/app/media_test:ro
       # SSL
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot:ro
