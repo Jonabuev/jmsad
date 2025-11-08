@@ -1,0 +1,101 @@
+version: "3.8"
+
+services:
+  # PostgreSQL для TEST (другой порт!)
+  postgres_test:
+    image: postgres:16.9-alpine
+    container_name: jmsad_postgres_test
+    environment:
+      POSTGRES_DB: jmsad_db_test
+      POSTGRES_USER: jmsad_user_test
+      POSTGRES_PASSWORD: jmsad_password_test
+    ports:
+      - "5433:5432"  # ← ВАЖНО: другой внешний порт!
+    volumes:
+      - postgres_data_test:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - jmsad-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jmsad_user_test -d jmsad_db_test"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend TEST (внутренний порт 8000, НЕ публикуем наружу!)
+  backend_test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - ENVIRONMENT=test
+    container_name: jmsad_backend_test
+    # НЕТ ports! Доступ только через nginx
+    env_file:
+      - .env.test
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=True
+      - DB_NAME=jmsad_db_test
+      - DB_USER=jmsad_user_test
+      - DB_PASSWORD=jmsad_password_test
+      - DB_HOST=postgres_test  # ← указываем правильный контейнер
+      - DB_PORT=5432
+      - ALLOWED_HOSTS=dev.arno.kz,api.dev.arno.kz,localhost,127.0.0.1,jmsad_backend_test
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+    volumes:
+      - backend_static_test:/app/staticfiles
+      - backend_media_test:/app/media
+    restart: unless-stopped
+    networks:
+      - jmsad-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend TEST (внутренний порт 3000)
+  frontend_test:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
+        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+    container_name: jmsad_frontend_test
+    # НЕТ ports! Доступ только через nginx
+    env_file:
+      - front/.env.local
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=https://api.dev.arno.kz
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+    depends_on:
+      backend_test:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - jmsad-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data_test:
+    driver: local
+  backend_static_test:
+    driver: local
+  backend_media_test:
+    driver: local
+
+networks:
+  jmsad-network:
+    external: true
