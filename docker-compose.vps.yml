@@ -197,8 +197,9 @@ volumes:
 
 networks:
   jmsad-test-network:
-    name: jmsad-test-network
     driver: bridge
     ipam:
       config:
         - subnet: 172.29.0.0/16
+  jmsad-network:
+    external: true
