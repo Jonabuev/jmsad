@@ -11,11 +11,22 @@ PROD_DIR="${PROD_DIR:-~/t_Jmsad}"
 TEST_DIR="${TEST_DIR:-~/test}"
 NGINX_DIR="${NGINX_DIR:-~/test}"  # nginx тоже в test
 
-# Расширяем ~ до полного пути
+# --- Раскрываем ~ в $HOME, если оно в начале ---
+expand_tilde() {
+    local path="$1"
+    # Если строка начинается с ~/, заменяем на $HOME/
+    [[ "$path" == ~* ]] && path="${path/#~/$HOME}"
+    echo "$path"
+}
+
+PROD_DIR="$(expand_tilde "$PROD_DIR")"
+TEST_DIR="$(expand_tilde "$TEST_DIR")"
+NGINX_DIR="$(expand_tilde "$NGINX_DIR")"
+
+# --- Теперь безопасно используем realpath -m ---
 PROD_DIR="$(realpath -m "$PROD_DIR")"
 TEST_DIR="$(realpath -m "$TEST_DIR")"
 NGINX_DIR="$(realpath -m "$NGINX_DIR")"
-
 # Проверка существования директорий
 check_dir() {
     if [ ! -d "$1" ]; then
