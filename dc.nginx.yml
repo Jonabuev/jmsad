@@ -45,10 +45,10 @@ services:
 volumes:
   backend_static:
     external: true
-    name: test_backend_static
+    name: jmsad_backend_static
   backend_media:
     external: true
-    name: test_backend_media
+    name: jmsad_backend_media
   backend_static_test:
     external: true
     name: test_backend_static_test
