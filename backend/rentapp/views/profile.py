@@ -1,741 +1,741 @@
-# import os
-# from rentapp.permissions.document_valid import NotBlacklistedOrProfileEdit
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from rest_framework import status, generics, permissions
-# from django.shortcuts import get_object_or_404
-# from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification, UserViolation, AuditLog
-# from rentapp.serializers import CustomUserSerializer, HouseSerializer, RentalSerializer, RentalComplaintSerializer, ComplaintRegistrySerializer
-# from rest_framework.views import APIView
-# from django.db import transaction, IntegrityError
-# from django.core.mail import send_mail
-# from django.conf import settings
-# from django.db.models import Q, Count, F
-# from django.core.exceptions import PermissionDenied
-# from rest_framework.generics import ListAPIView
-# from datetime import datetime
-# from django.utils import timezone
-# from ..utils import generate_anonymous_name
-# from rentapp.permissions1 import IsAdmin
+import os
+from rentapp.permissions.document_valid import NotBlacklistedOrProfileEdit
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status, generics, permissions
+from django.shortcuts import get_object_or_404
+from rentapp.models import BlacklistEntry, CustomUser, House, Rental, RentalComplaint, IdentityVerification, UserViolation, AuditLog
+from rentapp.serializers import CustomUserSerializer, HouseSerializer, RentalSerializer, RentalComplaintSerializer, ComplaintRegistrySerializer
+from rest_framework.views import APIView
+from django.db import transaction, IntegrityError
+from django.core.mail import send_mail
+from django.conf import settings
+from django.db.models import Q, Count, F
+from django.core.exceptions import PermissionDenied
+from rest_framework.generics import ListAPIView
+from datetime import datetime
+from django.utils import timezone
+from ..utils import generate_anonymous_name
+from rentapp.permissions1 import IsAdmin
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
-# def profile(request):
-#     """
-#     API endpoint для получения полного профиля пользователя.
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
+def profile(request):
+    """
+    API endpoint для получения полного профиля пользователя.
     
-#     Возвращает подробную информацию о пользователе, включая:
-#     - Данные пользователя
-#     - Дома (для арендодателей)
-#     - Аренды (для арендаторов)
-#     - Жалобы (отправленные и полученные)
-#     - Админские жалобы (для администраторов)
+    Возвращает подробную информацию о пользователе, включая:
+    - Данные пользователя
+    - Дома (для арендодателей)
+    - Аренды (для арендаторов)
+    - Жалобы (отправленные и полученные)
+    - Админские жалобы (для администраторов)
     
-#     Permissions:
-#         - Требуется аутентификация
-#     """
-#     try:
-#         user = request.user
-#         # БЕЗОПАСНОСТЬ: НЕ логируем детали пользователя через print()
-#         # Используем security_logger для важных событий
+    Permissions:
+        - Требуется аутентификация
+    """
+    try:
+        user = request.user
+        # БЕЗОПАСНОСТЬ: НЕ логируем детали пользователя через print()
+        # Используем security_logger для важных событий
         
-#         # ✅ Audit Trail: Логируем просмотр профиля
-#         AuditLog.log_action(
-#             action='view_profile',
-#             request=request,
-#             target_user=user,
-#             details={'profile_id': user.id, 'role': user.role}
-#         )
+        # ✅ Audit Trail: Логируем просмотр профиля
+        AuditLog.log_action(
+            action='view_profile',
+            request=request,
+            target_user=user,
+            details={'profile_id': user.id, 'role': user.role}
+        )
 
-#         # ✅ Оптимизация: используем select_related и prefetch_related
-#         # Жалобы
-#         complaint_send = RentalComplaint.objects.select_related(
-#             'complainant', 'accused', 'moderated_by'
-#         ).prefetch_related('reasons', 'images').filter(complainant=user)
+        # ✅ Оптимизация: используем select_related и prefetch_related
+        # Жалобы
+        complaint_send = RentalComplaint.objects.select_related(
+            'complainant', 'accused', 'moderated_by'
+        ).prefetch_related('reasons', 'images').filter(complainant=user)
         
-#         complaint_received = RentalComplaint.objects.select_related(
-#             'complainant', 'accused', 'moderated_by'
-#         ).prefetch_related('reasons', 'images').filter(accused=user)
+        complaint_received = RentalComplaint.objects.select_related(
+            'complainant', 'accused', 'moderated_by'
+        ).prefetch_related('reasons', 'images').filter(accused=user)
 
-#         # Дома (только если арендодатель)
-#         houses = House.objects.select_related('owner').prefetch_related(
-#             'rental_set__tenant'
-#         ).filter(owner=user) if user.role == "landlord" else []
+        # Дома (только если арендодатель)
+        houses = House.objects.select_related('owner').prefetch_related(
+            'rental_set__tenant'
+        ).filter(owner=user) if user.role == "landlord" else []
         
-#         # ✅ Оптимизация: избегаем загрузки всех аренд без необходимости
-#         rentals_all = Rental.objects.select_related(
-#             'house__owner', 'tenant'
-#         ).all()[:100]  # Ограничиваем количество для производительности
+        # ✅ Оптимизация: избегаем загрузки всех аренд без необходимости
+        rentals_all = Rental.objects.select_related(
+            'house__owner', 'tenant'
+        ).all()[:100]  # Ограничиваем количество для производительности
 
-#         # Аренды (только если арендатор)
-#         rentals = Rental.objects.select_related(
-#             'house__owner', 'tenant'
-#         ).filter(tenant=user) if user.role == "tenant" else []
+        # Аренды (только если арендатор)
+        rentals = Rental.objects.select_related(
+            'house__owner', 'tenant'
+        ).filter(tenant=user) if user.role == "tenant" else []
 
-#         # Жалобы по арендам
-#         rental_complaints = (
-#             RentalComplaint.objects.select_related(
-#                 'complainant', 'accused', 'moderated_by'
-#             ).prefetch_related('reasons', 'images').filter(complainant=user)
-#             if user.role == "tenant"
-#             else RentalComplaint.objects.select_related(
-#                 'complainant', 'accused', 'moderated_by'
-#             ).prefetch_related('reasons', 'images').filter(accused=user.identifier)
-#         )
+        # Жалобы по арендам
+        rental_complaints = (
+            RentalComplaint.objects.select_related(
+                'complainant', 'accused', 'moderated_by'
+            ).prefetch_related('reasons', 'images').filter(complainant=user)
+            if user.role == "tenant"
+            else RentalComplaint.objects.select_related(
+                'complainant', 'accused', 'moderated_by'
+            ).prefetch_related('reasons', 'images').filter(accused=user.identifier)
+        )
 
-#         # Админские жалобы
-#         admin_complaints = RentalComplaint.objects.select_related(
-#             'complainant', 'accused', 'moderated_by'
-#         ).prefetch_related('reasons', 'images').filter(status='pending')
-
-        
-        
+        # Админские жалобы
+        admin_complaints = RentalComplaint.objects.select_related(
+            'complainant', 'accused', 'moderated_by'
+        ).prefetch_related('reasons', 'images').filter(status='pending')
 
         
-
-#         # Получаем сериализованные данные пользователя
-#         serialized_user = CustomUserSerializer(user).data
-
-#         data = {
-#             'user': serialized_user,  # Убираем средний рейтинг, так как репутация убрана
-#             'houses': HouseSerializer(houses, many=True).data,
-#             'rentals': RentalSerializer(rentals, many=True).data,
-#             'complaint_send': RentalComplaintSerializer(complaint_send, many=True).data,
-#             'complaints_rental': RentalComplaintSerializer(rental_complaints, many=True).data,
-#             'complaint_received': RentalComplaintSerializer(complaint_received, many=True).data,
-#             'admin_complaints': RentalComplaintSerializer(admin_complaints, many=True).data,
-#             'rentals_all':RentalSerializer(rentals_all, many=True).data
-#         }
-#         # БЕЗОПАСНОСТЬ: НЕ логируем response data через print()
-
-#         return Response(data, status=status.HTTP_200_OK)
-#     except Exception as e:
-#         import traceback
-#         import logging
-#         # Используем logger вместо print()
-#         logger = logging.getLogger(__name__)
-#         logger.error(f"Error in profile view: {str(e)}\n{traceback.format_exc()}")
-#         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-# @api_view(['PATCH'])
-# @permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
-# def edit_profile(request):
-#     """
-#     API endpoint для редактирования профиля пользователя.
-    
-#     Позволяет обновить данные пользователя, включая аватар.
-#     Поддерживает частичное обновление (PATCH).
-    
-#     Supported fields:
-#         - Все поля модели CustomUser
-#         - avatar: Новый аватар
-#         - clear_avatar: Удаление аватара (true/false)
-    
-#     Permissions:
-#         - Требуется аутентификация
-#         - Пользователь может редактировать только свой профиль
-#     """
-#     user = request.user
-
-#     serializer = CustomUserSerializer(user, data=request.data, partial=True)
-#     if serializer.is_valid():
-#         # Обработка удаления аватара
-#         if request.data.get('clear_avatar') == 'true':
-#             if user.avatar and user.avatar.name != 'avatars/def.jpg':
-#                 old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
-#                 if os.path.exists(old_path):
-#                     os.remove(old_path)
-#             user.avatar = 'avatars/def.jpg'
-
-
-#         # Обработка нового аватара
-#         if 'avatar' in request.FILES:
-#             # Удалим старый файл, если не дефолтный
-#             if user.avatar and user.avatar.name != 'avatars/def.jpg':
-#                 old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
-#                 if os.path.exists(old_path):
-#                     os.remove(old_path)
-#             user.avatar = request.FILES['avatar']
-
-#         serializer.save()
         
-#         # ✅ Audit Trail: Логируем изменение профиля
-#         AuditLog.log_action(
-#             action='edit_profile',
-#             request=request,
-#             target_user=user,
-#             details={
-#                 'profile_id': user.id,
-#                 'changed_fields': list(request.data.keys())[:10]  # Первые 10 изменённых полей
-#             }
-#         )
 
-#         # 🔍 Проверка обновлённой даты документа
-#         passport_expiry = serializer.validated_data.get("passport_expiry")
-#         if passport_expiry and passport_expiry >= timezone.now().date():
-#             try:
-#                 # Удалим из blacklist, если причина expired_document
-#                 entry = user.blacklist
-#                 if entry.reason == "expired_document" and not entry.manual_block:
-#                     entry.delete()
-#             except BlacklistEntry.DoesNotExist:
-#                 pass
-
-#         data = {
-#             'user': CustomUserSerializer(user).data,
-#         }
-#         return Response(data, status=status.HTTP_200_OK)
-    
-#     # БЕЗОПАСНОСТЬ: Логируем через logger вместо print()
-#     import logging
-#     logger = logging.getLogger(__name__)
-#     logger.warning(f"Serializer errors: {serializer.errors}")
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# # Представление для получения профиля
-# @api_view(['GET'])
-# def profile_view(request):
-#     """
-#     API endpoint для получения базовой информации о профиле.
-    
-#     Возвращает только основные данные пользователя без дополнительной информации.
-    
-#     Permissions:
-#         - Требуется аутентификация
-#     """
-#     user = request.user
-#     serializer = CustomUserSerializer(user)
-#     return Response(serializer.data)
-
-
-# class PublicUserProfileView(APIView):
-#     """
-#     API endpoint для получения публичного профиля пользователя.
-    
-#     Возвращает публичную информацию о пользователе по username.
-#     Включает дома, аренды и жалобы пользователя.
-    
-#     БЕЗОПАСНОСТЬ: Чувствительные данные (phone, email, identifier) маскируются.
-    
-#     URL Parameters:
-#         - username: Имя пользователя для просмотра профиля
-    
-#     Permissions:
-#         - Доступно всем пользователям
-#     """
-#     def get(self, request, username):
-#         from rentapp.serializers import PublicUserSerializer
         
-#         user = get_object_or_404(CustomUser, username=username)
+
+        # Получаем сериализованные данные пользователя
+        serialized_user = CustomUserSerializer(user).data
+
+        data = {
+            'user': serialized_user,  # Убираем средний рейтинг, так как репутация убрана
+            'houses': HouseSerializer(houses, many=True).data,
+            'rentals': RentalSerializer(rentals, many=True).data,
+            'complaint_send': RentalComplaintSerializer(complaint_send, many=True).data,
+            'complaints_rental': RentalComplaintSerializer(rental_complaints, many=True).data,
+            'complaint_received': RentalComplaintSerializer(complaint_received, many=True).data,
+            'admin_complaints': RentalComplaintSerializer(admin_complaints, many=True).data,
+            'rentals_all':RentalSerializer(rentals_all, many=True).data
+        }
+        # БЕЗОПАСНОСТЬ: НЕ логируем response data через print()
+
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        import traceback
+        import logging
+        # Используем logger вместо print()
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in profile view: {str(e)}\n{traceback.format_exc()}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
+def edit_profile(request):
+    """
+    API endpoint для редактирования профиля пользователя.
+    
+    Позволяет обновить данные пользователя, включая аватар.
+    Поддерживает частичное обновление (PATCH).
+    
+    Supported fields:
+        - Все поля модели CustomUser
+        - avatar: Новый аватар
+        - clear_avatar: Удаление аватара (true/false)
+    
+    Permissions:
+        - Требуется аутентификация
+        - Пользователь может редактировать только свой профиль
+    """
+    user = request.user
+
+    serializer = CustomUserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        # Обработка удаления аватара
+        if request.data.get('clear_avatar') == 'true':
+            if user.avatar and user.avatar.name != 'avatars/def.jpg':
+                old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
+            user.avatar = 'avatars/def.jpg'
+
+
+        # Обработка нового аватара
+        if 'avatar' in request.FILES:
+            # Удалим старый файл, если не дефолтный
+            if user.avatar and user.avatar.name != 'avatars/def.jpg':
+                old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
+            user.avatar = request.FILES['avatar']
+
+        serializer.save()
         
-#         # ✅ Audit Trail: Логируем просмотр публичного профиля
-#         AuditLog.log_action(
-#             action='view_profile',
-#             request=request,
-#             target_user=user,
-#             details={
-#                 'profile_id': user.id,
-#                 'profile_username': username,
-#                 'viewer_authenticated': request.user.is_authenticated
-#             }
-#         )
+        # ✅ Audit Trail: Логируем изменение профиля
+        AuditLog.log_action(
+            action='edit_profile',
+            request=request,
+            target_user=user,
+            details={
+                'profile_id': user.id,
+                'changed_fields': list(request.data.keys())[:10]  # Первые 10 изменённых полей
+            }
+        )
+
+        # 🔍 Проверка обновлённой даты документа
+        passport_expiry = serializer.validated_data.get("passport_expiry")
+        if passport_expiry and passport_expiry >= timezone.now().date():
+            try:
+                # Удалим из blacklist, если причина expired_document
+                entry = user.blacklist
+                if entry.reason == "expired_document" and not entry.manual_block:
+                    entry.delete()
+            except BlacklistEntry.DoesNotExist:
+                pass
+
+        data = {
+            'user': CustomUserSerializer(user).data,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+    # БЕЗОПАСНОСТЬ: Логируем через logger вместо print()
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.warning(f"Serializer errors: {serializer.errors}")
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Представление для получения профиля
+@api_view(['GET'])
+def profile_view(request):
+    """
+    API endpoint для получения базовой информации о профиле.
+    
+    Возвращает только основные данные пользователя без дополнительной информации.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    user = request.user
+    serializer = CustomUserSerializer(user)
+    return Response(serializer.data)
+
+
+class PublicUserProfileView(APIView):
+    """
+    API endpoint для получения публичного профиля пользователя.
+    
+    Возвращает публичную информацию о пользователе по username.
+    Включает дома, аренды и жалобы пользователя.
+    
+    БЕЗОПАСНОСТЬ: Чувствительные данные (phone, email, identifier) маскируются.
+    
+    URL Parameters:
+        - username: Имя пользователя для просмотра профиля
+    
+    Permissions:
+        - Доступно всем пользователям
+    """
+    def get(self, request, username):
+        from rentapp.serializers import PublicUserSerializer
         
-#         # Получение всех домов арендодателя
-#         houses = House.objects.filter(owner=user) if user.role == "landlord" else []
-
-#         # Получение аренд, где пользователь — арендатор
-#         rentals = Rental.objects.select_related("house").filter(tenant=user) if user.role == "tenant" else []
-
-#         # Жалобы, полученные этим пользователем
-#         complaint_received = RentalComplaint.objects.filter(accused=user)
-
-#         # Жалобы, отправленные этим пользователем
-#         complaints_rental = RentalComplaint.objects.filter(complainant=user)
-
-#         # Используем PublicUserSerializer для безопасного отображения данных
-#         # Чувствительные данные (phone, email, identifier) будут маскированы
-#         user_data = PublicUserSerializer(user).data
-#         user_data["is_banned"] = hasattr(user, "blacklist")
+        user = get_object_or_404(CustomUser, username=username)
         
-#         data = {
-#             **user_data,  # Безопасные данные пользователя (phone/email маскированы)
-#             "houses": [
-#                 {
-#                     "id": house.id,
-#                     "address": house.address,
-#                     "type_p": house.type_p,
-#                     "num_of_rooms": house.num_of_rooms
-#                 }
-#                 for house in houses
-#             ],
-#             "rentals": [
-#                 {
-#                     "id": rental.id,
-#                     "status": rental.status,
-#                     "house": {
-#                         "id": rental.house.id,
-#                         "address": rental.house.address,
-#                         "type_p": rental.house.type_p,
-#                         "num_of_rooms": rental.house.num_of_rooms
-#                     },
-#                 }
-#                 for rental in rentals
-#             ],
-#             "complaint_received": [
-#                 {
-#                     "id": comp.id,
-#                     "description": comp.description,
-#                     "status": comp.status,
-#                     "uuid": str(comp.uuid),
-#                     "created_at": comp.created_at,
-#                 }
-#                 for comp in complaint_received
-#             ],
-#             "complaints_rental": [
-#                 {
-#                     "id": comp.id,
-#                     "description": comp.description,
-#                     "status": comp.status,
-#                     "created_at": comp.created_at,
-#                 }
-#                 for comp in complaints_rental
-#             ],
-#         }
-#         return Response(data, status=status.HTTP_200_OK)
-
-
-# class IssueViolationAPIView(APIView):
-#     permission_classes = [IsAuthenticated, IsAdmin]
-
-#     def post(self, request):
-#         # БЕЗОПАСНОСТЬ: НЕ логируем данные через print()
+        # ✅ Audit Trail: Логируем просмотр публичного профиля
+        AuditLog.log_action(
+            action='view_profile',
+            request=request,
+            target_user=user,
+            details={
+                'profile_id': user.id,
+                'profile_username': username,
+                'viewer_authenticated': request.user.is_authenticated
+            }
+        )
         
-#         user_id = request.data.get("user_id")
-#         reason = request.data.get("reason", "")
+        # Получение всех домов арендодателя
+        houses = House.objects.filter(owner=user) if user.role == "landlord" else []
 
-#         try:
-#             user = CustomUser.objects.get(id=user_id)
-#         except CustomUser.DoesNotExist:
-#             return Response({"error": "Пользователь не найден"}, status=404)
+        # Получение аренд, где пользователь — арендатор
+        rentals = Rental.objects.select_related("house").filter(tenant=user) if user.role == "tenant" else []
 
-#         UserViolation.objects.create(
-#             user=user,
-#             issued_by=request.user,
-#             reason=reason
-#         )
+        # Жалобы, полученные этим пользователем
+        complaint_received = RentalComplaint.objects.filter(accused=user)
 
-#         return Response({"message": "Нарушение назначено"}, status=201)
+        # Жалобы, отправленные этим пользователем
+        complaints_rental = RentalComplaint.objects.filter(complainant=user)
 
-
-# class RemoveBanAPIView(APIView):
-#     permission_classes = [IsAuthenticated, IsAdmin]
-
-#     def post(self, request):
-#         user_id = request.data.get("user_id")
-#         if not user_id:
-#             return Response({"error": "user_id обязателен"}, status=400)
-
-#         try:
-#             user = CustomUser.objects.get(id=user_id)
-#         except CustomUser.DoesNotExist:
-#             return Response({"error": "Пользователь не найден"}, status=404)
-
-#         # Удаляем из черного списка
-#         removed = BlacklistEntry.objects.filter(user=user).delete()
-
-#         # Если хочешь, можно также снять все нарушения
-#         UserViolation.objects.filter(user=user, active=True).update(active=False)
-
-#         return Response({"message": "Блокировка снята"}, status=200)
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def user_apartments(request):
-#     """
-#     API endpoint для получения квартир пользователя.
-    
-#     Возвращает список всех домов/квартир, принадлежащих текущему пользователю.
-    
-#     Permissions:
-#         - Требуется аутентификация
-#     """
-#     houses = House.objects.filter(owner=request.user)
-#     return Response(HouseSerializer(houses, many=True).data, status=status.HTTP_200_OK)
-
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def user_info(request):
-#     """
-#     API endpoint для получения базовой информации о пользователе.
-    
-#     Возвращает минимальную информацию: username и статус суперпользователя.
-    
-#     Permissions:
-#         - Требуется аутентификация
-#     """
-#     user = request.user
-#     return Response({
-#         "username": user.username,
-#         "is_superuser": user.is_superuser,
-#     })
-
-
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def verification_status(request):
-#     """
-#     API endpoint для проверки статуса подтверждения email пользователя.
-    
-#     Возвращает информацию о том, подтвержден ли email пользователя.
-#     - email_confirmed: статус подтверждения email
-    
-#     Permissions:
-#         - Требуется аутентификация
-#     """
-#     user = request.user
-#     # БЕЗОПАСНОСТЬ: НЕ логируем через print()
-    
-#     response_data = {
-#         "email_confirmed": user.email_confirmed,
-#     }
-    
-#     return Response(response_data)
-
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def verify_identity(request):
-#     """
-#     API endpoint для подтверждения email пользователя.
-    
-#     Помечает email как подтвержденный и отправляет уведомление.
-#     Для доступа к странице поиска достаточно подтверждения email.
-    
-#     Required fields:
-#         - id_document: Файл документа для верификации (опционально)
-    
-#     Permissions:
-#         - Требуется аутентификация
-#     """
-#     try:
-#         id_doc = request.FILES.get('id_document')
-#         # БЕЗОПАСНОСТЬ: НЕ логируем через print() в production
+        # Используем PublicUserSerializer для безопасного отображения данных
+        # Чувствительные данные (phone, email, identifier) будут маскированы
+        user_data = PublicUserSerializer(user).data
+        user_data["is_banned"] = hasattr(user, "blacklist")
         
-#         with transaction.atomic():
-#             request.user.email_confirmed = True
-#             request.user.save()
-#             # БЕЗОПАСНОСТЬ: НЕ логируем через print()
+        data = {
+            **user_data,  # Безопасные данные пользователя (phone/email маскированы)
+            "houses": [
+                {
+                    "id": house.id,
+                    "address": house.address,
+                    "type_p": house.type_p,
+                    "num_of_rooms": house.num_of_rooms
+                }
+                for house in houses
+            ],
+            "rentals": [
+                {
+                    "id": rental.id,
+                    "status": rental.status,
+                    "house": {
+                        "id": rental.house.id,
+                        "address": rental.house.address,
+                        "type_p": rental.house.type_p,
+                        "num_of_rooms": rental.house.num_of_rooms
+                    },
+                }
+                for rental in rentals
+            ],
+            "complaint_received": [
+                {
+                    "id": comp.id,
+                    "description": comp.description,
+                    "status": comp.status,
+                    "uuid": str(comp.uuid),
+                    "created_at": comp.created_at,
+                }
+                for comp in complaint_received
+            ],
+            "complaints_rental": [
+                {
+                    "id": comp.id,
+                    "description": comp.description,
+                    "status": comp.status,
+                    "created_at": comp.created_at,
+                }
+                for comp in complaints_rental
+            ],
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class IssueViolationAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request):
+        # БЕЗОПАСНОСТЬ: НЕ логируем данные через print()
+        
+        user_id = request.data.get("user_id")
+        reason = request.data.get("reason", "")
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Пользователь не найден"}, status=404)
+
+        UserViolation.objects.create(
+            user=user,
+            issued_by=request.user,
+            reason=reason
+        )
+
+        return Response({"message": "Нарушение назначено"}, status=201)
+
+
+class RemoveBanAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        if not user_id:
+            return Response({"error": "user_id обязателен"}, status=400)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Пользователь не найден"}, status=404)
+
+        # Удаляем из черного списка
+        removed = BlacklistEntry.objects.filter(user=user).delete()
+
+        # Если хочешь, можно также снять все нарушения
+        UserViolation.objects.filter(user=user, active=True).update(active=False)
+
+        return Response({"message": "Блокировка снята"}, status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_apartments(request):
+    """
+    API endpoint для получения квартир пользователя.
+    
+    Возвращает список всех домов/квартир, принадлежащих текущему пользователю.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    houses = House.objects.filter(owner=request.user)
+    return Response(HouseSerializer(houses, many=True).data, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def user_info(request):
+    """
+    API endpoint для получения базовой информации о пользователе.
+    
+    Возвращает минимальную информацию: username и статус суперпользователя.
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    user = request.user
+    return Response({
+        "username": user.username,
+        "is_superuser": user.is_superuser,
+    })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def verification_status(request):
+    """
+    API endpoint для проверки статуса подтверждения email пользователя.
+    
+    Возвращает информацию о том, подтвержден ли email пользователя.
+    - email_confirmed: статус подтверждения email
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    user = request.user
+    # БЕЗОПАСНОСТЬ: НЕ логируем через print()
+    
+    response_data = {
+        "email_confirmed": user.email_confirmed,
+    }
+    
+    return Response(response_data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_identity(request):
+    """
+    API endpoint для подтверждения email пользователя.
+    
+    Помечает email как подтвержденный и отправляет уведомление.
+    Для доступа к странице поиска достаточно подтверждения email.
+    
+    Required fields:
+        - id_document: Файл документа для верификации (опционально)
+    
+    Permissions:
+        - Требуется аутентификация
+    """
+    try:
+        id_doc = request.FILES.get('id_document')
+        # БЕЗОПАСНОСТЬ: НЕ логируем через print() в production
+        
+        with transaction.atomic():
+            request.user.email_confirmed = True
+            request.user.save()
+            # БЕЗОПАСНОСТЬ: НЕ логируем через print()
             
-#             # Создаем запись о верификации, если документ загружен
-#             if id_doc:
-#                 verification, created = IdentityVerification.objects.get_or_create(
-#                     user=request.user,
-#                     defaults={'id_document': id_doc, 'verified': True}
-#                 )
-#                 if not created:
-#                     verification.id_document = id_doc
-#                     verification.verified = True
-#                     verification.save()
-#                 # БЕЗОПАСНОСТЬ: НЕ логируем через print()
+            # Создаем запись о верификации, если документ загружен
+            if id_doc:
+                verification, created = IdentityVerification.objects.get_or_create(
+                    user=request.user,
+                    defaults={'id_document': id_doc, 'verified': True}
+                )
+                if not created:
+                    verification.id_document = id_doc
+                    verification.verified = True
+                    verification.save()
+                # БЕЗОПАСНОСТЬ: НЕ логируем через print()
             
-#             send_mail(
-#                 'Email confirmation successful',
-#                 'Your email has been confirmed successfully. You can now access the search page.',
-#                 settings.DEFAULT_FROM_EMAIL,
-#                 [request.user.email],
-#                 fail_silently=False,
-#             )
-#             return Response({"message": "Email confirmed successfully."}, status=status.HTTP_200_OK)
-#     except IntegrityError:
-#         return Response({"error": "Error occurred during email confirmation."}, status=status.HTTP_400_BAD_REQUEST)
+            send_mail(
+                'Email confirmation successful',
+                'Your email has been confirmed successfully. You can now access the search page.',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=False,
+            )
+            return Response({"message": "Email confirmed successfully."}, status=status.HTTP_200_OK)
+    except IntegrityError:
+        return Response({"error": "Error occurred during email confirmation."}, status=status.HTTP_400_BAD_REQUEST)
 
-# class TenantRegistryView(generics.ListAPIView):
-#     """
-#     API endpoint для реестра арендаторов.
+class TenantRegistryView(generics.ListAPIView):
+    """
+    API endpoint для реестра арендаторов.
     
-#     Возвращает список жалоб, поданных арендодателями на арендаторов.
-#     Поддерживает фильтрацию по поиску и датам.
+    Возвращает список жалоб, поданных арендодателями на арендаторов.
+    Поддерживает фильтрацию по поиску и датам.
     
-#     Query Parameters:
-#         - search: Поиск по username или identifier
-#         - start_date: Начальная дата фильтрации
-#         - end_date: Конечная дата фильтрации
+    Query Parameters:
+        - search: Поиск по username или identifier
+        - start_date: Начальная дата фильтрации
+        - end_date: Конечная дата фильтрации
     
-#     Permissions:
-#         - Требуется аутентификация
-#         - Требуется подтверждение email
-#     """
-#     serializer_class = ComplaintRegistrySerializer
-#     permission_classes = [permissions.IsAuthenticated]
+    Permissions:
+        - Требуется аутентификация
+        - Требуется подтверждение email
+    """
+    serializer_class = ComplaintRegistrySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-#     def get_queryset(self):
-#         user = self.request.user
+    def get_queryset(self):
+        user = self.request.user
 
-#         # Проверка подтверждения почты
-#         if not user.email_confirmed:
-#             raise PermissionDenied("Требуется подтверждение почты для доступа.")
+        # Проверка подтверждения почты
+        if not user.email_confirmed:
+            raise PermissionDenied("Требуется подтверждение почты для доступа.")
 
-#         # Базовый фильтр: жалобы, где арендодатель подал жалобу на арендатора
-#         queryset = RentalComplaint.objects.filter(
-#             complainant__role='landlord',
-#             accused__role='tenant'
-#         )
+        # Базовый фильтр: жалобы, где арендодатель подал жалобу на арендатора
+        queryset = RentalComplaint.objects.filter(
+            complainant__role='landlord',
+            accused__role='tenant'
+        )
 
-#         # Поисковый запрос (по username и iin)
-#         search_query = self.request.query_params.get('search')
+        # Поисковый запрос (по username и iin)
+        search_query = self.request.query_params.get('search')
 
-#         if search_query:
-#             queryset = queryset.filter(
-#                 Q(accused__username__icontains=search_query) |
-#                 Q(accused__identifier__icontains=search_query)
-#             )
-#         # Фильтр по дате
-#         start_date = self.request.query_params.get('start_date')
-#         end_date = self.request.query_params.get('end_date')
+        if search_query:
+            queryset = queryset.filter(
+                Q(accused__username__icontains=search_query) |
+                Q(accused__identifier__icontains=search_query)
+            )
+        # Фильтр по дате
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
 
-#         if start_date and end_date:
-#             queryset = queryset.filter(created_at__range=[start_date, end_date])
+        if start_date and end_date:
+            queryset = queryset.filter(created_at__range=[start_date, end_date])
 
-#         # БЕЗОПАСНОСТЬ: НЕ логируем через print()
+        # БЕЗОПАСНОСТЬ: НЕ логируем через print()
 
-#         return queryset
+        return queryset
 
 
 
-# class TenantRegistryView1(ListAPIView):
-#     """
-#     API endpoint для расширенного реестра арендаторов.
+class TenantRegistryView1(ListAPIView):
+    """
+    API endpoint для расширенного реестра арендаторов.
     
-#     Возвращает список арендаторов с фильтрацией по различным критериям:
-#     - По адресу дома
-#     - По court_decision_score
-#     - По причинам жалоб
-#     - По датам
-#     - Поиск по username/identifier
+    Возвращает список арендаторов с фильтрацией по различным критериям:
+    - По адресу дома
+    - По court_decision_score
+    - По причинам жалоб
+    - По датам
+    - Поиск по username/identifier
     
-#     Query Parameters:
-#         - address: Фильтр по адресу дома
-#         - court_decision_score: Фильтр по court_decision_score
-#         - reasons: Фильтр по причинам жалоб (через запятую)
-#         - search: Поиск по username или identifier
-#         - start_date: Начальная дата
-#         - end_date: Конечная дата
+    Query Parameters:
+        - address: Фильтр по адресу дома
+        - court_decision_score: Фильтр по court_decision_score
+        - reasons: Фильтр по причинам жалоб (через запятую)
+        - search: Поиск по username или identifier
+        - start_date: Начальная дата
+        - end_date: Конечная дата
     
-#     Permissions:
-#         - Требуется аутентификация
-#         - Требуется подтверждение email
-#     """
-#     serializer_class = CustomUserSerializer
-#     permission_classes = [permissions.IsAuthenticated]
+    Permissions:
+        - Требуется аутентификация
+        - Требуется подтверждение email
+    """
+    serializer_class = CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-#     def get_queryset(self):
-#         user = self.request.user
+    def get_queryset(self):
+        user = self.request.user
 
-#         if not user.email_confirmed:
-#             raise PermissionDenied("Требуется подтверждение почты для доступа.")
+        if not user.email_confirmed:
+            raise PermissionDenied("Требуется подтверждение почты для доступа.")
 
-#         queryset = CustomUser.objects.filter(role='tenant')
+        queryset = CustomUser.objects.filter(role='tenant')
 
-#         # Фильтрация по адресу дома
-#         address = self.request.query_params.get('address')
-#         if address:
-#             queryset = queryset.filter(rentals__house__address__icontains=address)
+        # Фильтрация по адресу дома
+        address = self.request.query_params.get('address')
+        if address:
+            queryset = queryset.filter(rentals__house__address__icontains=address)
 
-#         # Фильтрация по court_score и причинам — временно сохраняем для фильтрации пользователей
-#         court_score_filter = self.request.query_params.get('court_decision_score')
-#         reasons_filter = self.request.query_params.get('reasons')
+        # Фильтрация по court_score и причинам — временно сохраняем для фильтрации пользователей
+        court_score_filter = self.request.query_params.get('court_decision_score')
+        reasons_filter = self.request.query_params.get('reasons')
 
-#         # Отдельный queryset пользователей, удовлетворяющих фильтрам по жалобам
-#         if court_score_filter or reasons_filter:
-#             # Пользователи, у которых есть жалобы с заданными court_score или reasons
-#             complaint_filter = Q()
+        # Отдельный queryset пользователей, удовлетворяющих фильтрам по жалобам
+        if court_score_filter or reasons_filter:
+            # Пользователи, у которых есть жалобы с заданными court_score или reasons
+            complaint_filter = Q()
 
-#             if court_score_filter:
-#                 complaint_filter &= Q(received_rental_complaints__court_decision_score__startswith=court_score_filter)
-#             if reasons_filter:
-#                 reason_ids = [int(r) for r in reasons_filter.split(',') if r.isdigit()]
-#                 if reason_ids:
-#                     complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
+            if court_score_filter:
+                complaint_filter &= Q(received_rental_complaints__court_decision_score__startswith=court_score_filter)
+            if reasons_filter:
+                reason_ids = [int(r) for r in reasons_filter.split(',') if r.isdigit()]
+                if reason_ids:
+                    complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
 
-#             # Получаем пользователей с этими жалобами
-#             filtered_user_ids = CustomUser.objects.filter(role='tenant').filter(complaint_filter).values_list('id', flat=True).distinct()
+            # Получаем пользователей с этими жалобами
+            filtered_user_ids = CustomUser.objects.filter(role='tenant').filter(complaint_filter).values_list('id', flat=True).distinct()
 
-#             queryset = queryset.filter(id__in=filtered_user_ids)
+            queryset = queryset.filter(id__in=filtered_user_ids)
 
-#         # Далее фильтрация по search и дате (если есть)
-#         search_query = self.request.query_params.get('search')
-#         if search_query:
-#             queryset = queryset.filter(
-#                 Q(username__icontains=search_query) |
-#                 Q(identifier__icontains=search_query)
-#             )
+        # Далее фильтрация по search и дате (если есть)
+        search_query = self.request.query_params.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(username__icontains=search_query) |
+                Q(identifier__icontains=search_query)
+            )
 
-#         start_date_str = self.request.query_params.get('start_date')
-#         end_date_str = self.request.query_params.get('end_date')
-#         if start_date_str and end_date_str:
-#             start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-#             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-#             start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
-#             end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
-#             queryset = queryset.filter(r_date__range=[start_date, end_date])
+        start_date_str = self.request.query_params.get('start_date')
+        end_date_str = self.request.query_params.get('end_date')
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
+            end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
+            queryset = queryset.filter(r_date__range=[start_date, end_date])
 
-#         # Теперь аннотируем complaint_count по ВСЕМ жалобам с status='reviewed' без учета фильтров по причинам и court_score
-#         queryset = queryset.annotate(
-#             complaint_count=Count(
-#                 'received_rental_complaints',
-#                 filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
-#             )
-#         ).filter(complaint_count__gt=0)  # Оставляем только с жалобами
+        # Теперь аннотируем complaint_count по ВСЕМ жалобам с status='reviewed' без учета фильтров по причинам и court_score
+        queryset = queryset.annotate(
+            complaint_count=Count(
+                'received_rental_complaints',
+                filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
+            )
+        ).filter(complaint_count__gt=0)  # Оставляем только с жалобами
 
-#         return queryset
+        return queryset
 
 
 
-# class TenantRegistryView2(ListAPIView):
-#     """
-#     API endpoint для реестра арендодателей.
+class TenantRegistryView2(ListAPIView):
+    """
+    API endpoint для реестра арендодателей.
     
-#     Аналогичен TenantRegistryView1, но для арендодателей.
-#     Возвращает список арендодателей с фильтрацией по различным критериям.
+    Аналогичен TenantRegistryView1, но для арендодателей.
+    Возвращает список арендодателей с фильтрацией по различным критериям.
     
-#     Query Parameters:
-#         - address: Фильтр по адресу дома
-#         - court_decision_score: Фильтр по court_decision_score
-#         - reasons: Фильтр по причинам жалоб (через запятую)
-#         - search: Поиск по username или identifier
-#         - start_date: Начальная дата
-#         - end_date: Конечная дата
+    Query Parameters:
+        - address: Фильтр по адресу дома
+        - court_decision_score: Фильтр по court_decision_score
+        - reasons: Фильтр по причинам жалоб (через запятую)
+        - search: Поиск по username или identifier
+        - start_date: Начальная дата
+        - end_date: Конечная дата
     
-#     Permissions:
-#         - Требуется аутентификация
-#         - Требуется подтверждение email
-#     """
-#     serializer_class = CustomUserSerializer
-#     permission_classes = [permissions.IsAuthenticated]
+    Permissions:
+        - Требуется аутентификация
+        - Требуется подтверждение email
+    """
+    serializer_class = CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-#     def get_queryset(self):
-#         user = self.request.user
+    def get_queryset(self):
+        user = self.request.user
 
-#         if not user.email_confirmed:
-#             raise PermissionDenied("Требуется подтверждение почты для доступа.")
+        if not user.email_confirmed:
+            raise PermissionDenied("Требуется подтверждение почты для доступа.")
 
-#         queryset = CustomUser.objects.filter(role='landlord')
+        queryset = CustomUser.objects.filter(role='landlord')
 
-#         address = self.request.query_params.get('address')
-#         if address:
-#             queryset = queryset.filter(rentals__house__address__icontains=address)
+        address = self.request.query_params.get('address')
+        if address:
+            queryset = queryset.filter(rentals__house__address__icontains=address)
 
-#         court_score_filter = self.request.query_params.get('court_decision_score')
-#         reasons_filter = self.request.query_params.get('reasons')
+        court_score_filter = self.request.query_params.get('court_decision_score')
+        reasons_filter = self.request.query_params.get('reasons')
 
-#         if court_score_filter or reasons_filter:
-#             complaint_filter = Q()
-#             if court_score_filter:
-#                 complaint_filter &= Q(received_rental_complaints__court_decision_score__startswith=court_score_filter)
-#             if reasons_filter:
-#                 reason_ids = [int(r) for r in reasons_filter.split(',') if r.isdigit()]
-#                 if reason_ids:
-#                     complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
+        if court_score_filter or reasons_filter:
+            complaint_filter = Q()
+            if court_score_filter:
+                complaint_filter &= Q(received_rental_complaints__court_decision_score__startswith=court_score_filter)
+            if reasons_filter:
+                reason_ids = [int(r) for r in reasons_filter.split(',') if r.isdigit()]
+                if reason_ids:
+                    complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
 
-#             filtered_user_ids = CustomUser.objects.filter(role='landlord').filter(complaint_filter).values_list('id', flat=True).distinct()
-#             queryset = queryset.filter(id__in=filtered_user_ids)
+            filtered_user_ids = CustomUser.objects.filter(role='landlord').filter(complaint_filter).values_list('id', flat=True).distinct()
+            queryset = queryset.filter(id__in=filtered_user_ids)
 
-#         search_query = self.request.query_params.get('search')
-#         if search_query:
-#             queryset = queryset.filter(
-#                 Q(username__icontains=search_query) |
-#                 Q(identifier__icontains=search_query)
-#             )
+        search_query = self.request.query_params.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(username__icontains=search_query) |
+                Q(identifier__icontains=search_query)
+            )
 
-#         start_date_str = self.request.query_params.get('start_date')
-#         end_date_str = self.request.query_params.get('end_date')
-#         if start_date_str and end_date_str:
-#             start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-#             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-#             start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
-#             end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
-#             queryset = queryset.filter(r_date__range=[start_date, end_date])
+        start_date_str = self.request.query_params.get('start_date')
+        end_date_str = self.request.query_params.get('end_date')
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
+            end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
+            queryset = queryset.filter(r_date__range=[start_date, end_date])
 
-#         queryset = queryset.annotate(
-#             complaint_count=Count(
-#                 'received_rental_complaints',
-#                 filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
-#             )
-#         ).filter(complaint_count__gt=0)
+        queryset = queryset.annotate(
+            complaint_count=Count(
+                'received_rental_complaints',
+                filter=Q(received_rental_complaints__accused=F('id'), received_rental_complaints__status='reviewed')
+            )
+        ).filter(complaint_count__gt=0)
 
-#         return queryset
+        return queryset
     
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def regenerate_anonymous_name(request):
-#     """Генерирует новое анонимное имя для текущего пользователя"""
-#     try:
-#         user = request.user
-#         old_name = user.anonymous_name
-#         user.anonymous_name = generate_anonymous_name()
-#         user.save()
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def regenerate_anonymous_name(request):
+    """Генерирует новое анонимное имя для текущего пользователя"""
+    try:
+        user = request.user
+        old_name = user.anonymous_name
+        user.anonymous_name = generate_anonymous_name()
+        user.save()
         
-#         return Response({
-#             'success': True,
-#             'anonymous_name': user.anonymous_name,
-#             'old_anonymous_name': old_name,
-#             'message': 'Анонимное имя успешно обновлено'
-#         })
-#     except Exception as e:
-#         return Response({
-#             'success': False,
-#             'error': str(e)
-#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({
+            'success': True,
+            'anonymous_name': user.anonymous_name,
+            'old_anonymous_name': old_name,
+            'message': 'Анонимное имя успешно обновлено'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def get_anonymous_name(request):
-#     """Получает текущее анонимное имя пользователя"""
-#     try:
-#         user = request.user
-#         return Response({
-#             'anonymous_name': user.anonymous_name,
-#             'username': user.username,
-#             'has_anonymous_name': bool(user.anonymous_name)
-#         })
-#     except Exception as e:
-#         return Response({
-#             'error': str(e)
-#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_anonymous_name(request):
+    """Получает текущее анонимное имя пользователя"""
+    try:
+        user = request.user
+        return Response({
+            'anonymous_name': user.anonymous_name,
+            'username': user.username,
+            'has_anonymous_name': bool(user.anonymous_name)
+        })
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-# # views/comment.py
-# from rest_framework import generics, permissions
-# from ..models import UserComment
-# from ..serializers import UserCommentSerializer
+# views/comment.py
+from rest_framework import generics, permissions
+from ..models import UserComment
+from ..serializers import UserCommentSerializer
 
-# from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-# class UserCommentListCreateAPIView(generics.ListCreateAPIView):
-#     serializer_class = UserCommentSerializer
+class UserCommentListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = UserCommentSerializer
 
-#     def get_permissions(self):
-#         if self.request.method == "GET":
-#             return [AllowAny()]  # 👈 Публичный просмотр комментариев
-#         return [IsAuthenticated()]  # 👈 Только авторизованные могут писать
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]  # 👈 Публичный просмотр комментариев
+        return [IsAuthenticated()]  # 👈 Только авторизованные могут писать
 
-#     def get_queryset(self):
-#         target_username = self.request.query_params.get("target_user")
-#         if target_username:
-#             return UserComment.objects.filter(
-#                 target_user__username=target_username
-#             ).order_by("-created_at")
-#         return UserComment.objects.none()
+    def get_queryset(self):
+        target_username = self.request.query_params.get("target_user")
+        if target_username:
+            return UserComment.objects.filter(
+                target_user__username=target_username
+            ).order_by("-created_at")
+        return UserComment.objects.none()
 
-#     def perform_create(self, serializer):
-#         serializer.save(author=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 
-# class UserCommentDetailAPIView(generics.RetrieveDestroyAPIView):
-#     queryset = UserComment.objects.all()
-#     serializer_class = UserCommentSerializer
+class UserCommentDetailAPIView(generics.RetrieveDestroyAPIView):
+    queryset = UserComment.objects.all()
+    serializer_class = UserCommentSerializer
