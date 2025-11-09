@@ -93,8 +93,9 @@ volumes:
     driver: local
   backend_static_test:
     driver: local
-  backend_media_test:
+  test_backend_media_test:
     driver: local
+    name: test_backend_media_test
 
 networks:
   jmsad-network:
