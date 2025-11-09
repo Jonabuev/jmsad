@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Скрипт для управления JMSAD Production
-# Использует dc.prod.yml
+# Скрипт для управления JMSAD Test
+# Использует dc.test.yml
 
 set -e
 
@@ -9,7 +9,7 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="dc.test.yml"
 ENV_FILE=".env"
 
-echo "🚀 JMSAD Production Management Script"
+echo "🧪 JMSAD Test Management Script"
 echo "📂 Project directory: $PROJECT_DIR"
 
 # Цвета для вывода
@@ -18,13 +18,31 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Приведение пользовательских названий сервисов к реальным именам docker-compose
+normalize_service_name() {
+    case "$1" in
+        backend|backend_test)
+            echo "backend_test"
+            ;;
+        frontend|frontend_test)
+            echo "frontend_test"
+            ;;
+        postgres|db|postgres_test)
+            echo "postgres_test"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
 # --- Проверка статуса ---
 check_status() {
-    echo -e "${YELLOW}📊 Checking production containers...${NC}"
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_(backend_prod|frontend_prod|postgres_prod|redis)"
+    echo -e "${YELLOW}📊 Checking test containers...${NC}"
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "jmsad_(backend_test|frontend_test|postgres_test)"
     echo ""
     echo -e "${YELLOW}💾 Database status:${NC}"
-    docker exec jmsad_postgres_prod pg_isready -U ${DB_USER:-jmsad_user} || echo "Database not ready"
+    docker exec jmsad_postgres_test pg_isready -U ${DB_USER:-jmsad_user_test} -d ${DB_NAME:-jmsad_db_test} || echo "Database not ready"
     echo ""
     echo -e "${YELLOW}📋 Recent logs:${NC}"
     docker compose -f $COMPOSE_FILE logs --tail=10
@@ -32,7 +50,7 @@ check_status() {
 
 # --- Запуск ---
 start_app() {
-    echo -e "${GREEN}🚀 Starting JMSAD Production...${NC}"
+    echo -e "${GREEN}🚀 Starting JMSAD Test...${NC}"
     
     # Проверка .env файла
     if [ ! -f "$ENV_FILE" ]; then
@@ -51,26 +69,26 @@ start_app() {
     
     # Миграции
     echo "⚙️ Applying Django migrations..."
-    docker exec jmsad_backend_prod python manage.py migrate --noinput || echo "Migration failed"
+    docker exec jmsad_backend_test python manage.py migrate --noinput || echo "Migration failed"
     
     # Сбор статики
     echo "📦 Collecting static files..."
-    docker exec jmsad_backend_prod python manage.py collectstatic --noinput || echo "Collectstatic failed"
+    docker exec jmsad_backend_test python manage.py collectstatic --noinput || echo "Collectstatic failed"
     
-    echo -e "${GREEN}✅ JMSAD Production started!${NC}"
+    echo -e "${GREEN}✅ JMSAD Test started!${NC}"
     check_status
 }
 
 # --- Остановка ---
 stop_app() {
-    echo -e "${YELLOW}🛑 Stopping JMSAD Production...${NC}"
+    echo -e "${YELLOW}🛑 Stopping JMSAD Test...${NC}"
     docker compose -f $COMPOSE_FILE down
-    echo -e "${GREEN}✅ JMSAD Production stopped!${NC}"
+    echo -e "${GREEN}✅ JMSAD Test stopped!${NC}"
 }
 
 # --- Перезапуск ---
 restart_app() {
-    echo -e "${YELLOW}🔄 Restarting JMSAD Production...${NC}"
+    echo -e "${YELLOW}🔄 Restarting JMSAD Test...${NC}"
     stop_app
     sleep 3
     start_app
@@ -80,17 +98,23 @@ restart_app() {
 show_logs() {
     SERVICE="${2:-}"
     if [ -z "$SERVICE" ]; then
-        echo "📋 All production logs (Ctrl+C to exit)..."
+        echo "📋 All test logs (Ctrl+C to exit)..."
         docker compose -f $COMPOSE_FILE logs -f
     else
+        NORMALIZED_SERVICE="$(normalize_service_name "$SERVICE")"
+        if [ -z "$NORMALIZED_SERVICE" ]; then
+            echo -e "${RED}❌ Unknown service: $SERVICE${NC}"
+            echo "Available: backend(_test), frontend(_test), postgres(_test)"
+            exit 1
+        fi
         echo "📋 Logs for $SERVICE (Ctrl+C to exit)..."
-        docker compose -f $COMPOSE_FILE logs -f $SERVICE
+        docker compose -f $COMPOSE_FILE logs -f $NORMALIZED_SERVICE
     fi
 }
 
 # --- Обновление с пересборкой ---
 update_app() {
-    echo -e "${YELLOW}📦 Updating JMSAD Production...${NC}"
+    echo -e "${YELLOW}📦 Updating JMSAD Test...${NC}"
     
     # Backup перед обновлением
     echo "💾 Creating backup before update..."
@@ -104,25 +128,25 @@ update_app() {
     
     # Миграции
     echo "⚙️ Running migrations..."
-    docker exec jmsad_backend_prod python manage.py migrate --noinput
+    docker exec jmsad_backend_test python manage.py migrate --noinput
     
     # Статика
     echo "📦 Collecting static..."
-    docker exec jmsad_backend_prod python manage.py collectstatic --noinput
+    docker exec jmsad_backend_test python manage.py collectstatic --noinput
     
-    echo -e "${GREEN}✅ JMSAD Production updated!${NC}"
+    echo -e "${GREEN}✅ JMSAD Test updated!${NC}"
     check_status
 }
 
 # --- Пересборка backend ---
 rebuild_backend() {
-    echo -e "${YELLOW}🔨 Rebuilding production backend...${NC}"
-    docker compose -f $COMPOSE_FILE stop backend
-    docker compose -f $COMPOSE_FILE build --no-cache backend
-    docker compose -f $COMPOSE_FILE --env-file $ENV_FILE up -d backend
+    echo -e "${YELLOW}🔨 Rebuilding test backend...${NC}"
+    docker compose -f $COMPOSE_FILE stop backend_test
+    docker compose -f $COMPOSE_FILE build --no-cache backend_test
+    docker compose -f $COMPOSE_FILE --env-file $ENV_FILE up -d backend_test
     
     echo "⚙️ Running migrations..."
-    docker exec jmsad_backend_prod python manage.py migrate --noinput
+    docker exec jmsad_backend_test python manage.py migrate --noinput
     
     echo -e "${GREEN}✅ Backend rebuilt!${NC}"
     check_status
@@ -130,10 +154,10 @@ rebuild_backend() {
 
 # --- Пересборка frontend ---
 rebuild_frontend() {
-    echo -e "${YELLOW}🔨 Rebuilding production frontend...${NC}"
-    docker compose -f $COMPOSE_FILE stop frontend
-    docker compose -f $COMPOSE_FILE build --no-cache frontend
-    docker compose -f $COMPOSE_FILE --env-file $ENV_FILE up -d frontend
+    echo -e "${YELLOW}🔨 Rebuilding test frontend...${NC}"
+    docker compose -f $COMPOSE_FILE stop frontend_test
+    docker compose -f $COMPOSE_FILE build --no-cache frontend_test
+    docker compose -f $COMPOSE_FILE --env-file $ENV_FILE up -d frontend_test
     
     echo -e "${GREEN}✅ Frontend rebuilt!${NC}"
     check_status
@@ -143,24 +167,31 @@ rebuild_frontend() {
 restart_service() {
     SERVICE="$2"
     if [ -z "$SERVICE" ]; then
-        echo -e "${RED}❌ Please specify service: backend, frontend, postgres, redis${NC}"
+        echo -e "${RED}❌ Please specify service: backend(_test), frontend(_test), postgres(_test)${NC}"
         exit 1
     fi
     
-    echo -e "${YELLOW}🔄 Restarting $SERVICE...${NC}"
-    docker compose -f $COMPOSE_FILE restart $SERVICE
-    echo -e "${GREEN}✅ $SERVICE restarted!${NC}"
+    TARGET_SERVICE="$(normalize_service_name "$SERVICE")"
+    if [ -z "$TARGET_SERVICE" ]; then
+        echo -e "${RED}❌ Unknown service: $SERVICE${NC}"
+        echo "Available: backend(_test), frontend(_test), postgres(_test)"
+        exit 1
+    fi
+
+    echo -e "${YELLOW}🔄 Restarting $TARGET_SERVICE...${NC}"
+    docker compose -f $COMPOSE_FILE restart $TARGET_SERVICE
+    echo -e "${GREEN}✅ $TARGET_SERVICE restarted!${NC}"
 }
 
 # --- Backup базы данных ---
 backup_db() {
-    echo -e "${YELLOW}💾 Creating production database backup...${NC}"
+    echo -e "${YELLOW}💾 Creating test database backup...${NC}"
     BACKUP_DIR="backups"
-    BACKUP_FILE="$BACKUP_DIR/prod_backup_$(date +%Y%m%d_%H%M%S).sql"
+    BACKUP_FILE="$BACKUP_DIR/test_backup_$(date +%Y%m%d_%H%M%S).sql"
     
     mkdir -p $BACKUP_DIR
     
-    docker exec jmsad_postgres_prod pg_dump -U ${DB_USER:-jmsad_user} ${DB_NAME:-jmsad_db} > "$BACKUP_FILE"
+    docker exec jmsad_postgres_test pg_dump -U ${DB_USER:-jmsad_user_test} ${DB_NAME:-jmsad_db_test} > "$BACKUP_FILE"
     
     # Сжатие
     gzip "$BACKUP_FILE"
@@ -168,7 +199,7 @@ backup_db() {
     echo -e "${GREEN}✅ Backup created: ${BACKUP_FILE}.gz${NC}"
     
     # Удаление старых бэкапов (старше 30 дней)
-    find $BACKUP_DIR -name "prod_backup_*.sql.gz" -mtime +30 -delete
+    find $BACKUP_DIR -name "test_backup_*.sql.gz" -mtime +30 -delete
     echo "🧹 Old backups cleaned (>30 days)"
 }
 
@@ -178,7 +209,7 @@ restore_db() {
     
     if [ -z "$BACKUP_FILE" ]; then
         echo -e "${RED}❌ Please specify backup file${NC}"
-        echo "Usage: $0 restore backups/prod_backup_YYYYMMDD_HHMMSS.sql.gz"
+        echo "Usage: $0 restore backups/test_backup_YYYYMMDD_HHMMSS.sql.gz"
         exit 1
     fi
     
@@ -187,7 +218,7 @@ restore_db() {
         exit 1
     fi
     
-    echo -e "${YELLOW}⚠️  WARNING: This will overwrite production database!${NC}"
+    echo -e "${YELLOW}⚠️  WARNING: This will overwrite test database!${NC}"
     read -p "Are you sure? (yes/no): " confirm
     
     if [ "$confirm" != "yes" ]; then
@@ -199,9 +230,9 @@ restore_db() {
     
     # Распаковка если .gz
     if [[ "$BACKUP_FILE" == *.gz ]]; then
-        gunzip -c "$BACKUP_FILE" | docker exec -i jmsad_postgres_prod psql -U ${DB_USER:-jmsad_user} ${DB_NAME:-jmsad_db}
+        gunzip -c "$BACKUP_FILE" | docker exec -i jmsad_postgres_test psql -U ${DB_USER:-jmsad_user_test} ${DB_NAME:-jmsad_db_test}
     else
-        docker exec -i jmsad_postgres_prod psql -U ${DB_USER:-jmsad_user} ${DB_NAME:-jmsad_db} < "$BACKUP_FILE"
+        docker exec -i jmsad_postgres_test psql -U ${DB_USER:-jmsad_user_test} ${DB_NAME:-jmsad_db_test} < "$BACKUP_FILE"
     fi
     
     echo -e "${GREEN}✅ Database restored!${NC}"
@@ -210,12 +241,12 @@ restore_db() {
 # --- Django команды ---
 django_shell() {
     echo "🐍 Opening Django shell..."
-    docker exec -it jmsad_backend_prod python manage.py shell
+    docker exec -it jmsad_backend_test python manage.py shell
 }
 
 django_createsuperuser() {
     echo "👤 Creating Django superuser..."
-    docker exec -it jmsad_backend_prod python manage.py createsuperuser
+    docker exec -it jmsad_backend_test python manage.py createsuperuser
 }
 
 django_command() {
@@ -227,13 +258,13 @@ django_command() {
     fi
     
     echo "⚙️ Running: python manage.py $COMMAND"
-    docker exec -it jmsad_backend_prod python manage.py $COMMAND
+    docker exec -it jmsad_backend_test python manage.py $COMMAND
 }
 
 # --- Мониторинг ---
 monitor() {
-    echo "📊 Monitoring production resources (Ctrl+C to exit)..."
-    watch -n 2 'docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" | grep -E "jmsad_(backend_prod|frontend_prod|postgres_prod|redis)"'
+    echo "📊 Monitoring test resources (Ctrl+C to exit)..."
+    watch -n 2 'docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" | grep -E "jmsad_(backend_test|frontend_test|postgres_test)"'
 }
 
 # --- Очистка ---
@@ -246,7 +277,7 @@ cleanup() {
 
 # --- Health check ---
 health_check() {
-    echo -e "${YELLOW}🏥 Running health checks...${NC}"
+    echo -e "${YELLOW}🏥 Running test health checks...${NC}"
     
     # Backend
     echo "Checking backend..."
@@ -268,18 +299,10 @@ health_check() {
     
     # Database
     echo "Checking database..."
-    if docker exec jmsad_postgres_prod pg_isready -U ${DB_USER:-jmsad_user} > /dev/null 2>&1; then
+    if docker exec jmsad_postgres_test pg_isready -U ${DB_USER:-jmsad_user_test} -d ${DB_NAME:-jmsad_db_test} > /dev/null 2>&1; then
         echo -e "${GREEN}✅ Database: OK${NC}"
     else
         echo -e "${RED}❌ Database: FAILED${NC}"
-    fi
-    
-    # Redis
-    echo "Checking Redis..."
-    if docker exec jmsad_redis_prod redis-cli ping > /dev/null 2>&1; then
-        echo -e "${GREEN}✅ Redis: OK${NC}"
-    else
-        echo -e "${RED}❌ Redis: FAILED${NC}"
     fi
 }
 
@@ -337,12 +360,12 @@ case "${1:-help}" in
         cleanup
         ;;
     help|*)
-        echo "📋 JMSAD Production Management Commands:"
+        echo "📋 JMSAD Test Management Commands:"
         echo ""
-        echo "  ${GREEN}start${NC}                    - Start production environment"
-        echo "  ${GREEN}stop${NC}                     - Stop all production containers"
-        echo "  ${GREEN}restart${NC}                  - Restart all containers"
-        echo "  ${GREEN}restart-service SERVICE${NC}  - Restart specific service (backend/frontend/postgres/redis)"
+        echo "  ${GREEN}start${NC}                    - Start test environment"
+        echo "  ${GREEN}stop${NC}                     - Stop all test containers"
+        echo "  ${GREEN}restart${NC}                  - Restart all test containers"
+        echo "  ${GREEN}restart-service SERVICE${NC}  - Restart specific service (backend[_test]/frontend[_test]/postgres[_test])"
         echo "  ${GREEN}status${NC}                   - Show container status"
         echo "  ${GREEN}logs [SERVICE]${NC}           - Show logs (all or specific service)"
         echo "  ${GREEN}update${NC}                   - Pull, rebuild and restart (with backup)"
@@ -362,7 +385,7 @@ case "${1:-help}" in
         echo "  $0 logs backend"
         echo "  $0 restart-service frontend"
         echo "  $0 backup"
-        echo "  $0 restore backups/prod_backup_20250108_120000.sql.gz"
+        echo "  $0 restore backups/test_backup_20250108_120000.sql.gz"
         echo "  $0 django 'makemigrations'"
         ;;
 esac
