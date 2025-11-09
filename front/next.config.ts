@@ -37,6 +37,13 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '/**',
       },
+      // Тестовый адрес
+      {
+        protocol: 'https',
+        hostname: 'api.dev.arno.kz',
+        port: '',
+        pathname: '/**',
+      },
       // Продакшн адреса
       {
         protocol: 'https',
@@ -58,26 +65,21 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // unoptimized: false, // ✅ Оптимизация включена (по умолчанию)
   },
   i18n, // 👈 подключение локалей
   transpilePackages: ['antd', '@ant-design/icons'],
   eslint: {
-    // ⏳ Временно отключено для сборки (TODO: исправить ~50 ошибок)
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // ⏳ Временно отключено для сборки (TODO: исправить ~50 ошибок)
     ignoreBuildErrors: true,
   },
   publicRuntimeConfig: {
     googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
   },
-  
-  // ✅ Оптимизация: удаление console.* в продакшене через compiler
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'], // Оставляем только error и warn
+      exclude: ['error', 'warn'],
     } : false,
   },
 };
