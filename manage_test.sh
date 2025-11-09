@@ -7,7 +7,7 @@ set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="dc.test.yml"
-ENV_FILE=".env"
+ENV_FILE=".env.test"
 
 echo "🧪 JMSAD Test Management Script"
 echo "📂 Project directory: $PROJECT_DIR"

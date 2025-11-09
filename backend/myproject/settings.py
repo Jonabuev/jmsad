@@ -280,6 +280,7 @@ LANGUAGES = [
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = config('STATIC_ROOT', default=str(BASE_DIR / 'staticfiles'))
 
 # Настройки для правильной работы с файлами
 FILE_UPLOAD_HANDLERS = [
@@ -345,7 +346,7 @@ FCM_PRIVATE_KEY = config('FCM_PRIVATE_KEY', default='')
 FCM_CLIENT_EMAIL = config('FCM_CLIENT_EMAIL', default='')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = config('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
 
 # Прод безопасность (за прокси/Nginx с HTTPS)
 SECURE_SSL_REDIRECT = False
