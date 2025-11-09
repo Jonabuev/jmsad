@@ -44,8 +44,8 @@ from .views.fcm_views import (
 from .views.file_access import serve_protected_file, serve_complaint_image
 from .views.gdpr import request_data_deletion, export_user_data, gdpr_info
 
-# from django.conf import settings
-# from django.conf.urls.static import static
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # Получение токенов
