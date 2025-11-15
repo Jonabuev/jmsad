@@ -21,7 +21,7 @@ class CustomUserCreationForm(UserCreationForm):
             'password1', 'password2'
         )
 
-    role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, label="Role", widget=forms.Select(attrs={'class': 'form-control'}))
+    # role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, label="Role", widget=forms.Select(attrs={'class': 'form-control'}))
     phone_number = forms.CharField(max_length=15, required=False, label="Phone Number", widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
     identifier = forms.CharField(max_length=15, required=False, label="Identifier", widget=forms.TextInput(attrs={'class': 'form-control'}))

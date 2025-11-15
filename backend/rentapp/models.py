@@ -20,10 +20,10 @@ def user_avatar_upload_path(instance, filename):
     return os.path.join('avatars', user_id, filename)
 
 class CustomUser(AbstractUser):
-    ROLE_CHOICES = (
-        ('landlord', 'Landlord'),
-        ('tenant', 'Tenant'),
-    )
+    # ROLE_CHOICES = (
+    #     ('landlord', 'Landlord'),
+    #     ('tenant', 'Tenant'),
+    # )
     type_chose = (
         ('individual', 'Individual'),
         ('legal_entity', 'Legal Entity'),
@@ -330,7 +330,7 @@ class CustomUser(AbstractUser):
     visa_number = models.CharField(max_length=50, null=True, blank=True)
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPES, blank=True, null=True)
     username = models.CharField(max_length=150, unique=True, validators=[RegexValidator(r'^[\w\s]+$', 'Username can contain letters, numbers, and spaces only.')])
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, null=True, blank=True, default="user")
     thirdname = models.CharField(max_length=20, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)  
     email_confirmed = models.BooleanField(default=False)
