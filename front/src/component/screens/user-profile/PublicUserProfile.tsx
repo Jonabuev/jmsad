@@ -270,14 +270,6 @@ const PublicUserProfile: FC = () => {
                     <span>{profileData.identifier || t("profile.noIIN")}</span>
                   </div>
                 </div>
-                <div className={styles.userBadges}>
-                  <div className={styles.badge}>
-                    <svg className={styles.badgeIcon} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                    {profileData.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -394,22 +386,6 @@ const PublicUserProfile: FC = () => {
                       <div>
                         <p className={styles.infoLabel}>{t("profile.username")}</p>
                         <p className={styles.infoValue}>{profileData.username}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.infoCard}>
-                    <div className={styles.infoCardHeader}>
-                      <div className={`${styles.infoIcon} ${styles.infoIconGreen}`}>
-                        <svg className={styles.infoIconSvg} fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className={styles.infoLabel}>{t("profile.role")}</p>
-                        <p className={styles.infoValue}>
-                          {profileData.role === "landlord" ? t("profile.landlord") : t("profile.tenant")}
-                        </p>
                       </div>
                     </div>
                   </div>
