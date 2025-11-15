@@ -21,7 +21,7 @@ interface IComplaintReason {
 const TenantRegistry: React.FC = () => {
   const { t } = useTranslation("common");
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const [activeTab, setActiveTab] = useState<"tenants" | "landlords">("tenants");
+  // const [activeTab, setActiveTab] = useState<"tenants" | "landlords">("tenants");
   const [searchQuery, setSearchQuery] = useState("");
   const [fullName, setFullName] = useState("");
   const [iin, setIin] = useState("");
@@ -99,15 +99,15 @@ const TenantRegistry: React.FC = () => {
         }
         const locale = router.locale || 'ru';
         // Запрашиваем причины с фильтрацией по типу на бэкенде
-        const type = activeTab === "tenants" ? "tenant" : "landlord";
-        const res = await fetchComplaintReasons(locale, type);
+        // const type = activeTab === "tenants" ? "tenant" : "landlord";
+        const res = await fetchComplaintReasons(locale);
         setReasons(res.data);
       } catch (error) {
         console.error("Ошибка загрузки причин жалоб:", error);
       }
     };
     fetchReasons();
-  }, [activeTab, router.locale]);
+  }, [router.locale]);
 
   const toggleReason = (id: number) => {
     setSelectedReasons((prev) =>
@@ -142,16 +142,13 @@ const TenantRegistry: React.FC = () => {
         params.reasons = selectedReasons.join(",");
       }
       let res;
-      if (activeTab === "tenants") {
+      
         res = await fetchTenants(params, token);
-      } else {
-        res = await fetchLandlords(params, token);
-      }
       setUsers(res.data);
     } catch (error) {
       console.error("Ошибка при загрузке:", error);
     }
-  }, [activeTab, router, searchQuery, startDate, endDate, addressQuery, courtScore, selectedReasons, iin, fullName]);
+  }, [router, searchQuery, startDate, endDate, addressQuery, courtScore, selectedReasons, iin, fullName]);
 
   useEffect(() => {
     fetchUsers();
@@ -164,7 +161,7 @@ const TenantRegistry: React.FC = () => {
           setAddressQuery("");
           setCourtScore("");
           setSelectedReasons([]);
-        }, [activeTab]);
+        }, []);
   // Показываем загрузку пока проверяем верификацию или восстанавливаем токены
   if (isVerified === null || (!isAuthenticated && getCookie("access_token"))) {
     return (
@@ -192,20 +189,7 @@ const TenantRegistry: React.FC = () => {
         </div>
 
         {/* Табы */}
-        <div className={styles.tabsContainer}>
-          <button
-            onClick={() => setActiveTab("tenants")}
-            className={`${styles.tabButton} ${activeTab === "tenants" ? styles.active : ""}`}
-          >
-            {t("profile.search.tenants")}
-          </button>
-          <button
-            onClick={() => setActiveTab("landlords")}
-            className={`${styles.tabButton} ${activeTab === "landlords" ? styles.active : ""}`}
-          >
-            {t("profile.search.landlords")}
-          </button>
-        </div>
+        
         
         {/* Секция поиска и фильтров */}
         <div className={styles.searchSection}>
@@ -345,7 +329,7 @@ const TenantRegistry: React.FC = () => {
                 <thead className={styles.tableHead}>
                   <tr>
                     <th className={styles.tableHeader}>
-                      {activeTab === "tenants" ? t("search.tenant") : t("search.tenant")}
+                      {t("search.tenant")}
                     </th>
                     <th className={styles.tableHeader}>
                       {t("profile.search.iin")}

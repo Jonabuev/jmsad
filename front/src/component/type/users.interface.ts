@@ -170,7 +170,7 @@ export interface IRegisterData {
   anonymous_name?: string;
   email: string;
   phone_number: string;
-  role: "tenant" | "landlord";
+  // role: "tenant" | "landlord";
   type_entity: "individual" | "legal_entity";
   type_identify: "iin" | "bin";
   identifier: string;

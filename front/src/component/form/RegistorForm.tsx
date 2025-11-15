@@ -16,7 +16,7 @@ interface IRegisterErrors {
   username?: string;
   email?: string;
   phone_number?: string;
-  role?: string;
+  // role?: string;
   type_entity?: string;
   type_identify?: string;
   identifier?: string;
@@ -33,7 +33,7 @@ const RegisterForm: FC = () => {
     username: "",
     email: "",
     phone_number: "",
-    role: "tenant", // или "landlord"
+    // role: "tenant", // или "landlord"
     type_entity: "individual", 
     type_identify: "iin",
     identifier: "",
@@ -87,8 +87,8 @@ const RegisterForm: FC = () => {
       validationErrors.password1 = t("registration.field_required");
     if (formData.password1 !== formData.password2)
       validationErrors.password2 = t("registration.password_mismatch");
-    if (!formData.role)
-      validationErrors.role = t("registration.field_required");
+    // if (!formData.role)
+    //   validationErrors.role = t("registration.field_required");
     if (
       !(formData.document_type === "visa" && formData.type_entity === "individual") &&
       !formData.identifier
@@ -207,7 +207,7 @@ const RegisterForm: FC = () => {
         )}
 
         {/* Кнопки выбора типа пользователя */}
-        {isClient && (
+        {/* {isClient && (
           <div className={styles.roleButtons}>
             <button
               type="button"
@@ -224,7 +224,7 @@ const RegisterForm: FC = () => {
               {t("registration.landlord")}
             </button>
           </div>
-        )}
+        )} */}
 
         {isClient && (
           <form onSubmit={handleSubmit} className={styles.form}>

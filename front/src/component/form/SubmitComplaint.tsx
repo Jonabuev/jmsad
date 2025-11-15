@@ -46,7 +46,7 @@ const SubmitComplaintForm: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeRole, setActiveRole] = useState<"tenant" | "landlord">("tenant");
+  // const [activeRole, setActiveRole] = useState<"tenant" | "landlord">("tenant");
   const [isDragging, setIsDragging] = useState(false);
 
   const router = useRouter();
@@ -70,15 +70,15 @@ const SubmitComplaintForm: React.FC = () => {
         }
         const locale = router.locale || 'ru';
         // Запрашиваем причины с фильтрацией по типу на бэкенде
-        const type = activeRole === "tenant" ? "tenant" : "landlord";
-        const res = await fetchComplaintReasons(locale, type);
+        // const type = activeRole === "tenant" ? "tenant" : "landlord";
+        const res = await fetchComplaintReasons(locale);
         setComplaintReasons(res.data);
       } catch (error) {
         console.error("Ошибка загрузки причин жалоб:", error);
       }
     };
     fetchReasons();
-  }, [router.locale, activeRole]);
+  }, [router.locale]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -202,11 +202,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       setIsSubmitting(false);
       return;
     }
-    if (formData.accusedRole !== activeRole) {
-      setErrorMessage(t("Scomplaint.roleMismatch"));
-      setIsSubmitting(false);
-      return;
-    }
+    // if (formData.accusedRole !== activeRole) {
+    //   setErrorMessage(t("Scomplaint.roleMismatch"));
+    //   setIsSubmitting(false);
+    //   return;
+    // }
 
     const token = getCookie("access_token");
     if (!token) {
@@ -299,7 +299,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           {/* Form */}
           <form onSubmit={handleSubmit} className={styles.form}>
             {/* Role Selection */}
-            <div className={styles.formSection}>
+            {/* <div className={styles.formSection}>
               <div className={styles.sectionHeader}>
                 <div className={`${styles.sectionIcon} ${styles.sectionIconBlue}`}>
                   <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,7 +370,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   </div>
                 </button>
               </div>
-            </div>
+            </div> */}
 
 
             {/* IIN Field */}
@@ -471,7 +471,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               
               <div className={styles.reasonsGrid}>
                 {complaintReasons
-                  .filter((reason) => reason.type === activeRole)
                   .map((reason) => (
                     <label key={reason.id} className={styles.reasonItem}>
                       <input

@@ -20,9 +20,8 @@ export const fetchMyRentals = (token: string) =>
   api.get("/my-rentals/", { headers: { Authorization: `Bearer ${token}` } });
 
 // Получить причины жалоб с поддержкой мультиязычности
-export const fetchComplaintReasons = (token: string, locale: string = 'ru', type?: string) => {
+export const fetchComplaintReasons = (token: string, locale: string = 'ru') => {
   const params = new URLSearchParams({ locale });
-  if (type) params.append('type', type);
   
   return api.get(`/all-complaint-reasons/?${params.toString()}`, { 
     headers: { Authorization: `Bearer ${token}` } 
