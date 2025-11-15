@@ -13,7 +13,7 @@ import styles from "./LoginForm.module.scss";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",  // ✅ Изменено с username на email
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
@@ -34,23 +34,21 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // БЕЗОПАСНОСТЬ: НЕ логируем токены или чувствительные данные в console
-      
       // 1. Авторизация
-      const loginResponse = await login(formData.username, formData.password);
+      const loginResponse = await login(formData.email, formData.password);  // ✅ Передаем email
       const accessToken = loginResponse.data.access_token;
       const refreshToken = loginResponse.data.refresh_token;
       
-      // Сохраняем токены с проверкой валидности
+      // Сохраняем токены
       saveTokens(accessToken, refreshToken);
 
-      // 2. Получаем профиль пользователя и обновляем Redux store
+      // 2. Получаем профиль пользователя
       const profileResponse = await fetchProfileWithToken(accessToken);
       const profileData = profileResponse.data;
       
-      // Сохраняем профиль в cookie (для совместимости)
+      // Сохраняем профиль в cookie
       setCookie("profile", JSON.stringify(profileData), {
-        expires: 7, // 7 дней
+        expires: 7,
         path: '/',
         secure: false,
         sameSite: 'lax'
@@ -59,29 +57,21 @@ const LoginForm = () => {
       // 3. Обновляем Redux store
       await dispatch(fetchUserProfile());
 
-      // 4. Переход на страницу профиля
-      // БЕЗОПАСНОСТЬ: НЕ логируем данные пользователя
-      
+      // 4. Переход на профиль
       try {
-        // Перенаправление на профиль
         await router.push("/profile");
         
-        // Если router.push не сработал, попробуем альтернативы
         setTimeout(() => {
-          // БЕЗОПАСНОСТЬ: НЕ логируем данные
-          
           if (router.asPath !== "/profile") {
             window.location.href = "/profile";
           }
         }, 1000);
         
       } catch (redirectError) {
-        // Альтернативный способ перенаправления
         window.location.href = "/profile";
       }
     } catch (err: any) {
-      // Показываем ошибку пользователю
-      setError("Неверное имя пользователя или пароль.");
+      setError("Неверный email или пароль.");
     }
   };
 
@@ -104,17 +94,14 @@ const LoginForm = () => {
           <div className={styles.googleButtonContainer}>
             <GoogleLoginButton 
               onSuccess={async () => {
-                // БЕЗОПАСНОСТЬ: НЕ логируем токены
                 try {
                   await dispatch(fetchUserProfile());
                   router.push("/profile");
                 } catch (error) {
-                  // Fallback на window.location
                   window.location.href = "/profile";
                 }
               }}
               onError={(error) => {
-                // Показываем ошибку пользователю
                 setError("Ошибка входа через Google");
               }}
               className="w-full"
@@ -136,26 +123,55 @@ const LoginForm = () => {
         
         {isClient && (
           <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="username" className={styles.inputLabel}>
-              {t("login.username")}
-            </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              required
-              className={styles.input}
-              placeholder={t("login.usernamePlaceholder")}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <div className={styles.inputLabelRow}>
-              <label htmlFor="password" className={styles.inputLabel}>
-                {t("login.password")}
+            {/* ✅ Изменено поле на email */}
+            <div className={styles.inputGroup}>
+              <label htmlFor="email" className={styles.inputLabel}>
+                {t("login.email")}
               </label>
+              <input
+                type="email"  // ✅ Тип изменен на email
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className={styles.input}
+                placeholder={t("login.emailPlaceholder")}
+              />
+            </div>
+            
+            <div className={styles.inputGroup}>
+              <div className={styles.inputLabelRow}>
+                <label htmlFor="password" className={styles.inputLabel}>
+                  {t("login.password")}
+                </label>
+                <Link 
+                  href="/reset-password" 
+                  className={styles.forgotPasswordLink}
+                >
+                  {t("login.forgotPassword")}
+                </Link>
+              </div>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className={styles.input}
+                placeholder={t("login.passwordPlaceholder")}
+              />
+            </div>
+            
+            <button
+              type="submit"
+              className={styles.submitButton}
+            >
+              {t("login.submit")}
+            </button>
+            
+            <div className={styles.forgotPasswordContainer}>
               <Link 
                 href="/reset-password" 
                 className={styles.forgotPasswordLink}
@@ -163,32 +179,7 @@ const LoginForm = () => {
                 {t("login.forgotPassword")}
               </Link>
             </div>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              className={styles.input}
-              placeholder={t("login.passwordPlaceholder")}
-            />
-          </div>
-          <button
-            type="submit"
-            className={styles.submitButton}
-          >
-            {t("login.submit")}
-          </button>
-          <div className={styles.forgotPasswordContainer}>
-            <Link 
-                  href="/reset-password" 
-                  className={styles.forgotPasswordLink}
-                >
-                  {t("login.forgotPassword")}
-            </Link>
-          </div>
-        </form>
+          </form>
         )}
       </div>
     </div>

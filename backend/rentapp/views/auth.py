@@ -123,17 +123,15 @@ def register(request):
     print("Ошибка в данных формы:", form.errors)
     return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@ratelimit(key='ip', rate='5/m', method='POST')  # ✅ 5 попыток входа в минуту
+@ratelimit(key='ip', rate='5/m', method='POST')
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
     """
-    API endpoint для аутентификации пользователя.
-    
-    Проверяет учетные данные пользователя и возвращает JWT токены.
+    API endpoint для аутентификации пользователя по email.
     
     Required fields:
-        - username: Имя пользователя или email
+        - email: Email пользователя
         - password: Пароль пользователя
     
     Returns:
@@ -141,80 +139,80 @@ def login_view(request):
         - refresh_token: JWT токен для обновления
         - profile_url: Ссылка на профиль пользователя
     
-    Permissions:
-        - Доступно всем пользователям
-    
     Rate Limit:
         - 5 попыток входа в минуту с одного IP
     """
-    # ✅ Проверка rate limit (защита от брутфорса)
     if getattr(request, 'limited', False):
         return Response({
             'error': 'Слишком много попыток входа. Попробуйте через минуту.'
         }, status=status.HTTP_429_TOO_MANY_REQUESTS)
-    
-    # БЕЗОПАСНОСТЬ: НЕ логируем request.data, так как содержит пароль!
-    # Используем безопасное логирование через security_logger
 
     # Получаем данные из запроса
-    username = request.data.get('username')
+    email = request.data.get('email')  # ✅ Изменено с username на email
     password = request.data.get('password')
     ip_address = request.META.get('REMOTE_ADDR', 'unknown')
     user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
+
+    # ✅ Ищем пользователя по email
+    try:
+        user_obj = CustomUser.objects.get(email=email)
+        username = user_obj.username
+    except CustomUser.DoesNotExist:
+        security_logger.warning(
+            f"❌ Неудачная попытка входа | Email: {email} | IP: {ip_address}"
+        )
+        return Response({
+            "error": "Неверный email или пароль"
+        }, status=status.HTTP_401_UNAUTHORIZED)
 
     # Аутентификация пользователя
     user = authenticate(request, username=username, password=password)
     
     if user is not None:
-        # Проверяем, не заблокирован ли пользователь
+        # Проверки безопасности
         if user.is_banned:
             return Response({
                 "error": "Ваш аккаунт заблокирован. Обратитесь к администратору."
             }, status=status.HTTP_403_FORBIDDEN)
         
-        # Проверяем, активен ли пользователь
         if not user.is_active:
             return Response({
                 "error": "Ваш аккаунт деактивирован. Обратитесь к администратору."
             }, status=status.HTTP_403_FORBIDDEN)
         
-            # ✅ Логируем успешный вход
+        # Логирование успешного входа
         security_logger.info(
-            f"✅ Успешный вход | User: {username} | IP: {ip_address} | Agent: {user_agent[:50]}"
+            f"✅ Успешный вход | Email: {email} | IP: {ip_address}"
         )
         
-        # ✅ Audit Trail: Логируем успешный вход
         AuditLog.log_action(
             action='login',
             request=request,
             user=user
         )
             
-            # Пользователь прошел аутентификацию, генерируем токены
+        # Генерация токенов
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        # Логируем вход в систему
+        # Логирование активности
         try:
             from rentapp.utils import log_activity
             log_activity(
                 action_type='user_login',
-                description=f'Пользователь {user.username} вошел в систему',
+                description=f'Пользователь {user.email} вошел в систему',
                 user=user,
                 target_object=None,
                 request=request,
                 metadata={
                     'user_id': user.id,
-                    'username': user.username,
-                    # 'role': user.role
-                    # email НЕ логируем для безопасности
+                    'email': email,
                 }
             )
         except Exception as e:
-            # Используем security_logger вместо print()
             security_logger.error(f'Error logging user login: {str(e)}')
 
-        # Создаем успешный ответ с токенами
+        # Создание ответа с токенами
         profile_url = f"http://localhost:3000/profile/"
         response = Response({
             "message": "Логин успешен",
@@ -223,50 +221,44 @@ def login_view(request):
             "profile_url": profile_url,
         }, status=status.HTTP_200_OK)
         
-        # Устанавливаем токены в cookies
-        # Access token (30 минут) - УЛУЧШЕННАЯ БЕЗОПАСНОСТЬ
+        # Установка cookies
         response.set_cookie(
             key='access_token',
             value=access_token,
-            max_age=30 * 60,  # ✅ 30 минут (было 300 минут)
-            httponly=False,  # False чтобы frontend мог читать
-            secure=False,  # False для localhost (без HTTPS)
+            max_age=30 * 60,
+            httponly=False,
+            secure=False,
             samesite='Lax',
             path='/'
         )
         
-        # Refresh token (7 дней) - УЛУЧШЕННАЯ БЕЗОПАСНОСТЬ
         response.set_cookie(
             key='refresh_token',
             value=str(refresh),
-            max_age=7 * 24 * 60 * 60,  # ✅ 7 дней (было 3 дня)
-            httponly=False,  # False чтобы frontend мог читать
-            secure=False,  # False для localhost
+            max_age=7 * 24 * 60 * 60,
+            httponly=False,
+            secure=False,
             samesite='Lax',
             path='/'
         )
         
         return response
     else:
-            # ✅ Логируем неудачную попытку входа (ВАЖНО для безопасности!)
-            security_logger.warning(
-                f"❌ Неудачная попытка входа | User: {username} | IP: {ip_address} | Agent: {user_agent[:50]}"
-            )
-            
-            # ✅ Audit Trail: Логируем неудачную попытку входа
-            AuditLog.log_action(
-                action='failed_login',
-                request=request,
-                user=None,
-                details={'attempted_username': username},
-                success=False
-            )
-            
-            # Неверные учетные данные
-            return Response({
-            "error": "Неверное имя пользователя или пароль"
+        security_logger.warning(
+            f"❌ Неудачная попытка входа | Email: {email} | IP: {ip_address}"
+        )
+        
+        AuditLog.log_action(
+            action='failed_login',
+            request=request,
+            user=None,
+            details={'attempted_email': email},
+            success=False
+        )
+        
+        return Response({
+            "error": "Неверный email или пароль"
         }, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 
