@@ -134,6 +134,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
+        command_timeout: 30m
         script: |
           # Переходим в папку тестовой среды
           cd ~/test || cd /home/$USER/test || cd /opt/test
@@ -205,6 +206,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
+        command_timeout: 30m
         script: |
           # Переходим в папку продакшн среды
           cd ~/t_Jmsad || cd /home/$USER/t_Jmsad || cd /opt/t_Jmsad
@@ -244,9 +246,12 @@ jobs:
 
     - name: Notify deployment
       if: always()
+      continue-on-error: true
       uses: 8398a7/action-slack@v3
       with:
         status: ${{ job.status }}
         channel: '#deployments'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        text: 'Deployment to production ${{ job.status }}'
         fields: repo,message,commit,author,action,eventName,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
