@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from rentapp.forms import CustomUserCreationForm
 from rentapp.models import PasswordChangeRequest, CustomUser, AuditLog
 from rentapp.serializers import RequestPasswordChangeSerializer, ConfirmPasswordChangeSerializer
-from rentapp.utils import generate_code, send_confirmation_code
+from ..utils import generate_code, send_confirmation_code
 from rentapp.notifications import create_notification
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError

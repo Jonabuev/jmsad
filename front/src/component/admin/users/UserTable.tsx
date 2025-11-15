@@ -27,16 +27,17 @@ const UserTable: FC<UserTableProps> = ({
 }) => {
   const { t } = useTranslation("common");
 
-  const getRoleBadge = (role: string) => {
-    const roleClasses = {
-      tenant: styles.roleBadgeTenant,
-      landlord: styles.roleBadgeLandlord,
-      admin: styles.roleBadgeAdmin,
-    };
-
+  const getRoleBadge = (isSuperuser: boolean) => {
+    if (isSuperuser) {
+      return (
+        <span className={`${styles.badge} ${styles.roleBadgeAdmin}`}>
+          {t("admin.administrator")}
+        </span>
+      );
+    }
     return (
-      <span className={`${styles.badge} ${roleClasses[role as keyof typeof roleClasses] || styles.roleBadgeDefault}`}>
-        {role === "tenant" ? t("profile.tenant") : role === "landlord" ? t("profile.landlord") : t("admin.administrator")}
+      <span className={`${styles.badge} ${styles.roleBadgeDefault}`}>
+        {t("admin.user")}
       </span>
     );
   };
@@ -167,7 +168,7 @@ const UserTable: FC<UserTableProps> = ({
                   </div>
                 </td>
                 <td className={styles.tableCell}>
-                  {getRoleBadge(user.user?.role || "tenant")}
+                  {getRoleBadge(user.is_superuser || false)}
                 </td>
                 <td className={styles.tableCell}>
                   {getVerificationBadge(user.email_confirmed)}

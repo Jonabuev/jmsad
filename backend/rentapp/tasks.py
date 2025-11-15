@@ -72,3 +72,13 @@ def get_log_stats():
     except Exception as e:
         logger.error(f"Ошибка при получении статистики логов: {e}")
         return f"Ошибка: {e}"
+
+
+from celery import shared_task
+from django.core.management import call_command
+
+@shared_task
+def parse_emails_task():
+    """Celery задача для парсинга email."""
+    call_command('parse_emails')
+    return "Email parsing completed"

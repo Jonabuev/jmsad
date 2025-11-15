@@ -183,7 +183,7 @@ const UserDetail: FC<UserDetailProps> = ({ userId }) => {
           </div>
           <div className={styles.badgesContainer}>
             {getStatusBadge(user.is_banned)}
-            {getRoleBadge(user.role || "tenant")}
+            {getRoleBadge(user.role || "user")}
           </div>
         </div>
       </div>

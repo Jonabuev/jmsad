@@ -65,7 +65,10 @@ ALLOWED_PATHS_FOR_EXPIRED = [
     "/api/rental-complaints/<uuid:uuid>/update/",
     "/api/rental-complaints/<uuid:uuid>/",
     "api/comments/",
-    "comments/<int:pk>/"
+    "comments/<int:pk>/",
+    "api/email-documents/",
+    "api/email-documents/<int:document_id>/process/",
+    "api/email-documents/trigger-parsing/",
 
 ]
 

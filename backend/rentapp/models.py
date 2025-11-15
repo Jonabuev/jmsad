@@ -1598,3 +1598,67 @@ class AuditLog(models.Model):
             success=success,
             error_message=error_message
         )
+
+
+class EmailDocument(models.Model):
+    """Модель для хранения документов из email до их обработки."""
+    
+    email_id = models.CharField(max_length=255, db_index=True, verbose_name="ID письма")  # Убираем unique=True
+    sender = models.EmailField(verbose_name="Отправитель")
+    subject = models.CharField(max_length=500, verbose_name="Тема письма")
+    received_date = models.DateTimeField(verbose_name="Дата получения")
+    
+    # PDF документ
+    pdf_file = models.FileField(
+        upload_to='email_documents/%Y/%m/',
+        verbose_name="PDF файл"
+    )
+    filename = models.CharField(max_length=255, verbose_name="Имя файла")
+    
+    # Результаты парсинга
+    parsed_data = models.JSONField(null=True, blank=True, verbose_name="Распарсенные данные")
+    
+    # Статусы
+    STATUS_CHOICES = [
+        ('pending', 'Ожидает обработки'),
+        ('parsed', 'Распарсен'),
+        ('processed', 'Обработан'),
+        ('error', 'Ошибка'),
+    ]
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="Статус"
+    )
+    
+    error_message = models.TextField(blank=True, verbose_name="Сообщение об ошибке")
+    
+    # Связь с жалобой (после обработки)
+    complaint = models.ForeignKey(
+        'RentalComplaint',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='email_documents',
+        verbose_name="Связанная жалоба"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
+    
+    class Meta:
+        verbose_name = "Email документ"
+        verbose_name_plural = "Email документы"
+        ordering = ['-received_date']
+        # ГЛАВНОЕ: Уникальность по комбинации email_id + filename
+        unique_together = [['email_id', 'filename']]
+        indexes = [
+            models.Index(fields=['email_id', 'status']),
+            models.Index(fields=['status', 'created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.sender} - {self.filename} ({self.status})"
+    
+    

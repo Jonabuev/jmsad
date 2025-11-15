@@ -1,0 +1,51 @@
+.tabsContainer {
+  width: 100%;
+}
+
+.tabsHeader {
+  background: white;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+.tabsList {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.tabButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  bottom: -2px;
+
+  &:hover {
+    color: #3b82f6;
+    background: #f3f4f6;
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.tabButtonActive {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.tabContent {
+  padding: 0;
+}

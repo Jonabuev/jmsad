@@ -1,4 +1,6 @@
 from django.urls import path, include
+
+from .views.email_documents import EmailDocumentsListView, ProcessEmailDocumentView, TriggerEmailParsingView
 from .views.read_pdf import CreateUserFromPDFView, PDFCheckView
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views.auth import (
@@ -188,5 +190,10 @@ urlpatterns = [
     path('gdpr/delete-data/', request_data_deletion, name='gdpr-delete-data'),
     path('gdpr/export-data/', export_user_data, name='gdpr-export-data'),
     path('gdpr/info/', gdpr_info, name='gdpr-info'),
+    # Email документы
+    path('email-documents/', EmailDocumentsListView.as_view(), name='email-documents-list'),
+    path('email-documents/<int:document_id>/process/', ProcessEmailDocumentView.as_view(), name='process-email-document'),
+    path('email-documents/trigger-parsing/', TriggerEmailParsingView.as_view(), name='trigger-email-parsing'),
+
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
