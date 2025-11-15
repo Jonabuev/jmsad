@@ -55,28 +55,28 @@ class ComplaintService:
             raise HouseNotFoundError(house_id)
             
         # Проверяем, что пользователь имеет отношение к дому
-        if user.role == 'tenant':
-            # Проверяем, есть ли активная аренда у пользователя
-            if not house.rental_set.filter(tenant=user, status='active').exists():
-                raise BusinessLogicException(
-                    "У вас нет активной аренды в этом доме.",
-                    "NO_ACTIVE_RENTAL",
-                    {"house_id": house_id, "user_id": user.id}
-                )
-        elif user.role == 'landlord':
-            # Проверяем, является ли пользователь владельцем
-            if house.owner != user:
-                raise BusinessLogicException(
-                    "Вы не являетесь владельцем этого дома.",
-                    "NOT_HOUSE_OWNER",
-                    {"house_id": house_id, "user_id": user.id}
-                )
-        else:
-            raise BusinessLogicException(
-                "Недостаточно прав для создания жалобы.",
-                "INSUFFICIENT_PERMISSIONS",
-                {"user_role": user.role}
-            )
+        # if user.role == 'tenant':
+        #     # Проверяем, есть ли активная аренда у пользователя
+        #     if not house.rental_set.filter(tenant=user, status='active').exists():
+        #         raise BusinessLogicException(
+        #             "У вас нет активной аренды в этом доме.",
+        #             "NO_ACTIVE_RENTAL",
+        #             {"house_id": house_id, "user_id": user.id}
+        #         )
+        # elif user.role == 'landlord':
+        #     # Проверяем, является ли пользователь владельцем
+        #     if house.owner != user:
+        #         raise BusinessLogicException(
+        #             "Вы не являетесь владельцем этого дома.",
+        #             "NOT_HOUSE_OWNER",
+        #             {"house_id": house_id, "user_id": user.id}
+        #         )
+        # else:
+        #     raise BusinessLogicException(
+        #         "Недостаточно прав для создания жалобы.",
+        #         "INSUFFICIENT_PERMISSIONS",
+        #         {"user_role": user.role}
+        #     )
             
         complaint = Complaint.objects.create(
             title=title,
@@ -119,13 +119,13 @@ class ComplaintService:
             raise ComplaintNotFoundError(complaint_id)
             
         # Проверяем права доступа
-        if user.role == 'landlord':
-            if complaint.house.owner != user:
-                raise ComplaintPermissionError("обновления", complaint_id)
-        elif user.role == 'admin':
-            pass  # Админ может обновлять любые жалобы
-        else:
-            raise ComplaintPermissionError("обновления", complaint_id)
+        # if user.role == 'landlord':
+        #     if complaint.house.owner != user:
+        #         raise ComplaintPermissionError("обновления", complaint_id)
+        # elif user.role == 'admin':
+        #     pass  # Админ может обновлять любые жалобы
+        # else:
+        #     raise ComplaintPermissionError("обновления", complaint_id)
             
         allowed_statuses = {'pending', 'in_progress', 'resolved', 'closed'}
         if new_status not in allowed_statuses:

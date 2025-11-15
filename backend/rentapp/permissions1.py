@@ -7,19 +7,19 @@ class IsOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return hasattr(obj, 'owner') and obj.owner == request.user
 
-class IsLandlord(BasePermission):
-    """
-    Разрешение только для пользователей с ролью 'landlord'
-    """
-    def has_permission(self, request, view):
-        return hasattr(request.user, 'role') and request.user.role == 'landlord'
+# class IsLandlord(BasePermission):
+#     """
+#     Разрешение только для пользователей с ролью 'landlord'
+#     """
+#     def has_permission(self, request, view):
+#         return hasattr(request.user, 'role') and request.user.role == 'landlord'
 
-class IsTenant(BasePermission):
-    """
-    Разрешение только для пользователей с ролью 'tenant'
-    """
-    def has_permission(self, request, view):
-        return hasattr(request.user, 'role') and request.user.role == 'tenant'
+# class IsTenant(BasePermission):
+#     """
+#     Разрешение только для пользователей с ролью 'tenant'
+#     """
+#     def has_permission(self, request, view):
+#         return hasattr(request.user, 'role') and request.user.role == 'tenant'
 
 class IsOwnerOrReadOnly(BasePermission):
     """

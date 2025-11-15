@@ -266,17 +266,17 @@ def export_user_data(request):
             'anonymous_name': user.anonymous_name,
         }
         
-        # 2. Дома (если арендодатель)
-        houses = []
-        if user.role == 'landlord':
-            user_houses = House.objects.filter(owner=user)
-            houses = HouseSerializer(user_houses, many=True).data
+        # # 2. Дома (если арендодатель)
+        # houses = []
+        # if user.role == 'landlord':
+        #     user_houses = House.objects.filter(owner=user)
+        #     houses = HouseSerializer(user_houses, many=True).data
         
-        # 3. История аренды (если арендатор)
-        rentals = []
-        if user.role == 'tenant':
-            user_rentals = Rental.objects.filter(tenant=user)
-            rentals = RentalSerializer(user_rentals, many=True).data
+        # # 3. История аренды (если арендатор)
+        # rentals = []
+        # if user.role == 'tenant':
+        #     user_rentals = Rental.objects.filter(tenant=user)
+        #     rentals = RentalSerializer(user_rentals, many=True).data
         
         # 4. Жалобы отправленные
         complaints_sent = RentalComplaint.objects.filter(complainant=user)

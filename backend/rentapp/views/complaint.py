@@ -1,7 +1,7 @@
 from rentapp.cache import ComplaintCache, HouseCache, invalidate_complaint_cache
 from rentapp.exceptions import RentAppException
 from rentapp.services.complaint_service import ComplaintService
-from rentapp.permissions1 import IsAdmin, IsLandlord, IsTenant, IsTenantOrLandlordOrAdmin
+from rentapp.permissions1 import IsAdmin, IsTenantOrLandlordOrAdmin
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -22,7 +22,7 @@ from rentapp.notifications import (
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import MultiPartParser, FormParser
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
+@permission_classes([IsAuthenticated])
 def createRentalComplaint(request):
     user = request.user
     accused_iin = request.data.get('accused_iin')
@@ -75,7 +75,7 @@ def createRentalComplaint(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
+@permission_classes([IsAuthenticated])
 def submit_complaint(request):
     try:
         # Получаем текущего пользователя как отправителя жалобы
@@ -167,7 +167,7 @@ def submit_complaint(request):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
+@permission_classes([IsAuthenticated])
 def dispute_complaint(request, complaint_id):
     try:
         complaint = RentalComplaint.objects.select_related('rental', 'complainant', 'accused').get(id=complaint_id)
@@ -193,7 +193,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.exceptions import ValidationError
 
 @api_view(["PATCH"])
-@permission_classes([IsAuthenticated, IsTenant | IsLandlord])
+@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def update_complaint(request, uuid):
     try:
@@ -219,15 +219,15 @@ def update_complaint(request, uuid):
 
     if reason_ids:
         try:
-            reasons = ComplaintReason.objects.filter(
-                id__in=reason_ids,
-                type=complaint.accused.role  # Проверяем, что причины соответствуют роли обвиняемого
-            )
+            reasons = ComplaintReason.objects.filter(id__in=reason_ids)
+
             if len(reasons) != len(reason_ids):
-                return Response({"error": "Одна или несколько причин не соответствуют роли обвиняемого"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Некорректные причины"}, status=status.HTTP_400_BAD_REQUEST)
+
             complaint.reasons.set(reasons)
-        except Exception as e:
+        except Exception:
             return Response({"error": "Некорректные причины"}, status=status.HTTP_400_BAD_REQUEST)
+
 
     # Обновление court_decision_score
     court_decision_score = request.data.get("court_decision_score")
@@ -316,7 +316,7 @@ def dispute_complaintFinal(request, uuid):
     return Response({"success": "Оспаривание отправлено на рассмотрение."})
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsLandlord])
+@permission_classes([IsAuthenticated])
 def update_complaint_status(request, pk):
     try:
         result = ComplaintService.update_complaint_status(pk, request.data.get('status'), request.user)
@@ -333,20 +333,20 @@ def complaint_reasons(request):
     API endpoint для получения причин жалоб в зависимости от роли пользователя.
     Автоматически возвращает дефолтные причины для соответствующего типа.
     """
-    user = request.user
-    role = user.role
+    # user = request.user
+    # role = user.role
 
     # Убеждаемся, что дефолтные причины существуют
     ComplaintReason.ensure_default_reasons_exist()
-
-    if role == "tenant":
-        # Арендатор может жаловаться на арендодателя
-        reasons = ComplaintReason.get_default_reasons_for_type("landlord")
-    elif role == "landlord":
-        # Арендодатель может жаловаться на арендатора
-        reasons = ComplaintReason.get_default_reasons_for_type("tenant")
-    else:
-        return Response({"error": "Invalid role"}, status=400)
+    reasons = ComplaintReason.get.all()
+    # if role == "tenant":
+    #     # Арендатор может жаловаться на арендодателя
+    #     reasons = ComplaintReason.get_default_reasons_for_type("landlord")
+    # elif role == "landlord":
+    #     # Арендодатель может жаловаться на арендатора
+    #     reasons = ComplaintReason.get_default_reasons_for_type("tenant")
+    # else:
+    #     return Response({"error": "Invalid role"}, status=400)
 
     serializer = ComplaintReasonSerializer(reasons, many=True)
     return Response(serializer.data)
@@ -410,7 +410,7 @@ def default_complaint_reasons(request):
 class ComplaintReasonListTenant(generics.ListAPIView):
     queryset = ComplaintReason.objects.filter(type='tenant')
     serializer_class = ComplaintReasonSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTenant]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['type']
     search_fields = ['reason']
@@ -426,7 +426,7 @@ class ComplaintReasonListTenant(generics.ListAPIView):
 class ComplaintReasonListLandlord(generics.ListAPIView):
     queryset = ComplaintReason.objects.filter(type='landlord')
     serializer_class = ComplaintReasonSerializer
-    permission_classes = [permissions.IsAuthenticated, IsLandlord]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['type']
     search_fields = ['reason']
@@ -441,7 +441,7 @@ class ComplaintReasonListLandlord(generics.ListAPIView):
 
 class ComplaintDetailListView(generics.ListAPIView):
     serializer_class = RentalComplaintSerializer
-    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'complainant', 'accused',]
     search_fields = ['description', 'complainant__username', 'accused__username']
@@ -469,7 +469,7 @@ class ComplaintDetailByUUIDView(RetrieveAPIView):
 
 
 class AddCommentAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, complaint_id):
         try:
@@ -520,7 +520,7 @@ class AddCommentAPIView(APIView):
 
 
 class SupportComplaintAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         complaint_id = request.data.get('complaint_id')

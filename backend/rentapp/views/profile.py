@@ -58,20 +58,20 @@ def profile(request):
             'complainant', 'accused', 'moderated_by'
         ).prefetch_related('reasons', 'images').filter(accused=user)
 
-        # Дома (только если арендодатель)
-        houses = House.objects.select_related('owner').prefetch_related(
-            'rental_set__tenant'
-        ).filter(owner=user) if user.role == "landlord" else []
+        # # Дома (только если арендодатель)
+        # houses = House.objects.select_related('owner').prefetch_related(
+        #     'rental_set__tenant'
+        # ).filter(owner=user) if user.role == "landlord" else []
         
-        # ✅ Оптимизация: избегаем загрузки всех аренд без необходимости
-        rentals_all = Rental.objects.select_related(
-            'house__owner', 'tenant'
-        ).all()[:100]  # Ограничиваем количество для производительности
+        # # ✅ Оптимизация: избегаем загрузки всех аренд без необходимости
+        # rentals_all = Rental.objects.select_related(
+        #     'house__owner', 'tenant'
+        # ).all()[:100]  # Ограничиваем количество для производительности
 
-        # Аренды (только если арендатор)
-        rentals = Rental.objects.select_related(
-            'house__owner', 'tenant'
-        ).filter(tenant=user) if user.role == "tenant" else []
+        # # Аренды (только если арендатор)
+        # rentals = Rental.objects.select_related(
+        #     'house__owner', 'tenant'
+        # ).filter(tenant=user) if user.role == "tenant" else []
 
         # Жалобы по арендам
         rental_complaints = (
@@ -99,13 +99,13 @@ def profile(request):
 
         data = {
             'user': serialized_user,  # Убираем средний рейтинг, так как репутация убрана
-            'houses': HouseSerializer(houses, many=True).data,
-            'rentals': RentalSerializer(rentals, many=True).data,
+            # 'houses': HouseSerializer(houses, many=True).data,
+            # 'rentals': RentalSerializer(rentals, many=True).data,
             'complaint_send': RentalComplaintSerializer(complaint_send, many=True).data,
             'complaints_rental': RentalComplaintSerializer(rental_complaints, many=True).data,
             'complaint_received': RentalComplaintSerializer(complaint_received, many=True).data,
             'admin_complaints': RentalComplaintSerializer(admin_complaints, many=True).data,
-            'rentals_all':RentalSerializer(rentals_all, many=True).data
+            # 'rentals_all':RentalSerializer(rentals_all, many=True).data
         }
         # БЕЗОПАСНОСТЬ: НЕ логируем response data через print()
 
@@ -243,11 +243,11 @@ class PublicUserProfileView(APIView):
             }
         )
         
-        # Получение всех домов арендодателя
-        houses = House.objects.filter(owner=user) if user.role == "landlord" else []
+        # # Получение всех домов арендодателя
+        # houses = House.objects.filter(owner=user) if user.role == "landlord" else []
 
-        # Получение аренд, где пользователь — арендатор
-        rentals = Rental.objects.select_related("house").filter(tenant=user) if user.role == "tenant" else []
+        # # Получение аренд, где пользователь — арендатор
+        # rentals = Rental.objects.select_related("house").filter(tenant=user) if user.role == "tenant" else []
 
         # Жалобы, полученные этим пользователем
         complaint_received = RentalComplaint.objects.filter(accused=user)
@@ -262,28 +262,28 @@ class PublicUserProfileView(APIView):
         
         data = {
             **user_data,  # Безопасные данные пользователя (phone/email маскированы)
-            "houses": [
-                {
-                    "id": house.id,
-                    "address": house.address,
-                    "type_p": house.type_p,
-                    "num_of_rooms": house.num_of_rooms
-                }
-                for house in houses
-            ],
-            "rentals": [
-                {
-                    "id": rental.id,
-                    "status": rental.status,
-                    "house": {
-                        "id": rental.house.id,
-                        "address": rental.house.address,
-                        "type_p": rental.house.type_p,
-                        "num_of_rooms": rental.house.num_of_rooms
-                    },
-                }
-                for rental in rentals
-            ],
+            # "houses": [
+            #     {
+            #         "id": house.id,
+            #         "address": house.address,
+            #         "type_p": house.type_p,
+            #         "num_of_rooms": house.num_of_rooms
+            #     }
+            #     for house in houses
+            # ],
+            # "rentals": [
+            #     {
+            #         "id": rental.id,
+            #         "status": rental.status,
+            #         "house": {
+            #             "id": rental.house.id,
+            #             "address": rental.house.address,
+            #             "type_p": rental.house.type_p,
+            #             "num_of_rooms": rental.house.num_of_rooms
+            #         },
+            #     }
+            #     for rental in rentals
+            # ],
             "complaint_received": [
                 {
                     "id": comp.id,
@@ -537,7 +537,7 @@ class TenantRegistryView1(ListAPIView):
         if not user.email_confirmed:
             raise PermissionDenied("Требуется подтверждение почты для доступа.")
 
-        queryset = CustomUser.objects.filter(role='tenant')
+        queryset = CustomUser.objects.all()
 
         # Фильтрация по адресу дома
         address = self.request.query_params.get('address')
@@ -561,7 +561,7 @@ class TenantRegistryView1(ListAPIView):
                     complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
 
             # Получаем пользователей с этими жалобами
-            filtered_user_ids = CustomUser.objects.filter(role='tenant').filter(complaint_filter).values_list('id', flat=True).distinct()
+            filtered_user_ids = CustomUser.objects.all().filter(complaint_filter).values_list('id', flat=True).distinct()
 
             queryset = queryset.filter(id__in=filtered_user_ids)
 
@@ -622,7 +622,7 @@ class TenantRegistryView2(ListAPIView):
         if not user.email_confirmed:
             raise PermissionDenied("Требуется подтверждение почты для доступа.")
 
-        queryset = CustomUser.objects.filter(role='landlord')
+        queryset = CustomUser.objects.all()
 
         address = self.request.query_params.get('address')
         if address:
@@ -640,7 +640,7 @@ class TenantRegistryView2(ListAPIView):
                 if reason_ids:
                     complaint_filter &= Q(received_rental_complaints__reasons__id__in=reason_ids)
 
-            filtered_user_ids = CustomUser.objects.filter(role='landlord').filter(complaint_filter).values_list('id', flat=True).distinct()
+            filtered_user_ids = CustomUser.objects.all().filter(complaint_filter).values_list('id', flat=True).distinct()
             queryset = queryset.filter(id__in=filtered_user_ids)
 
         search_query = self.request.query_params.get('search')

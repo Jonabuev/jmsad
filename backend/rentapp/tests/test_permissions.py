@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIRequestFactory
-from rentapp.permissions import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
+from rentapp.permissions import IsOwner, IsOwnerOrReadOnly
 
 User = get_user_model()
 
@@ -35,33 +35,33 @@ def test_is_owner_false(user_tenant, dummy_obj):
     perm = IsOwner()
     assert perm.has_object_permission(request, None, dummy_obj) is False
 
-def test_is_landlord_true(user_landlord):
-    factory = APIRequestFactory()
-    request = factory.get('/')
-    request.user = user_landlord
-    perm = IsLandlord()
-    assert perm.has_permission(request, None) is True
+# def test_is_landlord_true(user_landlord):
+#     factory = APIRequestFactory()
+#     request = factory.get('/')
+#     request.user = user_landlord
+#     perm = IsLandlord()
+#     assert perm.has_permission(request, None) is True
 
-def test_is_landlord_false(user_tenant):
-    factory = APIRequestFactory()
-    request = factory.get('/')
-    request.user = user_tenant
-    perm = IsLandlord()
-    assert perm.has_permission(request, None) is False
+# def test_is_landlord_false(user_tenant):
+#     factory = APIRequestFactory()
+#     request = factory.get('/')
+#     request.user = user_tenant
+#     perm = IsLandlord()
+#     assert perm.has_permission(request, None) is False
 
-def test_is_tenant_true(user_tenant):
-    factory = APIRequestFactory()
-    request = factory.get('/')
-    request.user = user_tenant
-    perm = IsTenant()
-    assert perm.has_permission(request, None) is True
+# def test_is_tenant_true(user_tenant):
+#     factory = APIRequestFactory()
+#     request = factory.get('/')
+#     request.user = user_tenant
+#     perm = IsTenant()
+#     assert perm.has_permission(request, None) is True
 
-def test_is_tenant_false(user_landlord):
-    factory = APIRequestFactory()
-    request = factory.get('/')
-    request.user = user_landlord
-    perm = IsTenant()
-    assert perm.has_permission(request, None) is False
+# def test_is_tenant_false(user_landlord):
+#     factory = APIRequestFactory()
+#     request = factory.get('/')
+#     request.user = user_landlord
+#     perm = IsTenant()
+#     assert perm.has_permission(request, None) is False
 
 def test_is_owner_or_read_only_safe_method(user_tenant, dummy_obj):
     factory = APIRequestFactory()

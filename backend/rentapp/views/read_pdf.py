@@ -252,8 +252,9 @@ class CreateUserFromPDFView(APIView):
             accused_user = CustomUser.objects.create(
                 username=fio,
                 birth_date=birth_date_dt,
+                description="Created by documents",
                 is_from_pdf=True,
-                role="tenant",
+                role="user",
                 type_identify="iin",
             )
 
