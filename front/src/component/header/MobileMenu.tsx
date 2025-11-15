@@ -147,7 +147,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                 />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-gray-900 font-medium text-sm truncate">{user.user.username}</h3>
-                  <p className="text-gray-500 text-xs">{user.user.role === 'tenant' ? 'Арендатор' : 'Арендодатель'}</p>
                 </div>
               </div>
             </div>

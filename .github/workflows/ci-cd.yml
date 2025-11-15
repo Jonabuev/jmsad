@@ -153,6 +153,7 @@ jobs:
             docker compose -f dc.test.yml build --no-cache
             docker compose -f dc.test.yml up -d
             sleep 10
+            docker exec jmsad_backend_test python manage.py makemigrations || echo "Makemigrations skipped"
             docker exec jmsad_backend_test python manage.py migrate --noinput || echo "Migration skipped"
             docker exec jmsad_backend_test python manage.py collectstatic --noinput || echo "Collectstatic skipped"
           }
@@ -225,6 +226,7 @@ jobs:
             docker compose -f dc.prod.yml build --no-cache
             docker compose -f dc.prod.yml up -d
             sleep 15
+            docker exec jmsad_backend_prod python manage.py makemigrations || echo "Makemigrations skipped"
             docker exec jmsad_backend_prod python manage.py migrate --noinput || echo "Migration skipped"
             docker exec jmsad_backend_prod python manage.py collectstatic --noinput || echo "Collectstatic skipped"
           }
