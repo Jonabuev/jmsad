@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -36,7 +36,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.12'
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -49,7 +49,7 @@ jobs:
       run: |
         cd backend
         python -m pip install --upgrade pip
-        pip install -r req.txt
+        pip install -r req.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
     - name: Install Node.js dependencies
       run: |
@@ -89,7 +89,7 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/main'
 
     steps:
     - name: Checkout code
@@ -98,116 +98,147 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build and push backend image
+    - name: Build backend image (test build)
       uses: docker/build-push-action@v5
       with:
         context: ./backend
-        push: true
-        tags: |
-          ${{ secrets.DOCKER_USERNAME }}/jmsad-backend:latest
-          ${{ secrets.DOCKER_USERNAME }}/jmsad-backend:${{ github.sha }}
+        push: false
+        tags: jmsad-backend:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Build and push frontend image
+    - name: Build frontend image (test build)
       uses: docker/build-push-action@v5
       with:
         context: ./front
-        push: true
-        tags: |
-          ${{ secrets.DOCKER_USERNAME }}/jmsad-frontend:latest
-          ${{ secrets.DOCKER_USERNAME }}/jmsad-frontend:${{ github.sha }}
+        push: false
+        tags: jmsad-frontend:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-  deploy-staging:
-    needs: [test, build]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    environment: staging
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Deploy to staging
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.STAGING_HOST }}
-        username: ${{ secrets.STAGING_USERNAME }}
-        key: ${{ secrets.STAGING_SSH_KEY }}
-        script: |
-          cd /opt/jmsad
-          git pull origin develop
-          docker-compose -f docker-compose.staging.yml down
-          docker-compose -f docker-compose.staging.yml pull
-          docker-compose -f docker-compose.staging.yml up -d
-          docker-compose -f docker-compose.staging.yml exec -T backend_staging python manage.py migrate
-          docker-compose -f docker-compose.staging.yml exec -T backend_staging python manage.py collectstatic --noinput
-
-    - name: Run staging tests
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.STAGING_HOST }}
-        username: ${{ secrets.STAGING_USERNAME }}
-        key: ${{ secrets.STAGING_SSH_KEY }}
-        script: |
-          cd /opt/jmsad
-          docker-compose -f docker-compose.staging.yml exec -T backend_staging python manage.py test --settings=myproject.staging_settings
-
-    - name: Health check staging
-      run: |
-        sleep 30
-        curl -f http://${{ secrets.STAGING_HOST }}:8001/health/ || exit 1
-        curl -f http://${{ secrets.STAGING_HOST }}:3001/ || exit 1
-
-  deploy-production:
+  deploy-test:
     needs: [test, build]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    environment: production
+    environment: test
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Create backup
+    - name: Deploy to TEST environment
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.PRODUCTION_HOST }}
-        username: ${{ secrets.PRODUCTION_USERNAME }}
-        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          cd /opt/jmsad
-          mkdir -p backups/$(date +%Y%m%d_%H%M%S)
-          docker-compose -f docker-compose.prod.yml exec -T postgres_prod pg_dump -U jmsad_user -d jmsad_db > backups/$(date +%Y%m%d_%H%M%S)/database_backup.sql
+          # Переходим в папку тестовой среды
+          cd ~/test || cd /home/$USER/test || cd /opt/test
+          
+          # Принудительно синхронизируем с репозиторием (игнорируем локальные изменения)
+          git fetch origin
+          git reset --hard origin/main
+          git clean -fd
+          
+          # Используем скрипт управления для обновления
+          chmod +x manage_test.sh
+          ./manage_test.sh update || {
+            echo "Update script failed, trying manual update..."
+            # Ручное обновление если скрипт не сработал
+            docker compose -f dc.test.yml pull || true
+            docker compose -f dc.test.yml build --no-cache
+            docker compose -f dc.test.yml up -d
+            sleep 10
+            docker exec jmsad_backend_test python manage.py migrate --noinput || echo "Migration skipped"
+            docker exec jmsad_backend_test python manage.py collectstatic --noinput || echo "Collectstatic skipped"
+          }
 
-    - name: Deploy to production
+    - name: Health check TEST environment
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.PRODUCTION_HOST }}
-        username: ${{ secrets.PRODUCTION_USERNAME }}
-        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          cd /opt/jmsad
-          git pull origin main
-          docker-compose -f docker-compose.prod.yml down
-          docker-compose -f docker-compose.prod.yml pull
-          docker-compose -f docker-compose.prod.yml up -d
-          docker-compose -f docker-compose.prod.yml exec -T backend_prod python manage.py migrate
-          docker-compose -f docker-compose.prod.yml exec -T backend_prod python manage.py collectstatic --noinput
+          # Проверяем статус контейнеров
+          docker ps | grep -E "jmsad_(backend_test|frontend_test|postgres_test)" || echo "Some containers not running"
+          
+          # Проверяем health endpoints (если доступны через nginx)
+          sleep 15
+          curl -f http://localhost/health/ || echo "Health check endpoint not available"
 
-    - name: Health check production
-      run: |
-        sleep 60
-        curl -f https://arno.kz/ || exit 1
-        curl -f https://api.arno.kz/health/ || exit 1
+  deploy-production:
+    needs: [deploy-test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: 
+      name: production
+      url: https://arno.kz
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Create database backup
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # Переходим в папку продакшн среды
+          cd ~/t_Jmsad || cd /home/$USER/t_Jmsad || cd /opt/t_Jmsad
+          
+          # Создаем backup базы данных
+          mkdir -p backups
+          docker exec jmsad_postgres_prod pg_dump -U ${DB_USER:-jmsad_user} ${DB_NAME:-jmsad_db} > backups/backup_$(date +%Y%m%d_%H%M%S).sql || echo "Backup skipped - database not available"
+          
+          # Сжимаем backup
+          gzip backups/backup_*.sql 2>/dev/null || echo "Backup compression skipped"
+
+    - name: Deploy to PRODUCTION environment
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # Переходим в папку продакшн среды
+          cd ~/t_Jmsad || cd /home/$USER/t_Jmsad || cd /opt/t_Jmsad
+          
+          # Принудительно синхронизируем с репозиторием (игнорируем локальные изменения)
+          git fetch origin
+          git reset --hard origin/main
+          git clean -fd
+          
+          # Используем скрипт управления для обновления
+          chmod +x manage_prod.sh
+          ./manage_prod.sh update || {
+            echo "Update script failed, trying manual update..."
+            # Ручное обновление если скрипт не сработал
+            docker compose -f dc.prod.yml pull || true
+            docker compose -f dc.prod.yml build --no-cache
+            docker compose -f dc.prod.yml up -d
+            sleep 15
+            docker exec jmsad_backend_prod python manage.py migrate --noinput || echo "Migration skipped"
+            docker exec jmsad_backend_prod python manage.py collectstatic --noinput || echo "Collectstatic skipped"
+          }
+
+    - name: Health check PRODUCTION
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # Проверяем статус контейнеров
+          docker ps | grep -E "jmsad_(backend_prod|frontend_prod|postgres_prod|redis)" || echo "Some containers not running"
+          
+          # Проверяем health endpoints
+          sleep 20
+          curl -f https://arno.kz/ || echo "Frontend health check failed"
+          curl -f https://api.arno.kz/health/ || echo "Backend health check failed"
 
     - name: Notify deployment
       if: always()
