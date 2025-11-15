@@ -27,7 +27,7 @@ from rentapp.exceptions import RentAppException
 from rentapp.cache import HouseCache, invalidate_house_cache
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rentapp.permissions1 import IsOwner, IsLandlord, IsTenant, IsOwnerOrReadOnly
+from rentapp.permissions1 import IsOwner, IsOwnerOrReadOnly
 
 class MyRentalsAPIView(generics.ListAPIView):
     """
@@ -41,7 +41,7 @@ class MyRentalsAPIView(generics.ListAPIView):
         - Требуется аутентификация
     """
     serializer_class = MyRentalSerializer
-    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'house__address']
     search_fields = ['house__address', 'house__region', 'house__city']
@@ -73,7 +73,7 @@ class RentalListCreateView(generics.ListCreateAPIView):
         - Требуется аутентификация
     """
     serializer_class = RentalSerializer
-    permission_classes = [IsAuthenticated, IsLandlord]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'house', 'tenant']
     search_fields = ['house__address', 'house__region', 'house__city']
@@ -127,7 +127,7 @@ class RentalDetailView(APIView):
         - Требуется аутентификация
         - Только владелец дома может изменять статус
     """
-    permission_classes = [IsAuthenticated, IsLandlord]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         try:
@@ -151,7 +151,7 @@ class CreateRentalRequest(APIView):
     Permissions:
         - Требуется аутентификация
     """
-    permission_classes = [IsAuthenticated, IsTenant]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
@@ -177,7 +177,7 @@ class RentalRequestListView(generics.ListAPIView):
         - Только для арендодателей
     """
     serializer_class = RentalRequestSerializer
-    permission_classes = [IsAuthenticated, IsLandlord]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'house']
     search_fields = ['house__address', 'house__region', 'house__city']
@@ -193,7 +193,7 @@ class RentalRequestListView(generics.ListAPIView):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsLandlord])
+@permission_classes([IsAuthenticated])
 def confirm_rental(request, rental_id):
     """
     API endpoint для подтверждения аренды.
@@ -213,7 +213,7 @@ def confirm_rental(request, rental_id):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsLandlord])
+@permission_classes([IsAuthenticated])
 def reject_rental(request, rental_id):
     """
     API endpoint для отклонения аренды.
@@ -232,7 +232,7 @@ def reject_rental(request, rental_id):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsLandlord])
+@permission_classes([IsAuthenticated])
 def create_apartment(request):
     if not request.user.email_confirmed:
         return Response(
@@ -347,7 +347,7 @@ class FavoriteListCreateView(generics.ListCreateAPIView):
         - Требуется аутентификация
     """
     serializer_class = FavoriteSerializer
-    permission_classes = [IsAuthenticated, IsTenant | IsLandlord]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Favorite.objects.select_related(
