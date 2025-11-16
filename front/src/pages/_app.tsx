@@ -4,6 +4,7 @@ import { appWithTranslation } from "next-i18next";
 import { Provider, useDispatch } from "react-redux";
 import { store } from "@/component/store/store";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { fetchUserProfile } from "@/component/store/auth/authSlice";
 import { AppDispatch } from "@/component/store/store";
 import Header from "@/component/header/Header";
@@ -18,6 +19,10 @@ import Head from "next/head";
 
 const AppContent = (props: AppProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  
+  // Проверяем, находимся ли мы на странице админ-панели
+  const isAdminPage = router.pathname.startsWith("/admin");
   
   // Используем хук для валидации токенов
   useTokenValidation();
@@ -64,6 +69,19 @@ const AppContent = (props: AppProps) => {
 
   // Слушатель push-уведомлений настраивается в usePushNotifications хуке
 
+  // Если это админ-страница, рендерим только контент без Header и Footer
+  if (isAdminPage) {
+    return (
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+        </Head>
+        <props.Component {...props.pageProps} />
+      </>
+    );
+  }
+
+  // Для обычных страниц рендерим с Header и Footer
   return (
     <>
       <Head>

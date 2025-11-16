@@ -10,7 +10,7 @@ const PDFCheckPage = () => {
 
   return (
     <AdminLayout>
-      <div className={styles.pdfCheckContainer}>
+      <div className={styles.pdfCheckPage}>
         {/* Page Header */}
         <div className={styles.pageHeader}>
           <h1 className={styles.pageTitle}>

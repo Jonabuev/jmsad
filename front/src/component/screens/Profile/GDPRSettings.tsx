@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import api from '@/service/api';
 import styles from './GDPRSettings.module.scss';
 
@@ -17,6 +18,7 @@ interface GDPRSettingsProps {
 }
 
 const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
+  const { t } = useTranslation("common");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,12 +51,12 @@ const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
       
       setMessage({
         type: 'success',
-        text: 'Данные успешно экспортированы'
+        text: t('gdpr.exportSuccess')
       });
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Ошибка при экспорте данных'
+        text: error.response?.data?.message || t('gdpr.exportError')
       });
     } finally {
       setLoading(false);
@@ -68,7 +70,7 @@ const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
     if (deleteConfirmText !== username) {
       setMessage({
         type: 'error',
-        text: 'Введите ваш username для подтверждения'
+        text: t('gdpr.deleteConfirmText')
       });
       return;
     }
@@ -83,7 +85,7 @@ const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
       
       setMessage({
         type: 'success',
-        text: response.data.message || 'Данные успешно удалены'
+        text: response.data.message || t('gdpr.deleteSuccess')
       });
       
       // Через 3 секунды перенаправляем на страницу выхода
@@ -97,7 +99,7 @@ const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Ошибка при удалении данных'
+        text: error.response?.data?.message || t('gdpr.deleteError')
       });
     } finally {
       setLoading(false);
@@ -106,15 +108,15 @@ const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
 
   return (
     <div className={styles.gdprSettings}>
-      <h2 className={styles.title}>🛡️ Управление данными (GDPR)</h2>
+      <h2 className={styles.title}>{t('gdpr.title')}</h2>
       
       <div className={styles.section}>
-        <h3>Ваши права</h3>
+        <h3>{t('gdpr.yourRights')}</h3>
         <ul className={styles.rightsList}>
-          <li>✅ Право на доступ к своим данным</li>
-          <li>✅ Право на исправление данных</li>
-          <li>✅ Право на удаление ("право быть забытым")</li>
-          <li>✅ Право на перенос данных</li>
+          <li>{t('gdpr.rightAccess')}</li>
+          <li>{t('gdpr.rightCorrection')}</li>
+          <li>{t('gdpr.rightDeletion')}</li>
+          <li>{t('gdpr.rightPortability')}</li>
         </ul>
       </div>
 
@@ -126,17 +128,16 @@ const GDPRSettings: React.FC<GDPRSettingsProps> = ({ userId, username }) => {
 
       {/* Экспорт данных */}
       <div className={styles.section}>
-        <h3>📤 Экспорт данных</h3>
+        <h3>{t('gdpr.exportTitle')}</h3>
         <p className={styles.description}>
-          Скачайте все ваши персональные данные в формате JSON. 
-          Включает личные данные, историю аренды, жалобы.
+          {t('gdpr.exportDescription')}
         </p>
         <button
           onClick={handleExportData}
           disabled={loading}
           className={styles.exportButton}
         >
-          {loading ? 'Экспорт...' : '📥 Скачать мои данные'}
+          {loading ? t('gdpr.exporting') : t('gdpr.exportButton')}
         </button>
       </div>
 
