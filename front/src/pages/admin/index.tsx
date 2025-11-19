@@ -14,7 +14,6 @@ export default function AdminPage() {
     id: user.id,
     username: user.username,
     is_superuser: user.user?.is_superuser,
-    role: user.user?.role
   } : null });
 
   if (loading) {
@@ -45,7 +44,6 @@ export default function AdminPage() {
               <p className={styles.debugInfoItem}>User ID: {user.id}</p>
               <p className={styles.debugInfoItem}>Username: {user.username}</p>
               <p className={styles.debugInfoItem}>Is Superuser: {user.user?.is_superuser ? 'true' : 'false'}</p>
-              <p className={styles.debugInfoItem}>Role: {user.user?.role}</p>
             </div>
           )}
         </div>

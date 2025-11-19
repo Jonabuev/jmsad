@@ -66,7 +66,7 @@ const NavigationBar: React.FC = () => {
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></div>
           )}
         </Link>
-        {isAuthenticated && user?.user.role !== "tenant" && (
+        {isAuthenticated && (
           <Link 
             className={`text-[#0d151c] text-sm lg:text-base font-normal transition-all duration-200 hover:text-blue-600 relative ${
               router.pathname === "/faq" ? "text-blue-600" : ""

@@ -5,7 +5,6 @@ import styles from "./UserFilters.module.scss";
 interface UserFiltersProps {
   filters: {
     search: string;
-    role: string;
     verification_status: string;
     is_banned: string;
   };
@@ -30,7 +29,6 @@ const UserFilters: FC<UserFiltersProps> = ({ filters, onFilterChange, loading })
   const handleResetFilters = () => {
     const resetFilters = {
       search: "",
-      role: "",
       verification_status: "",
       is_banned: "",
     };
@@ -81,23 +79,6 @@ const UserFilters: FC<UserFiltersProps> = ({ filters, onFilterChange, loading })
         {/* Advanced Filters */}
         {showFilters && (
           <div className={styles.advancedFilters}>
-            {/* Role Filter */}
-            <div className={styles.filterGroup}>
-              <label htmlFor="role" className={styles.filterLabel}>
-                {t("admin.role")}
-              </label>
-              <select
-                id="role"
-                value={localFilters.role}
-                onChange={(e) => handleInputChange("role", e.target.value)}
-                className={styles.filterSelect}
-              >
-                <option value="">{t("admin.allRoles")}</option>
-                <option value="tenant">{t("profile.tenant")}</option>
-                <option value="landlord">{t("profile.landlord")}</option>
-              </select>
-            </div>
-
             {/* Verification Status Filter */}
             <div className={styles.filterGroup}>
               <label htmlFor="verification_status" className={styles.filterLabel}>

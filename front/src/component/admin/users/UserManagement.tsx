@@ -31,7 +31,6 @@ const UserManagement: FC = () => {
 
   const [filters, setFilters] = useState({
     search: "",
-    role: "",
     verification_status: "",
     is_banned: "",
   });

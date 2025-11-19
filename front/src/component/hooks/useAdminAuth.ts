@@ -27,7 +27,6 @@ export const useAdminAuth = () => {
           id: user.id, 
           username: user.username, 
           is_superuser: user.user?.is_superuser,
-          role: user.user?.role 
         } : null 
       });
 
@@ -56,7 +55,6 @@ export const useAdminAuth = () => {
       // Проверяем права администратора
       console.log('👤 User loaded:', { 
         is_superuser: user.user?.is_superuser, 
-        role: user.user?.role 
       });
       
       if (user.user?.is_superuser === true) {

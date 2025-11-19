@@ -455,41 +455,39 @@ const PublicUserProfile: FC = () => {
 
           {/* Apartments tab */}
           {activeTab === "apartments" && (
-            <div className="bg-white p-4 rounded-lg shadow flex-1 min-w-[280px] mt-4">
-              {profileData.role === "landlord" ? (
-                <>
-                  <h2 className="font-semibold mb-2 text-gray-700">{t("profile.apartments")}</h2>
-                  {profileData.houses?.length ? (
-                    <ul className="space-y-2">
-                      {profileData.houses.map((house: IHouse) => (
-                        <li key={house.id} className="bg-gray-100 p-3 rounded-md shadow-sm">
-                          <p><strong>{house.address}</strong></p>
-                          <p>{t(`profile.${house.type_p}`)} • {t("profile.rooms")}: {house.num_of_rooms}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-500">{t("profile.noAddedHomes")}</p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <h2 className="font-semibold mb-2 text-gray-700">{t("profile.apartments")}</h2>
-                  {profileData.rentals?.length ? (
-                    <ul className="space-y-2">
-                      {profileData.rentals.map((rental: IRental) => (
-                        <li key={rental.id} className="bg-gray-100 p-3 rounded-md shadow-sm">
-                          <p><strong>{rental.house.address}</strong></p>
-                          <p>{t(`profile.${rental.house.type_p}`)} • {t("profile.rooms")}: {rental.house.num_of_rooms}</p>
-                          <p><strong>{t("profile.rentalStatus")}:</strong> {rental.status}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-500">{t("profile.noAddedHomes")}</p>
-                  )}
-                </>
-              )}
+            <div className="bg-white p-4 rounded-lg shadow flex-1 min-w-[280px] mt-4 space-y-6">
+              <div>
+                <h2 className="font-semibold mb-2 text-gray-700">{t("profile.myApartments")}</h2>
+                {profileData.houses?.length ? (
+                  <ul className="space-y-2">
+                    {profileData.houses.map((house: IHouse) => (
+                      <li key={house.id} className="bg-gray-100 p-3 rounded-md shadow-sm">
+                        <p><strong>{house.address}</strong></p>
+                        <p>{t(`profile.${house.type_p}`)} • {t("profile.rooms")}: {house.num_of_rooms}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500">{t("profile.noAddedHomes")}</p>
+                )}
+              </div>
+
+              <div>
+                <h2 className="font-semibold mb-2 text-gray-700">{t("profile.rentalStatus")}</h2>
+                {profileData.rentals?.length ? (
+                  <ul className="space-y-2">
+                    {profileData.rentals.map((rental: IRental) => (
+                      <li key={rental.id} className="bg-gray-100 p-3 rounded-md shadow-sm">
+                        <p><strong>{rental.house.address}</strong></p>
+                        <p>{t(`profile.${rental.house.type_p}`)} • {t("profile.rooms")}: {rental.house.num_of_rooms}</p>
+                        <p><strong>{t("profile.rentalStatus")}:</strong> {t(`profile.${rental.status}`)}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500">{t("profile.noAddedHomes")}</p>
+                )}
+              </div>
             </div>
           )}
 

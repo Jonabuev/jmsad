@@ -195,7 +195,10 @@
       "confirmed": "Confirmed",
       "notConfirmed": "Not confirmed",
       "fullAccess": "Full access",
-      "limitedAccess": "Limited access"
+      "limitedAccess": "Limited access",
+      "required": "Verification Required",
+      "requiredText": "To access the user registry, you need to verify your identity. Please upload a document for verification.",
+      "goToVerification": "Go to Verification"
     },
     "docType": {
       "id_card": "ID Card",
@@ -253,11 +256,6 @@
     "success": {
       "apartmentAdded": "Apartment successfully added!",
       "disputeSubmitted": "Complaint submitted for reconsideration"
-    },
-    "verification": {
-      "required": "Verification Required",
-      "requiredText": "To access the user registry, you need to verify your identity. Please upload a document for verification.",
-      "goToVerification": "Go to Verification"
     },
     "search": {
       "title": "Registry of Dishonest Tenants and Landlords",

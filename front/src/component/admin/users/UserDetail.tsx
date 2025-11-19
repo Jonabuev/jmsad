@@ -130,16 +130,17 @@ const UserDetail: FC<UserDetailProps> = ({ userId }) => {
     );
   }
 
-  const getRoleBadge = (role: string) => {
-    const roleClasses = {
-      tenant: styles.roleBadgeTenant,
-      landlord: styles.roleBadgeLandlord,
-      admin: styles.roleBadgeAdmin,
-    };
-
+  const getRoleBadge = (isSuperuser: boolean) => {
+    if (isSuperuser) {
+      return (
+        <span className={`${styles.badge} ${styles.roleBadgeAdmin}`}>
+          {t("admin.administrator")}
+        </span>
+      );
+    }
     return (
-      <span className={`${styles.badge} ${roleClasses[role as keyof typeof roleClasses] || styles.roleBadgeDefault}`}>
-        {role === "tenant" ? t("profile.tenant") : role === "landlord" ? t("profile.landlord") : t("admin.administrator")}
+      <span className={`${styles.badge} ${styles.roleBadgeDefault}`}>
+        {t("admin.user")}
       </span>
     );
   };
@@ -183,7 +184,7 @@ const UserDetail: FC<UserDetailProps> = ({ userId }) => {
           </div>
           <div className={styles.badgesContainer}>
             {getStatusBadge(user.is_banned)}
-            {getRoleBadge(user.role || "user")}
+            {getRoleBadge(Boolean(user.is_superuser))}
           </div>
         </div>
       </div>

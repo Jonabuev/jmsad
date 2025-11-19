@@ -171,7 +171,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                 {t("navigation.registry")}
               </Link>
               
-              {isAuthenticated && user?.user.role !== "tenant" && (
+              {isAuthenticated && (
                 <Link 
                   className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ${
                     isActiveLink("/faq") 

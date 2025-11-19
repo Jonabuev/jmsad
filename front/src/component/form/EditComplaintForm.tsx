@@ -15,7 +15,6 @@ interface ComplaintReason {
 
 interface ComplaintData {
   accused_iin: string;
-  accused: { role: "tenant" | "landlord" };
   description: string;
   reasons: number[]; // Изменено с reason на reasons
   evidence: string | null;
@@ -31,7 +30,6 @@ const EditComplaintForm: React.FC = () => {
 
   const initialFormState = {
     accusedIin: "",
-    accusedRole: "" as "tenant" | "landlord" | "",
     description: "",
     reasons: [] as number[], // Изменено с reason на reasons
     evidence: null as File | null,
@@ -74,7 +72,6 @@ const EditComplaintForm: React.FC = () => {
         const data: ComplaintData = res.data;
         setFormData({
           accusedIin: data.accused_iin || "",
-          accusedRole: data.accused?.role || "",
           description: data.description || "",
           reasons: Array.isArray(data.reasons) ? data.reasons.map((r: any) => Number(r.id)) : [], // Извлекаем ID
           evidence: null,
@@ -94,10 +91,10 @@ const EditComplaintForm: React.FC = () => {
       .finally(() => setIsLoading(false));
   }, [uuid, t]);
 
-  // Загрузка причин в зависимости от роли обвиняемого
+  // Загрузка причин (все доступные типы)
   useEffect(() => {
     const locale = router.locale || "ru";
-    fetchComplaintReasons(locale, formData.accusedRole)
+    fetchComplaintReasons(locale)
       .then((res) => {
         if (Array.isArray(res.data)) {
           setComplaintReasons(res.data);
@@ -110,7 +107,7 @@ const EditComplaintForm: React.FC = () => {
         console.error("Error loading complaint reasons:", error);
         setErrorMessage(t("Scomplaint.loadReasonsError"));
       });
-  }, [router.locale, formData.accusedRole]);
+  }, [router.locale]);
 
   // Обработчик изменения полей
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

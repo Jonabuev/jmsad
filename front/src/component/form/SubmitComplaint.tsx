@@ -17,7 +17,6 @@ interface ComplaintReason {
 interface UserSuggestion {
   identifier: string;
   full_name: string;
-  role: string;  // 👈 добавляем
 }
 
 
@@ -26,7 +25,6 @@ const SubmitComplaintForm: React.FC = () => {
   const [complaintReasons, setComplaintReasons] = useState<ComplaintReason[]>([]);
   const initialFormState = {
     accusedIin: "",
-    accusedRole: "" as "tenant" | "landlord" | "",
     description: "",
     reason: [] as number[],
     evidence: null as File | null,
@@ -46,7 +44,6 @@ const SubmitComplaintForm: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [activeRole, setActiveRole] = useState<"tenant" | "landlord">("tenant");
   const [isDragging, setIsDragging] = useState(false);
 
   const router = useRouter();
@@ -70,7 +67,6 @@ const SubmitComplaintForm: React.FC = () => {
         }
         const locale = router.locale || 'ru';
         // Запрашиваем причины с фильтрацией по типу на бэкенде
-        // const type = activeRole === "tenant" ? "tenant" : "landlord";
         const res = await fetchComplaintReasons(locale);
         setComplaintReasons(res.data);
       } catch (error) {
@@ -93,25 +89,6 @@ const SubmitComplaintForm: React.FC = () => {
       }
 
       const token = getCookie("access_token");
-
-      if (token && value.length === 12) {
-        // если ровно 12 — ищем сразу и сохраняем роль
-        searchUsersByIin(value, token)
-          .then((res) => {
-            const foundUser = res.data?.[0];
-            if (foundUser) {
-              setFormData((prev) => ({
-                ...prev,
-                accusedRole: foundUser.role as "tenant" | "landlord",
-              }));
-            } else {
-              setFormData((prev) => ({ ...prev, accusedRole: "" }));
-            }
-          })
-          .catch(() => {
-            setFormData((prev) => ({ ...prev, accusedRole: "" }));
-          });
-      }
 
       // подсказки — если от 5 до 11 символов
       if (token && value.length >= 5 && value.length < 12) {
@@ -192,22 +169,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       setIsSubmitting(false);
       return;
     }
-    if (!formData.accusedRole) {
-      setErrorMessage(t("Scomplaint.userNotFound"));
-      setIsSubmitting(false);
-      return;
-    }
     if (formData.reason.length === 0) {
       setErrorMessage(t("Scomplaint.reasonRequired"));
       setIsSubmitting(false);
       return;
     }
-    // if (formData.accusedRole !== activeRole) {
-    //   setErrorMessage(t("Scomplaint.roleMismatch"));
-    //   setIsSubmitting(false);
-    //   return;
-    // }
-
     const token = getCookie("access_token");
     if (!token) {
       setErrorMessage(t("Scomplaint.authRequired"));
@@ -298,81 +264,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className={styles.form}>
-            {/* Role Selection */}
-            {/* <div className={styles.formSection}>
-              <div className={styles.sectionHeader}>
-                <div className={`${styles.sectionIcon} ${styles.sectionIconBlue}`}>
-                  <svg className={styles.sectionIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <h3 className={styles.sectionTitle}>{t("Scomplaint.selectComplaintType")}</h3>
-              </div>
-              
-              <div className={styles.roleSelection}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveRole("tenant");
-                    setFormData(initialFormState);
-                    setErrorMessage("");
-                    setSuccessMessage("");
-                    setIinSuggestions([]);
-                  }}
-                  className={`${styles.roleButton} ${
-                    activeRole === "tenant"
-                      ? styles.roleButtonActive
-                      : styles.roleButtonInactive
-                  }`}
-                >
-                  <div className={styles.roleButtonContent}>
-                    <div className={`${styles.roleRadio} ${
-                      activeRole === "tenant" ? styles.roleRadioActive : styles.roleRadioInactive
-                    }`}>
-                      {activeRole === "tenant" && (
-                        <div className={styles.roleRadioDot}></div>
-                      )}
-                    </div>
-                    <div className={styles.roleText}>
-                      <div className={styles.roleTitle}>{t("Scomplaint.tenantComplaint")}</div>
-                      <div className={styles.roleDescription}>{t("Scomplaint.tenantComplaintDesc")}</div>
-                    </div>
-                  </div>
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveRole("landlord");
-                    setFormData(initialFormState);
-                    setErrorMessage("");
-                    setSuccessMessage("");
-                    setIinSuggestions([]);
-                  }}
-                  className={`${styles.roleButton} ${
-                    activeRole === "landlord"
-                      ? styles.roleButtonActive
-                      : styles.roleButtonInactive
-                  }`}
-                >
-                  <div className={styles.roleButtonContent}>
-                    <div className={`${styles.roleRadio} ${
-                      activeRole === "landlord" ? styles.roleRadioActive : styles.roleRadioInactive
-                    }`}>
-                      {activeRole === "landlord" && (
-                        <div className={styles.roleRadioDot}></div>
-                      )}
-                    </div>
-                    <div className={styles.roleText}>
-                      <div className={styles.roleTitle}>{t("Scomplaint.landlordComplaint")}</div>
-                      <div className={styles.roleDescription}>{t("Scomplaint.landlordComplaintDesc")}</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div> */}
-
-
             {/* IIN Field */}
             <div className={styles.formSection}>
               <div className={styles.sectionHeader}>
@@ -407,7 +298,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                           setFormData((prev) => ({
                             ...prev,
                             accusedIin: u.identifier,
-                            accusedRole: u.role as "tenant" | "landlord",
                           }));
                           setIinSuggestions([]);
                         }}
@@ -417,13 +307,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                             <div className={styles.suggestionIin}>{u.identifier}</div>
                             <div className={styles.suggestionName}>{u.full_name}</div>
                           </div>
-                          <span className={`${styles.suggestionRole} ${
-                            u.role === 'tenant' 
-                              ? styles.suggestionRoleTenant
-                              : styles.suggestionRoleLandlord
-                          }`}>
-                            {u.role === 'tenant' ? t("Scomplaint.tenant") : t("Scomplaint.landlord")}
-                          </span>
                         </div>
                       </div>
                     ))}

@@ -8,7 +8,6 @@ export const getAdminUsers = (params?: {
   page?: number;
   page_size?: number;
   search?: string;
-  role?: string;
   verification_status?: string;
   is_banned?: string;
 }) => api.get("/admin/users/", { params });
@@ -111,7 +110,6 @@ export const getAdminComplaints = (params?: {
   date_from?: string;
   date_to?: string;
   reason?: number;
-  role_direction?: string;
   user_iin_bin?: string;
 }) => api.get("/admin/complaints/", { params });
 

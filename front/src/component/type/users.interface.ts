@@ -145,16 +145,16 @@ export interface IPublicProfileData {
   email_confirmed: boolean;
   phone_number: string;
   identifier: string;
-  role: "tenant" | "landlord";
+  role?: string;
   avatar: string | null;
   // rating: number;
   is_banned: boolean;
 
-  houses?: IHouse[]; // если landlord
-  rentals?: IRental[]; // если tenant
+  houses?: IHouse[];
+  rentals?: IRental[];
 
-  complaints_rental?: IComplaint[]; // отправленные жалобы
-  complaint_received?: IComplaint[]; // полученные жалобы
+  complaints_rental?: IComplaint[];
+  complaint_received?: IComplaint[];
 }
 
 export interface IUserShort {
@@ -170,7 +170,6 @@ export interface IRegisterData {
   anonymous_name?: string;
   email: string;
   phone_number: string;
-  // role: "tenant" | "landlord";
   type_entity: "individual" | "legal_entity";
   type_identify: "iin" | "bin";
   identifier: string;

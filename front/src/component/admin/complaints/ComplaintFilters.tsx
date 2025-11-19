@@ -8,7 +8,6 @@ interface ComplaintFilters {
   search?: string;
   ordering?: string;
   reason?: number;
-  role_direction?: string;
   user_iin_bin?: string;
 }
 
@@ -45,12 +44,6 @@ export const ComplaintFilters: React.FC<ComplaintFiltersProps> = ({
     { value: 'created_at', label: t('complaints.filters.oldest_first') },
     { value: '-updated_at', label: t('complaints.filters.recently_updated') },
     { value: 'status', label: t('complaints.filters.by_status') },
-  ];
-
-  const roleDirectionOptions = [
-    { value: '', label: t('complaints.filters.all_directions') },
-    { value: 'tenant_to_landlord', label: t('complaints.filters.tenant_to_landlord') },
-    { value: 'landlord_to_tenant', label: t('complaints.filters.landlord_to_tenant') },
   ];
 
   // Загружаем причины жалоб
@@ -196,23 +189,6 @@ export const ComplaintFilters: React.FC<ComplaintFiltersProps> = ({
             </select>
           </div>
 
-          {/* Направление жалобы */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('complaints.filters.role_direction')}
-            </label>
-            <select
-              value={filters.role_direction || ''}
-              onChange={(e) => handleFilterChange('role_direction', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {roleDirectionOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       )}
 
@@ -238,10 +214,6 @@ export const ComplaintFilters: React.FC<ComplaintFiltersProps> = ({
               case 'reason':
                 const reason = complaintReasons.find(r => r.id.toString() === value);
                 label = `Причина: ${reason ? reason.reason : value}`;
-                break;
-              case 'role_direction':
-                const directionOption = roleDirectionOptions.find(opt => opt.value === value);
-                label = `Направление: ${directionOption?.label}`;
                 break;
               case 'user_iin_bin':
                 label = `ИИН/БИН: ${value}`;

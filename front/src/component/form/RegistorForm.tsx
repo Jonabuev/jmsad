@@ -16,7 +16,6 @@ interface IRegisterErrors {
   username?: string;
   email?: string;
   phone_number?: string;
-  // role?: string;
   type_entity?: string;
   type_identify?: string;
   identifier?: string;
@@ -28,12 +27,23 @@ interface IRegisterErrors {
   [key: string]: string | undefined;
 }
 
+const buildRegisterFormData = (data: IRegisterData) => {
+  const fd = new FormData();
+  (Object.entries(data) as [keyof IRegisterData, IRegisterData[keyof IRegisterData]][]).forEach(
+    ([key, value]) => {
+      if (value !== undefined && value !== null) {
+        fd.append(key, typeof value === "string" ? value : String(value));
+      }
+    }
+  );
+  return fd;
+};
+
 const RegisterForm: FC = () => {
   const [formData, setFormData] = useState<IRegisterData>({
     username: "",
     email: "",
     phone_number: "",
-    // role: "tenant", // или "landlord"
     type_entity: "individual", 
     type_identify: "iin",
     identifier: "",
@@ -87,8 +97,6 @@ const RegisterForm: FC = () => {
       validationErrors.password1 = t("registration.field_required");
     if (formData.password1 !== formData.password2)
       validationErrors.password2 = t("registration.password_mismatch");
-    // if (!formData.role)
-    //   validationErrors.role = t("registration.field_required");
     if (
       !(formData.document_type === "visa" && formData.type_entity === "individual") &&
       !formData.identifier
@@ -120,7 +128,8 @@ const RegisterForm: FC = () => {
 
     try {
       console.log("📝 Начинаем процесс регистрации...");
-      const response = await register(formData);
+      const registerPayload = buildRegisterFormData(formData);
+      const response = await register(registerPayload);
       if (response.status === 200 || response.status === 201) {
         console.log("✅ Регистрация успешна, сохраняем токены...");
         saveTokens(response.data.access_token, response.data.refresh_token);
@@ -206,25 +215,6 @@ const RegisterForm: FC = () => {
           </div>
         )}
 
-        {/* Кнопки выбора типа пользователя */}
-        {/* {isClient && (
-          <div className={styles.roleButtons}>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, role: "tenant" })}
-              className={`${styles.roleButton} ${formData.role === "tenant" ? styles.active : ""}`}
-            >
-              {t("registration.tenant")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, role: "landlord" })}
-              className={`${styles.roleButton} ${formData.role === "landlord" ? styles.active : ""}`}
-            >
-              {t("registration.landlord")}
-            </button>
-          </div>
-        )} */}
 
         {isClient && (
           <form onSubmit={handleSubmit} className={styles.form}>

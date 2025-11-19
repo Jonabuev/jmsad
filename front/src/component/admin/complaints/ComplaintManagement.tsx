@@ -38,7 +38,6 @@ interface ComplaintFilters {
   search?: string;
   ordering?: string;
   reason?: number;
-  role_direction?: string;
   user_iin_bin?: string;
 }
 

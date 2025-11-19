@@ -193,14 +193,6 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                         <div className="text-xs text-gray-500">
                           ID: {complaint.complainant.id} → {complaint.accused.id}
                         </div>
-                        {(complaint.complainant.role || complaint.accused.role) && (
-                          <div className="text-xs text-blue-600">
-                            {complaint.complainant.role === 'tenant' ? 'Арендатор' : 
-                             complaint.complainant.role === 'landlord' ? 'Арендодатель' : ''} → 
-                            {complaint.accused.role === 'tenant' ? 'Арендатор' : 
-                             complaint.accused.role === 'landlord' ? 'Арендодатель' : ''}
-                          </div>
-                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
