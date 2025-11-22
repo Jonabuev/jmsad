@@ -375,7 +375,8 @@
     "apartment": "Пәтер",
     "house": "Үй",
     "room": "Бөлме",
-    "submit": "Мүлікті қосу"
+    "submit": "Мүлікті қосу",
+    "loading": "Жүктелуде..."
   },
   "property": {
     "photos": "Пәтер фотосуреттері"
@@ -417,7 +418,8 @@
     "bin_placeholder": "БИН енгізіңіз",
     "select_citizenship": "Азаматтықты таңдаңыз",
     "done": "Дайын",
-    "submitting": "Тіркелуде..."
+    "submitting": "Тіркелуде...",
+    "loading": "Жүктелуде..."
   },
   "Scomplaint": {
     "title": "Шағым беру",
@@ -430,6 +432,7 @@
     "evidence": "Құжаттар:",
     "submit": "Шағым жіберу",
     "submitting": "Жіберілуде...",
+    "loading": "Жүктелуде...",
     "success": "Шағым сәтті жіберілді",
     "submitError": "Шағымды жіберу кезінде қате орын алды",
     "unexpectedError": "Күтпеген қате орын алды",
@@ -1193,6 +1196,7 @@
     "passwordPlaceholder": "Құпия сөзді енгізіңіз",
     "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
     "submit": "Кіру",
+    "loading": "Жүктелуде...",
     "errorMessage": "Жарамсыз пайдаланушы аты немесе құпия сөз.",
     "googleError": "Google арқылы кіру қатесі"
   },

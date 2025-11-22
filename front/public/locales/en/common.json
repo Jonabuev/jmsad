@@ -375,7 +375,8 @@
     "apartment": "Apartment",
     "house": "House",
     "room": "Room",
-    "submit": "Add Property"
+    "submit": "Add Property",
+    "loading": "Loading..."
   },
   "property": {
     "photos": "Apartment Photos"
@@ -417,7 +418,8 @@
     "bin_placeholder": "Enter BIN",
     "select_citizenship": "Select citizenship",
     "done": "Done",
-    "submitting": "Registering..."
+    "submitting": "Registering...",
+    "loading": "Loading..."
   },
   "Scomplaint": {
     "title": "Submit a Complaint",
@@ -430,6 +432,7 @@
     "evidence": "Evidence:",
     "submit": "Submit Complaint",
     "submitting": "Submitting...",
+    "loading": "Loading...",
     "success": "Complaint submitted successfully",
     "submitError": "Error while submitting the complaint",
     "unexpectedError": "An unexpected error occurred",
@@ -1193,6 +1196,7 @@
     "passwordPlaceholder": "Enter password",
     "forgotPassword": "Forgot password?",
     "submit": "Login",
+    "loading": "Loading...",
     "errorMessage": "Invalid username or password.",
     "googleError": "Google login error"
   },
