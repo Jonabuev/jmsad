@@ -11,6 +11,7 @@ const PasswordResetFlow: FC = () => {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -29,6 +30,18 @@ const PasswordResetFlow: FC = () => {
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    // Валидация паролей
+    if (newPassword !== confirmPassword) {
+      setError(t("password.reset.password_mismatch") || "Пароли не совпадают");
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      setError(t("password.reset.password_too_short") || "Пароль должен содержать минимум 8 символов");
+      return;
+    }
+    
     try {
       const response = await confirmPasswordReset(email, code, newPassword);
       setMessage(response.data.success);
@@ -95,6 +108,19 @@ const PasswordResetFlow: FC = () => {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                className={styles.input}
+                required
+                minLength={8}
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
+                {t("password.reset.confirm_password_label")}
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className={styles.input}
                 required
                 minLength={8}

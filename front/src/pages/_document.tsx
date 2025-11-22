@@ -3,7 +3,7 @@ import Script from "next/script";
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html lang="ru">
       <Head>
         <link rel="icon" type="image/svg+xml" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/favicon.png" />
