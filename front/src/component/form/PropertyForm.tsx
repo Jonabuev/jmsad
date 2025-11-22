@@ -8,6 +8,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/navigation";
 import { createProperty } from "@/api/propertyApi";
 import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
+import { getCookie } from "@/utils/cookieUtils";
 import styles from "./PropertyForm.module.scss";
 
 interface PropertyFormInputs {
@@ -39,6 +40,7 @@ const PropertyForm: FC = () => {
   );
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadYMaps = () => {
@@ -90,6 +92,7 @@ const PropertyForm: FC = () => {
       return;
     }
 
+    setIsLoading(true);
     try {
       // Создаем FormData для отправки файлов
       const formData = new FormData();
@@ -125,6 +128,8 @@ const PropertyForm: FC = () => {
     } catch (err: any) {
       setErrorMessage("Ошибка при запросе. Попробуйте позже.");
       console.error("Ошибка при запросе:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -317,8 +322,19 @@ const PropertyForm: FC = () => {
           <button
             type="submit"
             className={styles.submitButton}
+            disabled={isLoading}
           >
-            {t("form.submit")}
+            {isLoading ? (
+              <>
+                <svg className={styles.submitButtonSpinner} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {t("form.loading") || "Загрузка..."}
+              </>
+            ) : (
+              t("form.submit")
+            )}
           </button>
         </form>
       </div>

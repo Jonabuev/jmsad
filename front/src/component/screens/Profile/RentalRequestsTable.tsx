@@ -15,6 +15,7 @@ const RentalRequestsTable: React.FC = () => {
   const [requests, setRequests] = useState<RentalRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
   const { t } = useTranslation("common");
 
   const fetchRequests = async () => {
@@ -45,6 +46,7 @@ const RentalRequestsTable: React.FC = () => {
     const token = getCookie("access_token");
     if (!token) return;
 
+    setUpdatingStatusId(id);
     try {
       await updateRentalStatus(id, newStatus, token);
       setRequests((prev) =>
@@ -52,6 +54,8 @@ const RentalRequestsTable: React.FC = () => {
       );
     } catch (err) {
       console.error("Ошибка обновления статуса:", err);
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -93,15 +97,37 @@ const RentalRequestsTable: React.FC = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleUpdateStatus(id, "active")}
-                          className="px-2 py-1 bg-green-500 text-white rounded"
+                          disabled={updatingStatusId === id}
+                          className="px-2 py-1 bg-green-500 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                         >
-                          {t("rentalTable.accept")}
+                          {updatingStatusId === id ? (
+                            <>
+                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              {t("loading") || "Загрузка..."}
+                            </>
+                          ) : (
+                            t("rentalTable.accept")
+                          )}
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(id, "declined")}
-                          className="px-2 py-1 bg-red-500 text-white rounded"
+                          disabled={updatingStatusId === id}
+                          className="px-2 py-1 bg-red-500 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                         >
-                          {t("rentalTable.decline")}
+                          {updatingStatusId === id ? (
+                            <>
+                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              {t("loading") || "Загрузка..."}
+                            </>
+                          ) : (
+                            t("rentalTable.decline")
+                          )}
                         </button>
                       </div>
                     ) : (

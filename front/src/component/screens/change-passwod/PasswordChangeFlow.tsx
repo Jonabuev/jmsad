@@ -13,6 +13,7 @@ const PasswordChangeFlow: FC = () => {
   const [step, setStep] = useState<Step>("requestCode");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -49,6 +50,18 @@ const PasswordChangeFlow: FC = () => {
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    // Валидация паролей
+    if (newPassword !== confirmPassword) {
+      setError(t("password.change.password_mismatch") || "Пароли не совпадают");
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      setError(t("password.change.password_too_short") || "Пароль должен содержать минимум 8 символов");
+      return;
+    }
+    
     try {
       const token = getCookie("access_token");
       const response = await confirmPasswordChange(code, newPassword, token!);
@@ -144,6 +157,20 @@ const PasswordChangeFlow: FC = () => {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                className={styles.input}
+                required
+                minLength={8}
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
+                {t("password.change.confirm_password_label")}
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className={styles.input}
                 required
                 minLength={8}

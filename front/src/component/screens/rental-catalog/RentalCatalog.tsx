@@ -39,18 +39,21 @@ export default function RentalCatalog() {
   const [mainImgIdx, setMainImgIdx] = useState(0);
   // Мобильное меню
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  // Состояние загрузки при отправке запроса на аренду
+  const [rentingHouseId, setRentingHouseId] = useState<number | null>(null);
 
   useEffect(() => {
     setMainImgIdx(0);
   }, [selectedHouse]);
 
-  const handleRent = (houseId: number) => {
+  const handleRent = async (houseId: number) => {
     if (!startDate || !endDate) {
       alert(t("rentalCatalog.selectDates"));
       return;
     }
-    axios
-      .post(
+    setRentingHouseId(houseId);
+    try {
+      await axios.post(
         apiUrl("/rent-house/"),
         {
           house_id: houseId,
@@ -62,9 +65,13 @@ export default function RentalCatalog() {
             Authorization: `Bearer ${getCookie("access_token")}`,
           },
         }
-      )
-      .then(() => alert(t("rentalCatalog.requestSent")))
-      .catch(() => alert(t("rentalCatalog.requestFailed")));
+      );
+      alert(t("rentalCatalog.requestSent"));
+    } catch (error) {
+      alert(t("rentalCatalog.requestFailed"));
+    } finally {
+      setRentingHouseId(null);
+    }
   };
 
   // Применение фильтров к данным
@@ -260,7 +267,7 @@ export default function RentalCatalog() {
         {loading ? (
           <LoadingIndicator text={t("rentalCatalog.loading")} />
         ) : (
-          <RentalMap rentals={filteredRentals} onRentClick={handleRent} onSelectHouse={setSelectedHouse} />
+          <RentalMap rentals={filteredRentals} onRentClick={handleRent} onSelectHouse={setSelectedHouse} rentingHouseId={rentingHouseId} />
         )}
       </div>
     </div>

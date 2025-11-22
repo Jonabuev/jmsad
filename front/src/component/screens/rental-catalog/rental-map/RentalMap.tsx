@@ -23,9 +23,10 @@ interface Props {
   rentals: IHouse[];
   onRentClick: (id: number) => void;
   onSelectHouse: (house: IHouse) => void;
+  rentingHouseId?: number | null;
 }
 
-export default function RentalMap({ rentals, onRentClick, onSelectHouse }: Props) {
+export default function RentalMap({ rentals, onRentClick, onSelectHouse, rentingHouseId }: Props) {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function RentalMap({ rentals, onRentClick, onSelectHouse }: Props
       const house = rentals.find((r) => r.id === id);
       if (house) onSelectHouse(house);
     };
-  }, [onRentClick, onSelectHouse, rentals]);
+  }, [onRentClick, onSelectHouse, rentals, rentingHouseId]);
 
   return (
     <div className={styles.mapContainer}>
@@ -62,11 +63,11 @@ export default function RentalMap({ rentals, onRentClick, onSelectHouse }: Props
                   </div>
                 ` : ''}
                 <button 
-                  style="margin-top:8px; background:${rental.is_rented ? '#ef4444' : '#22c55e'}; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; width:100%;"
+                  style="margin-top:8px; background:${rental.is_rented ? '#ef4444' : (rentingHouseId === rental.id ? '#9ca3af' : '#22c55e')}; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:${rentingHouseId === rental.id || rental.is_rented ? 'not-allowed' : 'pointer'}; font-weight:500; width:100%; opacity:${rentingHouseId === rental.id ? '0.7' : '1'};"
                   onclick="window.handleRent(${rental.id})"
-                  ${rental.is_rented ? 'disabled' : ''}
+                  ${rental.is_rented || rentingHouseId === rental.id ? 'disabled' : ''}
                 >
-                  ${rental.is_rented ? t("rentalCatalog.rented") : t("rentalCatalog.rent")}
+                  ${rentingHouseId === rental.id ? (t("rentalCatalog.loading") || "Загрузка...") : (rental.is_rented ? t("rentalCatalog.rented") : t("rentalCatalog.rent"))}
                 </button>
                 <button
                   style="margin-top:8px; background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; width:100%;"
