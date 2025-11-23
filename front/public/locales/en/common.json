@@ -59,6 +59,16 @@
     "iinTooLong": "IIN cannot exceed 12 characters"
   },
   "welcome": "Welcome",
+  "notFound": {
+    "title": "Page not found",
+    "description": "Unfortunately, the requested page does not exist or has been moved.",
+    "backHome": "Back to home",
+    "suggestionsTitle": "Maybe this will help:",
+    "homeLink": "Home",
+    "catalogLink": "Rental Catalog",
+    "profileLink": "Profile",
+    "faqLink": "FAQ"
+  },
   "header": {
     "home": "Home",
     "about": "About",
