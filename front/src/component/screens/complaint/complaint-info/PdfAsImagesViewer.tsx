@@ -2,6 +2,7 @@
 
 import { FC, useEffect, useState } from "react";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+import { getValidAccessToken } from "@/utils/tokenUtils";
 
 GlobalWorkerOptions.workerSrc = "/pdfjs/5.3.31/pdf.worker.min.mjs"; // ✅ под твой путь
 
@@ -12,11 +13,27 @@ interface Props {
 const PdfAsImagesViewer: FC<Props> = ({ pdfUrl }) => {
   const [images, setImages] = useState<string[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadPdf = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const pdf = await getDocument(pdfUrl).promise;
+        // Получаем токен для аутентификации
+        const token = getValidAccessToken();
+        
+        // Настраиваем заголовки для PDF.js
+        const httpHeaders: Record<string, string> = {};
+        if (token) {
+          httpHeaders['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const pdf = await getDocument({
+          url: pdfUrl,
+          httpHeaders: httpHeaders,
+        }).promise;
         const pages: string[] = [];
 
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -33,15 +50,26 @@ const PdfAsImagesViewer: FC<Props> = ({ pdfUrl }) => {
         }
 
         setImages(pages);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to render PDF:", err);
+        if (err?.message?.includes('404') || err?.message?.includes('Unexpected server response')) {
+          setError("PDF файл не найден или недоступен");
+        } else if (err?.message?.includes('401') || err?.message?.includes('403')) {
+          setError("Нет доступа к PDF файлу. Пожалуйста, войдите в систему.");
+        } else {
+          setError("Ошибка при загрузке PDF файла");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     loadPdf();
   }, [pdfUrl]);
 
-  if (images.length === 0) return <div>Loading PDF...</div>;
+  if (loading) return <div>Загрузка PDF...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
+  if (images.length === 0) return <div>PDF файл пуст</div>;
 
   return (
     <div className="select-none pointer-events-auto mt-2 text-gray-900">

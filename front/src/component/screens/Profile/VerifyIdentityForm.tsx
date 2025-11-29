@@ -107,12 +107,15 @@ const VerifyIdentityForm: React.FC = () => {
       
       const errorData: ErrorResponse = err.response?.data || {};
       
-      // Устанавливаем основную ошибку
-      setError(errorData.error || "Ошибка при верификации документа.");
+      // Устанавливаем основную ошибку - используем детали, если есть, иначе общую ошибку
+      const mainError = errorData.details || errorData.error || "Ошибка при верификации документа.";
+      setError(mainError);
       
-      // Устанавливаем детали ошибки
-      if (errorData.details) {
+      // Устанавливаем детали ошибки (если они отличаются от основной ошибки)
+      if (errorData.details && errorData.details !== mainError) {
         setErrorDetails(errorData.details);
+      } else if (errorData.error && errorData.error !== mainError) {
+        setErrorDetails(errorData.error);
       }
       
       // Устанавливаем детали верификации
@@ -307,7 +310,7 @@ const VerifyIdentityForm: React.FC = () => {
                 maxSizeMB={10}
                 onFilesChange={handleFilesChange}
                 currentFiles={file ? [file] : []}
-                hint="PNG, JPG, JPEG, PDF до 10MB"
+                hint={t("verify.uploadHint")}
                 showPreview={true}
                 previewType="document"
                 error={error || ""}
@@ -324,12 +327,15 @@ const VerifyIdentityForm: React.FC = () => {
                   </svg>
                 </div>
                 <div className={styles.instructionsText}>
-                  <h4 className={styles.instructionsTitle}>Инструкции по загрузке:</h4>
+                  <h4 className={styles.instructionsTitle}>{t("verify.instructionsTitle")}</h4>
                   <ul className={styles.instructionsList}>
-                    <li className={styles.instructionsItem}>• Убедитесь, что документ четко читается</li>
-                    <li className={styles.instructionsItem}>• Поддерживаемые форматы: PNG, JPG, JPEG, PDF</li>
-                    <li className={styles.instructionsItem}>• Максимальный размер файла: 10MB</li>
-                    <li className={styles.instructionsItem}>• Документ должен содержать ваши данные: {profile?.user?.username} и {profile?.user?.identifier}</li>
+                    <li className={styles.instructionsItem}>
+                      <strong>{t("verify.important")}</strong> {t("verify.bothSidesRequired")}
+                    </li>
+                    <li className={styles.instructionsItem}>• {t("verify.ensureReadable")}</li>
+                    <li className={styles.instructionsItem}>• {t("verify.supportedFormats")}</li>
+                    <li className={styles.instructionsItem}>• {t("verify.maxFileSize")}</li>
+                    <li className={styles.instructionsItem}>• {t("verify.mustContainData", { username: profile?.user?.username, identifier: profile?.user?.identifier })}</li>
                   </ul>
                 </div>
               </div>

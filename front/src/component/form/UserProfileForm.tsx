@@ -18,8 +18,6 @@ type FormValues = {
   username?: string;
   phone_number?: string;
   email?: string;
-  avatar?: FileList | null;
-  clearAvatar: boolean;
   document_type?: string;
   passport_expiry?: string;
   visa_num?: string;
@@ -40,7 +38,7 @@ const UserProfileForm = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { fetchData: updateProfile, loading: updateLoading } = useApi<IProfileData>('/profile/edit/', {
     method: 'PATCH',
@@ -61,26 +59,14 @@ const UserProfileForm = () => {
   }, [profileData, reset]);
   const docType = watch("document_type");
 
-  const handleAvatarChange = (files: File[]) => {
-    if (files.length > 0) {
-      setAvatarFile(files[0]);
-    } else {
-      setAvatarFile(null);
-    }
-  };
-
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    setErrorMessage(null);
     const formPayload = new FormData();
     
     if (data.username?.trim()) formPayload.append("username", data.username);
     if(data.identifier?.trim()) formPayload.append("identifier", data.identifier);
     if (data.phone_number?.trim()) formPayload.append("phone_number", data.phone_number);
     if (data.email?.trim()) formPayload.append("email", data.email);
-    formPayload.append("clear_avatar", String(data.clearAvatar));
-
-    if (avatarFile) {
-      formPayload.append("avatar", avatarFile);
-    }
 
      if (data.document_type) formPayload.append("document_type", data.document_type);
 
@@ -97,9 +83,72 @@ const UserProfileForm = () => {
       await updateProfile({ data: formPayload });
       dispatch(fetchUserProfile());
       router.push("/profile");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Ошибка при обновлении профиля:", err);
-      alert("Ошибка при обновлении профиля");
+      
+      // Формируем детальное сообщение об ошибке
+      let errorText = "Ошибка при обновлении профиля";
+      
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        
+        // Приоритет: details > error > field_errors > старый формат
+        if (errorData.details) {
+          errorText = errorData.details;
+        } else if (errorData.error) {
+          errorText = errorData.error;
+          // Если есть details, добавляем их
+          if (errorData.details && errorData.details !== errorData.error) {
+            errorText += `\n${errorData.details}`;
+          }
+        } else if (errorData.field_errors) {
+          // Новый формат с field_errors
+          const fieldErrors: string[] = [];
+          Object.keys(errorData.field_errors).forEach((key) => {
+            const fieldError = Array.isArray(errorData.field_errors[key]) 
+              ? errorData.field_errors[key][0] 
+              : errorData.field_errors[key];
+            if (fieldError) {
+              const fieldName = key === 'username' ? 'ФИО' : 
+                               key === 'email' ? 'Email' : 
+                               key === 'phone_number' ? 'Телефон' : 
+                               key === 'identifier' ? 'ИИН' : 
+                               key === 'document_type' ? 'Тип документа' :
+                               key === 'passport_expiry' ? 'Срок действия документа' :
+                               key === 'visa_num' ? 'Номер визы' : key;
+              fieldErrors.push(`${fieldName}: ${fieldError}`);
+            }
+          });
+          if (fieldErrors.length > 0) {
+            errorText = fieldErrors.join('\n');
+          }
+        } else if (typeof errorData === 'object') {
+          // Старый формат - прямые ошибки полей
+          const fieldErrors: string[] = [];
+          Object.keys(errorData).forEach((key) => {
+            const fieldError = Array.isArray(errorData[key]) 
+              ? errorData[key][0] 
+              : errorData[key];
+            if (fieldError && typeof fieldError === 'string') {
+              const fieldName = key === 'username' ? 'ФИО' : 
+                               key === 'email' ? 'Email' : 
+                               key === 'phone_number' ? 'Телефон' : 
+                               key === 'identifier' ? 'ИИН' : 
+                               key === 'document_type' ? 'Тип документа' :
+                               key === 'passport_expiry' ? 'Срок действия документа' :
+                               key === 'visa_num' ? 'Номер визы' : key;
+              fieldErrors.push(`${fieldName}: ${fieldError}`);
+            }
+          });
+          if (fieldErrors.length > 0) {
+            errorText = fieldErrors.join('\n');
+          }
+        } else if (typeof errorData === 'string') {
+          errorText = errorData;
+        }
+      }
+      
+      setErrorMessage(errorText);
     }
   };
 
@@ -126,6 +175,19 @@ const UserProfileForm = () => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          {errorMessage && (
+            <div className={styles.errorNotification}>
+              <div className={styles.errorNotificationContent}>
+                <svg className={styles.errorNotificationIcon} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <div className={styles.errorNotificationText}>
+                  <p className={styles.errorNotificationTitle}>Ошибка при обновлении профиля</p>
+                  <pre className={styles.errorNotificationDetails}>{errorMessage}</pre>
+                </div>
+              </div>
+            </div>
+          )}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               {t("editProfile.fullName")}:
@@ -134,7 +196,9 @@ const UserProfileForm = () => {
               type="text"
               {...register("username")}
               className={styles.formInput}
+              placeholder={t("editProfile.fullNameHint")}
             />
+            <p className={styles.formHint}>{t("editProfile.fullNameHint")}</p>
             {errors.username && <p className={styles.formError}>{errors.username.message}</p>}
           </div>
 
@@ -234,29 +298,6 @@ const UserProfileForm = () => {
             />
           </div>
 
-          <div className={styles.formGroup}>
-            <FileUploadDropzone
-              accept="image/*"
-              multiple={false}
-              maxFiles={1}
-              maxSizeMB={5}
-              onFilesChange={handleAvatarChange}
-              currentFiles={avatarFile ? [avatarFile] : []}
-              label={t("editProfile.uploadNew")}
-              hint="PNG, JPG, GIF до 5MB"
-              showPreview={true}
-              previewType="image"
-            />
-          </div>
-
-          <div className={styles.checkboxContainer}>
-            <input 
-              type="checkbox" 
-              {...register("clearAvatar")} 
-              className={styles.checkbox}
-            />
-            <span className={styles.checkboxLabel}>{t("editProfile.clearAvatar")}</span>
-          </div>
 
           <button
             type="submit"

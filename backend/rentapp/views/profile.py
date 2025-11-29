@@ -125,13 +125,11 @@ def edit_profile(request):
     """
     API endpoint для редактирования профиля пользователя.
     
-    Позволяет обновить данные пользователя, включая аватар.
+    Позволяет обновить данные пользователя (без аватара).
     Поддерживает частичное обновление (PATCH).
     
     Supported fields:
-        - Все поля модели CustomUser
-        - avatar: Новый аватар
-        - clear_avatar: Удаление аватара (true/false)
+        - Все поля модели CustomUser (кроме avatar)
     
     Permissions:
         - Требуется аутентификация
@@ -139,26 +137,16 @@ def edit_profile(request):
     """
     user = request.user
 
-    serializer = CustomUserSerializer(user, data=request.data, partial=True)
+    # Удаляем поле avatar из данных запроса, если оно есть
+    # Создаем копию данных без аватара
+    data_dict = dict(request.data.items()) if hasattr(request.data, 'items') else dict(request.data)
+    if 'avatar' in data_dict:
+        del data_dict['avatar']
+    if 'clear_avatar' in data_dict:
+        del data_dict['clear_avatar']
+    
+    serializer = CustomUserSerializer(user, data=data_dict, partial=True)
     if serializer.is_valid():
-        # Обработка удаления аватара
-        if request.data.get('clear_avatar') == 'true':
-            if user.avatar and user.avatar.name != 'avatars/def.jpg':
-                old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
-                if os.path.exists(old_path):
-                    os.remove(old_path)
-            user.avatar = 'avatars/def.jpg'
-
-
-        # Обработка нового аватара
-        if 'avatar' in request.FILES:
-            # Удалим старый файл, если не дефолтный
-            if user.avatar and user.avatar.name != 'avatars/def.jpg':
-                old_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
-                if os.path.exists(old_path):
-                    os.remove(old_path)
-            user.avatar = request.FILES['avatar']
-
         serializer.save()
         
         # ✅ Audit Trail: Логируем изменение профиля
@@ -192,7 +180,30 @@ def edit_profile(request):
     import logging
     logger = logging.getLogger(__name__)
     logger.warning(f"Serializer errors: {serializer.errors}")
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Формируем детальное сообщение об ошибке
+    error_messages = []
+    for field, errors in serializer.errors.items():
+        field_name_ru = {
+            'username': 'ФИО',
+            'email': 'Email',
+            'phone_number': 'Телефон',
+            'identifier': 'ИИН',
+            'document_type': 'Тип документа',
+            'passport_expiry': 'Срок действия документа',
+            'visa_num': 'Номер визы'
+        }.get(field, field)
+        
+        error_text = errors[0] if isinstance(errors, list) else str(errors)
+        error_messages.append(f"{field_name_ru}: {error_text}")
+    
+    error_detail = ' | '.join(error_messages) if error_messages else 'Ошибка валидации данных'
+    
+    return Response({
+        'error': 'Ошибка при обновлении профиля',
+        'details': error_detail,
+        'field_errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Представление для получения профиля

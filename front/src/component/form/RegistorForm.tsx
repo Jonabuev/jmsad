@@ -251,6 +251,7 @@ const RegisterForm: FC = () => {
               className={`${styles.input} ${errors.username ? styles.inputError : ''}`}
               placeholder={t("registration.full_name_placeholder")}
             />
+            <p className={styles.hint}>{t("registration.full_name_hint")}</p>
             {errors.username && <p className={styles.errorMessage}>{errors.username}</p>}
           </div>
 

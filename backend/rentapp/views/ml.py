@@ -456,11 +456,25 @@ class OCRCheckView(APIView):
             import traceback
             traceback.print_exc()
             
+            # Формируем понятное сообщение об ошибке
+            error_message = str(e)
+            error_type = type(e).__name__
+            
+            # Улучшаем сообщения для распространенных ошибок
+            if 'File' in error_type or 'file' in error_message.lower():
+                error_message = 'Ошибка при чтении файла. Убедитесь, что файл не поврежден и имеет правильный формат.'
+            elif 'Image' in error_type or 'image' in error_message.lower():
+                error_message = 'Ошибка при обработке изображения. Убедитесь, что файл является корректным изображением или PDF.'
+            elif 'permission' in error_message.lower() or 'Permission' in error_type:
+                error_message = 'Ошибка доступа к файлу. Попробуйте загрузить файл снова.'
+            elif 'size' in error_message.lower() or 'too large' in error_message.lower():
+                error_message = 'Файл слишком большой. Максимальный размер: 10MB.'
+            
             return Response({
                 'success': False,
                 'error': 'Ошибка при обработке документа',
-                'details': str(e),
-                'type': type(e).__name__
+                'details': error_message,
+                'type': error_type
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RecommendTenantsAPIView(APIView):
