@@ -6,10 +6,31 @@ import { getCookie } from "@/utils/cookieUtils";
 import FileUploadDropzone from "@/component/ui/FileUploadDropzone";
 import styles from "./VerifyIdentityForm.module.scss";
 
+interface VerificationDetails {
+  total_found?: number;
+  min_required?: number;
+  field_matches?: Record<string, boolean>;
+  missing_fields?: string[];
+  identifier_match?: boolean;
+  expiry_match?: boolean;
+  found_dates?: string[];
+}
+
+interface ErrorResponse {
+  error?: string;
+  details?: string;
+  verification_details?: VerificationDetails;
+  suggestions?: string[];
+  type?: string;
+}
+
 const VerifyIdentityForm: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [verificationDetails, setVerificationDetails] = useState<VerificationDetails | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState<IProfile | null>(null);
   const { t } = useTranslation("common");
@@ -24,7 +45,6 @@ const VerifyIdentityForm: React.FC = () => {
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      // Проверяем, что мы на клиенте
       if (typeof window === 'undefined') return;
 
       const token = getCookie("access_token");
@@ -44,6 +64,9 @@ const VerifyIdentityForm: React.FC = () => {
     setLoading(true);
     setMessage(null);
     setError(null);
+    setErrorDetails(null);
+    setVerificationDetails(null);
+    setSuggestions([]);
 
     const token = getCookie("access_token");
     if (!token) {
@@ -59,7 +82,7 @@ const VerifyIdentityForm: React.FC = () => {
     }
 
     const user = profile?.user;
-    if (!user || !user.username ) {
+    if (!user || !user.username) {
       setError("Ошибка: данные пользователя не загружены.");
       setLoading(false);
       return;
@@ -80,14 +103,42 @@ const VerifyIdentityForm: React.FC = () => {
       const response = await verifyIdentity(formData, token);
       setMessage(response.data.message || "Успешно отправлено!");
     } catch (err: any) {
-      setError(
-        err.response?.data?.error ||
-          "Ошибка при верификации документа."
-      );
       console.error("Ошибка сервера:", err.response?.data);
+      
+      const errorData: ErrorResponse = err.response?.data || {};
+      
+      // Устанавливаем основную ошибку
+      setError(errorData.error || "Ошибка при верификации документа.");
+      
+      // Устанавливаем детали ошибки
+      if (errorData.details) {
+        setErrorDetails(errorData.details);
+      }
+      
+      // Устанавливаем детали верификации
+      if (errorData.verification_details) {
+        setVerificationDetails(errorData.verification_details);
+      }
+      
+      // Устанавливаем рекомендации
+      if (errorData.suggestions && errorData.suggestions.length > 0) {
+        setSuggestions(errorData.suggestions);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  // Функция для перевода названий полей на русский
+  const getFieldNameRu = (fieldName: string): string => {
+    const fieldNames: Record<string, string> = {
+      'last_name': 'Фамилия',
+      'first_name': 'Имя',
+      'thirdname': 'Отчество',
+      'identifier': 'ИИН',
+      'username': 'Имя пользователя'
+    };
+    return fieldNames[fieldName] || fieldName;
   };
 
   return (
@@ -148,7 +199,7 @@ const VerifyIdentityForm: React.FC = () => {
             </div>
           )}
 
-          {/* Notifications */}
+          {/* Success Notification */}
           {message && (
             <div className={`${styles.notification} ${styles.notificationSuccess}`}>
               <div className={styles.notificationContent}>
@@ -164,6 +215,7 @@ const VerifyIdentityForm: React.FC = () => {
             </div>
           )}
 
+          {/* Error Notification */}
           {error && (
             <div className={`${styles.notification} ${styles.notificationError}`}>
               <div className={styles.notificationContent}>
@@ -172,8 +224,64 @@ const VerifyIdentityForm: React.FC = () => {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className={`${styles.notificationText} ${styles.notificationTextError}`}>{error}</p>
+                  
+                  {/* Детали ошибки */}
+                  {errorDetails && (
+                    <p className={`${styles.notificationDetails} mt-2 text-sm`}>
+                      <strong>Детали:</strong> {errorDetails}
+                    </p>
+                  )}
+                  
+                  {/* Информация о верификации */}
+                  {verificationDetails && (
+                    <div className="mt-3 text-sm">
+                      <p className="font-semibold mb-1">Результаты проверки:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        {verificationDetails.total_found !== undefined && verificationDetails.min_required !== undefined && (
+                          <li>Найдено полей: {verificationDetails.total_found} из {verificationDetails.min_required} требуемых</li>
+                        )}
+                        
+                        {verificationDetails.field_matches && Object.keys(verificationDetails.field_matches).length > 0 && (
+                          <li>
+                            Статус полей:
+                            <ul className="list-none ml-4 mt-1">
+                              {Object.entries(verificationDetails.field_matches).map(([field, found]) => (
+                                <li key={field}>
+                                  {found ? '✓' : '✗'} {getFieldNameRu(field)}
+                                </li>
+                              ))}
+                            </ul>
+                          </li>
+                        )}
+                        
+                        {verificationDetails.identifier_match !== undefined && (
+                          <li>ИИН: {verificationDetails.identifier_match ? '✓ Найден' : '✗ Не найден'}</li>
+                        )}
+                        
+                        {verificationDetails.expiry_match !== undefined && (
+                          <li>Дата истечения: {verificationDetails.expiry_match ? '✓ Совпадает' : '✗ Не совпадает'}</li>
+                        )}
+                        
+                        {verificationDetails.found_dates && verificationDetails.found_dates.length > 0 && (
+                          <li>Найденные даты: {verificationDetails.found_dates.join(', ')}</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Рекомендации */}
+                  {suggestions.length > 0 && (
+                    <div className="mt-3">
+                      <p className="font-semibold text-sm mb-1">Рекомендации:</p>
+                      <ul className="list-disc list-inside space-y-1 text-sm">
+                        {suggestions.map((suggestion, index) => (
+                          <li key={index}>{suggestion}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

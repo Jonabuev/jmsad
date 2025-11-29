@@ -23,9 +23,9 @@ from .views.complaint import (
     house_locations, CreateComplaintAPIView)
 # from .views.forum import ForumView, get_location_filters
 from .views.chat import ChatThreadListCreateView, ChatMessageListCreateView
-# from .views.ml import (
-#     RecommendTenantsAPIView, ROCImageAPIView, OCRCheckView, evaluate_reliability
-# )
+from .views.ml import (
+    RecommendTenantsAPIView, ROCImageAPIView, OCRCheckView, evaluate_reliability
+)
 from .views.manual_verification import ManualVerificationView, PendingVerificationsView
 from .views.admin_views import (
     AdminUserListView, AdminUserDetailView, ban_user, unban_user, 
@@ -69,9 +69,9 @@ urlpatterns = [
     path('tenant-registry1/', TenantRegistryView1.as_view(), name='tenant_registry1'),
     path('complaint/<int:complaint_id>/comment/', AddCommentAPIView.as_view(), name='add_comment'),
     path('support-complaint/', SupportComplaintAPIView.as_view(), name='support_complaint'),
-    # path('forum/', ForumView.as_view(), name='forum'),
+    # # path('forum/', ForumView.as_view(), name='forum'),
     # path('forum/filters/', get_location_filters, name='forum-filters'),
-    # path('verify-identity1/', OCRCheckView.as_view(), name='verify_identity1'),
+    path('verify-identity1/', OCRCheckView.as_view(), name='verify_identity1'),
     # path('recommend-tenants/', RecommendTenantsAPIView.as_view(), name='recommend_tenants'),
     # path('analitics/', RecommendTenantsAPIView.as_view(), name='analitics'),
     # path('analiticsML/', evaluate_reliability, name='analiticsML'),
