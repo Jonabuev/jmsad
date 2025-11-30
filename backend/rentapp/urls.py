@@ -9,7 +9,7 @@ from .views.auth import (
 )
 from .views.profile import (
     IssueViolationAPIView, RemoveBanAPIView, UserCommentDetailAPIView, UserCommentListCreateAPIView, profile, edit_profile, profile_view, PublicUserProfileView, user_apartments, verify_identity,
-    TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, verification_status, regenerate_anonymous_name, get_anonymous_name
+    TenantRegistryView, TenantRegistryView1, TenantRegistryView2, user_info, verification_status, regenerate_anonymous_name, get_anonymous_name, upload_avatar
 )
 # from .views.rental import (
 #     MyRentalsAPIView, RentalListCreateView, RentalDetailView, RentalRequestListView,
@@ -54,6 +54,7 @@ urlpatterns = [
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/edit/', edit_profile, name='edit_profile'),
+    path('profile/upload-avatar/', upload_avatar, name='upload_avatar'),
     # path('apartments/create/', create_apartment, name='create_apartment'),
     path('apartments/', user_apartments, name='user_apartments'),
     path('verify-identity/', verify_identity, name='verify_identity'),

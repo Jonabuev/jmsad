@@ -168,6 +168,7 @@
     "connectionError": "Ошибка соединения с сервером",
     "edit": "Редактировать профиль",
     "changePassword": "Изменить пароль",
+    "changeAvatar": "Изменить аватарку",
     "logout": "Выйти",
     "sections": {
       "info": "Инфо",
@@ -266,6 +267,20 @@
     "success": {
       "apartmentAdded": "Апартамент успешно добавлен!",
       "disputeSubmitted": "Жалоба отправлена на повторное рассмотрение"
+    },
+    "avatar": {
+      "invalidFormat": "Разрешены только файлы JPG, JPEG и PNG",
+      "fileTooLarge": "Размер файла не должен превышать 5MB",
+      "noFileSelected": "Пожалуйста, выберите файл",
+      "authRequired": "Вы не авторизованы",
+      "uploadSuccess": "Аватарка успешно загружена",
+      "uploadError": "Ошибка при загрузке аватарки",
+      "selectFile": "Выберите файл",
+      "chooseFile": "Выбрать файл",
+      "noFileChosen": "Файл не выбран",
+      "fileRequirements": "Форматы: JPG, JPEG, PNG. Максимальный размер: 5MB",
+      "uploading": "Загрузка...",
+      "upload": "Загрузить"
     },
     "search": {
       "title": "Реестр недобросовестных арендаторов и арендодателей",

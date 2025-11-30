@@ -168,6 +168,7 @@
     "connectionError": "Server connection error",
     "edit": "Edit profile",
     "changePassword": "Change password",
+    "changeAvatar": "Change avatar",
     "logout": "Logout",
     "sections": {
       "info": "Info",
@@ -266,6 +267,20 @@
     "success": {
       "apartmentAdded": "Apartment successfully added!",
       "disputeSubmitted": "Complaint submitted for reconsideration"
+    },
+    "avatar": {
+      "invalidFormat": "Only JPG, JPEG and PNG files are allowed",
+      "fileTooLarge": "File size must not exceed 5MB",
+      "noFileSelected": "Please select a file",
+      "authRequired": "You are not authorized",
+      "uploadSuccess": "Avatar uploaded successfully",
+      "uploadError": "Error uploading avatar",
+      "selectFile": "Select file",
+      "chooseFile": "Choose File",
+      "noFileChosen": "No file chosen",
+      "fileRequirements": "Formats: JPG, JPEG, PNG. Maximum size: 5MB",
+      "uploading": "Uploading...",
+      "upload": "Upload"
     },
     "search": {
       "title": "Registry of Dishonest Tenants and Landlords",

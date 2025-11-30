@@ -38,6 +38,13 @@ const Profile: FC = () => {
 
   // Action menu state
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  
+  // Avatar upload modal state
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   // Close action menu when clicking outside
   useEffect(() => {
@@ -62,6 +69,103 @@ const Profile: FC = () => {
   const handleLogout = () => {
     clearAllTokens();
     router.push("/login");
+  };
+
+  // Avatar upload functions
+  const handleAvatarFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+        setAvatarError(t("profile.avatar.invalidFormat") || "Разрешены только файлы JPG, JPEG и PNG");
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setAvatarError(t("profile.avatar.fileTooLarge") || "Размер файла не должен превышать 5MB");
+        return;
+      }
+      
+      setAvatarError(null);
+      setAvatarFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile) {
+      setAvatarError(t("profile.avatar.noFileSelected") || "Пожалуйста, выберите файл");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setAvatarError(null);
+
+    try {
+      const token = getCookie("access_token");
+      if (!token) {
+        setAvatarError(t("profile.avatar.authRequired") || "Вы не авторизованы");
+        setUploadingAvatar(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("avatar", avatarFile);
+
+      const response = await fetch(apiUrl("/profile/upload-avatar/"), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.details || "Ошибка при загрузке аватарки");
+      }
+
+      const data = await response.json();
+      
+      // Update profile data
+      if (data.user) {
+        setProfileData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            user: data.user,
+            avatar: data.user.avatar,
+          };
+        });
+      }
+
+      // Close modal and reset
+      setIsAvatarModalOpen(false);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setAvatarError(null);
+      
+      // Show success message
+      alert(t("profile.avatar.uploadSuccess") || "Аватарка успешно загружена");
+    } catch (err: any) {
+      setAvatarError(err.message || t("profile.avatar.uploadError") || "Ошибка при загрузке аватарки");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleCloseAvatarModal = () => {
+    setIsAvatarModalOpen(false);
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setAvatarError(null);
   };
 
   // Comments functions
@@ -226,6 +330,18 @@ const Profile: FC = () => {
                </button>
                <button
                  onClick={() => {
+                   setIsAvatarModalOpen(true);
+                   setIsActionMenuOpen(false);
+                 }}
+                 className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+               >
+                 <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                 </svg>
+                 {t("profile.changeAvatar") || "Изменить аватарку"}
+               </button>
+               <button
+                 onClick={() => {
                    router.push("/reset-password");
                    setIsActionMenuOpen(false);
                  }}
@@ -346,6 +462,18 @@ const Profile: FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       {t("profile.edit")}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAvatarModalOpen(true);
+                        setIsActionMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {t("profile.changeAvatar") || "Изменить аватарку"}
                     </button>
                     <button
                       onClick={() => {
@@ -651,6 +779,113 @@ const Profile: FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Avatar Upload Modal */}
+      {isAvatarModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                {t("profile.changeAvatar") || "Изменить аватарку"}
+              </h2>
+              <button
+                onClick={handleCloseAvatarModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Preview */}
+            {avatarPreview && (
+              <div className="mb-6 flex justify-center">
+                <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200">
+                  <Image
+                    src={avatarPreview}
+                    alt="Preview"
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* File Input */}
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                {t("profile.avatar.selectFile") || "Выберите файл"}
+              </label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png"
+                  onChange={handleAvatarFileSelect}
+                  className="hidden"
+                  id="avatar-file-input"
+                />
+                <label
+                  htmlFor="avatar-file-input"
+                  className="flex items-center gap-3 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors"
+                >
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-sm font-medium text-purple-700">
+                    {avatarFile ? avatarFile.name : t("profile.avatar.chooseFile") || "Выбрать файл"}
+                  </span>
+                  {!avatarFile && (
+                    <span className="ml-auto text-xs text-gray-500">
+                      {t("profile.avatar.noFileChosen") || "Файл не выбран"}
+                    </span>
+                  )}
+                </label>
+              </div>
+              <p className="mt-2 text-xs text-gray-500">
+                {t("profile.avatar.fileRequirements") || "Форматы: JPG, JPEG, PNG. Максимальный размер: 5MB"}
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {avatarError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{avatarError}</p>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCloseAvatarModal}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors"
+                disabled={uploadingAvatar}
+              >
+                {t("profile.cancel") || "Отмена"}
+              </button>
+              <button
+                onClick={handleAvatarUpload}
+                disabled={!avatarFile || uploadingAvatar}
+                className="flex-1 px-4 py-2 text-white bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {uploadingAvatar ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {t("profile.avatar.uploading") || "Загрузка..."}
+                  </>
+                ) : (
+                  t("profile.avatar.upload") || "Загрузить"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

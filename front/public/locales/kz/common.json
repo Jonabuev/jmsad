@@ -168,6 +168,7 @@
     "connectionError": "Серверге қосылу қатесі",
     "edit": "Профильді өңдеу",
     "changePassword": "Құпия сөзді өзгерту",
+    "changeAvatar": "Аватарды өзгерту",
     "logout": "Шығу",
     "sections": {
       "info": "Ақпарат",
@@ -266,6 +267,20 @@
     "success": {
       "apartmentAdded": "Пәтер сәтті қосылды!",
       "disputeSubmitted": "Шағым қайта қарауға жіберілді"
+    },
+    "avatar": {
+      "invalidFormat": "Тек JPG, JPEG және PNG файлдары рұқсат етілген",
+      "fileTooLarge": "Файл өлшемі 5MB-тан аспауы керек",
+      "noFileSelected": "Файлды таңдаңыз",
+      "authRequired": "Сіз авторизацияланбағансыз",
+      "uploadSuccess": "Аватар сәтті жүктелді",
+      "uploadError": "Аватарды жүктеу кезінде қате",
+      "selectFile": "Файлды таңдаңыз",
+      "chooseFile": "Файлды таңдау",
+      "noFileChosen": "Файл таңдалмаған",
+      "fileRequirements": "Форматы: JPG, JPEG, PNG. Максималды өлшемі: 5MB",
+      "uploading": "Жүктелуде...",
+      "upload": "Жүктеу"
     },
     "search": {
       "title": "Сенімсіз жалдау алушылар мен жалдау берушілердің тіркелімі",

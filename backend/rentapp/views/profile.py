@@ -12,7 +12,7 @@ from django.db import transaction, IntegrityError
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Q, Count, F
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import ListAPIView
 from datetime import datetime
 from django.utils import timezone
@@ -679,6 +679,75 @@ class TenantRegistryView2(ListAPIView):
 
         return queryset
     
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, NotBlacklistedOrProfileEdit])
+def upload_avatar(request):
+    """
+    API endpoint для загрузки аватарки пользователя.
+    
+    Принимает файл изображения через multipart/form-data.
+    Поддерживает форматы: jpg, jpeg, png
+    Максимальный размер: 5MB
+    
+    Permissions:
+        - Требуется аутентификация
+        - Пользователь может загружать аватарку только для своего профиля
+    """
+    try:
+        user = request.user
+        
+        # Проверяем наличие файла
+        if 'avatar' not in request.FILES:
+            return Response(
+                {'error': 'Файл аватарки не был загружен'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        avatar_file = request.FILES['avatar']
+        
+        # Валидация файла (валидатор уже проверяет размер и расширение)
+        try:
+            from rentapp.validators import validate_avatar_image
+            validate_avatar_image(avatar_file)
+        except ValidationError as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Сохраняем аватарку
+        user.avatar = avatar_file
+        user.save()
+        
+        # ✅ Audit Trail: Логируем изменение аватарки
+        AuditLog.log_action(
+            action='upload_avatar',
+            request=request,
+            target_user=user,
+            details={
+                'profile_id': user.id,
+                'avatar_filename': avatar_file.name
+            }
+        )
+        
+        # Возвращаем обновленные данные пользователя
+        data = {
+            'user': CustomUserSerializer(user).data,
+            'message': 'Аватарка успешно загружена'
+        }
+        return Response(data, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        import traceback
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in upload_avatar view: {str(e)}\n{traceback.format_exc()}")
+        return Response(
+            {'error': 'Ошибка при загрузке аватарки', 'details': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
