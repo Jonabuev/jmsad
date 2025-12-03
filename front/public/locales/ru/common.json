@@ -351,7 +351,27 @@
     "ensureReadable": "Убедитесь, что документ четко читается",
     "supportedFormats": "Поддерживаемые форматы: PNG, JPG, JPEG, PDF",
     "maxFileSize": "Максимальный размер файла: 10MB",
-    "mustContainData": "Документ должен содержать ваши данные: {{username}} и {{identifier}}"
+    "mustContainData": "Документ должен содержать ваши данные: {{username}} и {{identifier}}",
+    "resultsTitle": "Результаты проверки:",
+    "fieldsFound": "Найдено полей: {verificationDetails.total_found} из {verificationDetails.min_required} требуемых",
+    "fieldStatus": "Статус полей:",
+    "iinFound": "✓ Найден",
+    "iinNotFound": "✗ Не найден",
+    "expiryMatch": "✓ Совпадает",
+    "expiryNotMatch": "✗ Не совпадает",
+    "details": "Детали:",
+    "foundDates": "Найденные даты:",
+    "recommendations": "Рекомендации:",
+    "sendDocument": "Отправить документ",
+    "sendingDocument": "Отправка документа...",
+    "dateExpiry": "Дата истечения:",
+    "expiryMatches": "Срок действия совпадает",
+    "expiryDoesNotMatch": "Срок действия не совпадает",
+    "last_name": "Фамилия",
+    "first_name": "Имя",
+    "thirdname": "Отчество",
+    "identifier": "ИИН",
+    "username": "Имя пользователя"
   },
   "rentalTable": {
     "rentalRequests": "Заявки на аренду (входящие)",
@@ -753,15 +773,11 @@
       "title": "3. Уважительное общение и этика",
       "prohibited": {
         "title": "Что запрещено:",
-        "items": [
-          "Нецензурная лексика, угрозы, травля и шантаж."
-        ]
+        "items": ["Нецензурная лексика, угрозы, травля и шантаж."]
       },
       "allowed": {
         "title": "Что приветствуется:",
-        "items": [
-          "Конструктивная критика и объективное изложение фактов."
-        ]
+        "items": ["Конструктивная критика и объективное изложение фактов."]
       },
       "sanctions": {
         "title": "Санкции:",
@@ -780,9 +796,7 @@
       "title": "5. Запрет на рекламу, спам и саморекламу",
       "prohibited": {
         "title": "Что запрещено:",
-        "items": [
-          "Рекламные ссылки, реферальные коды, спам."
-        ]
+        "items": ["Рекламные ссылки, реферальные коды, спам."]
       },
       "allowed": {
         "title": "Исключения:",

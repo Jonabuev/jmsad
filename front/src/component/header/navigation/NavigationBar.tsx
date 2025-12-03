@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
@@ -9,7 +9,7 @@ import { logout } from "@/component/store/auth/authSlice";
 import { mediaUrl } from "@/utils/url";
 import { NotificationBell } from "@/component/notifications";
 
-const NavigationBar: React.FC = () => {
+const NavigationBar: React.FC = React.memo(() => {
   const { profile: user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -42,15 +42,15 @@ const NavigationBar: React.FC = () => {
     };
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(logout());
     window.location.href = "/";
-  };
+  }, [dispatch]);
 
-  const changeLanguage = (newLocale: string) => {
+  const changeLanguage = useCallback((newLocale: string) => {
     router.push(router.pathname, router.asPath, { locale: newLocale });
     setIsLanguageDropdownOpen(false);
-  };
+  }, [router]);
 
   return (
     <div className="flex flex-1 justify-end gap-4 lg:gap-6 xl:gap-8 relative h-14 bg-white">
@@ -196,6 +196,8 @@ const NavigationBar: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+NavigationBar.displayName = 'NavigationBar';
 
 export default NavigationBar;

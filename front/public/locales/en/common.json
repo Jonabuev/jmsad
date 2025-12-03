@@ -326,9 +326,9 @@
     }
   },
   "verify": {
-    "identityVerification": "Identity verification",
+    "identityVerification": "Identity Verification",
     "uploadDocument": "Upload Document",
-    "formDescription": "Upload a document to verify your identity and gain access to all platform features",
+    "formDescription": "Upload a document to verify your identity and gain full access to all platform features",
     "userInfo": "User Information",
     "usernameLabel": "Username:",
     "iinLabel": "IIN:",
@@ -347,11 +347,31 @@
     "uploadHint": "PNG, JPG, JPEG, PDF up to 10MB",
     "instructionsTitle": "Upload Instructions:",
     "important": "Important:",
-    "bothSidesRequired": "The file must contain both sides of the document (front and back)",
+    "bothSidesRequired": "The file must contain both sides of the document (front and back). For example, the Kaspi document must include both sides.",
     "ensureReadable": "Make sure the document is clearly readable",
     "supportedFormats": "Supported formats: PNG, JPG, JPEG, PDF",
     "maxFileSize": "Maximum file size: 10MB",
-    "mustContainData": "The document must contain your data: {{username}} and {{identifier}}"
+    "mustContainData": "The document must contain your data: {{username}} and {{identifier}}",
+    "details": "Details:",
+    "resultsTitle": "Verification Results:",
+    "fieldsFound": "Fields found: {verificationDetails.total_found} of {verificationDetails.min_required} required",
+    "fieldStatus": "Field Status:",
+    "iinFound": "✓ Found",
+    "iinNotFound": "✗ Not found",
+    "expiryMatch": "✓ Matches",
+    "expiryNotMatch": "✗ Does not match",
+    "foundDates": "Found dates:",
+    "recommendations": "Recommendations:",
+    "sendDocument": "Send Document",
+    "sendingDocument": "Sending document...",
+    "dateExpiry": "Expiry Date:",
+    "expiryMatches": "Expiry date matches",
+    "expiryDoesNotMatch": "Expiry date does not match",
+    "last_name": "Last name",
+    "first_name": "First name",
+    "thirdname": "Middle name",
+    "identifier": "IIN",
+    "username": "Username"
   },
   "rentalTable": {
     "rentalRequests": "Rental requests (incoming)",
@@ -751,15 +771,11 @@
       "title": "3. Respectful Communication and Ethics",
       "prohibited": {
         "title": "What is prohibited:",
-        "items": [
-          "Profanity, threats, bullying, and extortion."
-        ]
+        "items": ["Profanity, threats, bullying, and extortion."]
       },
       "allowed": {
         "title": "What is encouraged:",
-        "items": [
-          "Constructive criticism and objective presentation of facts."
-        ]
+        "items": ["Constructive criticism and objective presentation of facts."]
       },
       "sanctions": {
         "title": "Sanctions:",
@@ -778,9 +794,7 @@
       "title": "5. Prohibition of Advertising, Spam, and Self-Promotion",
       "prohibited": {
         "title": "What is prohibited:",
-        "items": [
-          "Advertising links, referral codes, spam."
-        ]
+        "items": ["Advertising links, referral codes, spam."]
       },
       "allowed": {
         "title": "Exceptions:",
@@ -824,12 +838,7 @@
     "warningsSystem": {
       "title": "Warning System",
       "table": {
-        "headers": [
-          "Violation",
-          "First Measure",
-          "Repeat",
-          "Severe Violation"
-        ],
+        "headers": ["Violation", "First Measure", "Repeat", "Severe Violation"],
         "rows": [
           {
             "violation": "False Complaint",

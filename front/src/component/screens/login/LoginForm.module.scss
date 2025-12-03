@@ -16,12 +16,12 @@
 }
 
 .loginCard {
-  max-width: 28rem;
+  max-width: 32rem;
   width: 100%;
   background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
 }
 
 .header {
@@ -133,18 +133,23 @@
 
 .input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
   font-size: 0.875rem;
   color: #374151;
-  background-color: white;
+  background-color: #f9fafb;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: white;
+  }
+
+  &:hover {
+    background-color: white;
   }
 
   &::placeholder {
@@ -154,18 +159,22 @@
 
 .submitButton {
   width: 100%;
-  background-color: #2563eb;
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 1.5rem;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
 
-  &:hover {
-    background-color: #1d4ed8;
+  &:hover:not(:disabled) {
+    background: linear-gradient(90deg, #1d4ed8 0%, #1e40af 100%);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
   }
 
   &:focus {
@@ -173,13 +182,15 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  &:active {
-    transform: translateY(1px);
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { getCookie } from "@/utils/cookieUtils";
 import RentalDatePicker from "./rental-date/RentalDatePicker";
 import LoadingIndicator from "./loading/LoadingIndicator";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { IHouse } from "@/component/type/properties.interface";
 import { apiUrl, mediaUrl } from "@/utils/url";
 import styles from "./RentalCatalog.module.scss";
@@ -46,7 +46,7 @@ export default function RentalCatalog() {
     setMainImgIdx(0);
   }, [selectedHouse]);
 
-  const handleRent = async (houseId: number) => {
+  const handleRent = useCallback(async (houseId: number) => {
     if (!startDate || !endDate) {
       alert(t("rentalCatalog.selectDates"));
       return;
@@ -72,19 +72,21 @@ export default function RentalCatalog() {
     } finally {
       setRentingHouseId(null);
     }
-  };
+  }, [startDate, endDate, t]);
 
-  // Применение фильтров к данным
-  const filteredRentals = rentals.filter((rental) => {
-    if (filters.minPrice && parseFloat(rental.price) < parseFloat(filters.minPrice)) return false;
-    if (filters.maxPrice && parseFloat(rental.price) > parseFloat(filters.maxPrice)) return false;
-    if (filters.propertyType && rental.type_p !== filters.propertyType) return false;
-    if (filters.minRooms && rental.num_of_rooms < parseInt(filters.minRooms)) return false;
-    if (filters.maxRooms && rental.num_of_rooms > parseInt(filters.maxRooms)) return false;
-    if (filters.isFurnished && !rental.is_furnished) return false;
-    if (filters.hasBalcony && !rental.has_balcony) return false;
-    return true;
-  });
+  // Применение фильтров к данным (мемоизировано для оптимизации)
+  const filteredRentals = useMemo(() => {
+    return rentals.filter((rental) => {
+      if (filters.minPrice && parseFloat(rental.price) < parseFloat(filters.minPrice)) return false;
+      if (filters.maxPrice && parseFloat(rental.price) > parseFloat(filters.maxPrice)) return false;
+      if (filters.propertyType && rental.type_p !== filters.propertyType) return false;
+      if (filters.minRooms && rental.num_of_rooms < parseInt(filters.minRooms)) return false;
+      if (filters.maxRooms && rental.num_of_rooms > parseInt(filters.maxRooms)) return false;
+      if (filters.isFurnished && !rental.is_furnished) return false;
+      if (filters.hasBalcony && !rental.has_balcony) return false;
+      return true;
+    });
+  }, [rentals, filters]);
 
   return (
     <div className={styles.rentalCatalog}>

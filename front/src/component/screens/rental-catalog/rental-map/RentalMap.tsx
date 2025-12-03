@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { mediaUrl } from "@/utils/url";
 import styles from "./RentalMap.module.scss";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "next-i18next";
 
 const YandexMapWithNoSSR = dynamic(() => import("@/component/map/YandexMap"), {
@@ -29,20 +29,19 @@ interface Props {
 export default function RentalMap({ rentals, onRentClick, onSelectHouse, rentingHouseId }: Props) {
   const { t } = useTranslation();
 
+  const handleSelectHouseById = useCallback((id: number) => {
+    const house = rentals.find((r) => r.id === id);
+    if (house) onSelectHouse(house);
+  }, [rentals, onSelectHouse]);
+
   useEffect(() => {
     window.handleRent = onRentClick;
-    window.handleSelectHouse = (id: number) => {
-      const house = rentals.find((r) => r.id === id);
-      if (house) onSelectHouse(house);
-    };
-  }, [onRentClick, onSelectHouse, rentals, rentingHouseId]);
+    window.handleSelectHouse = handleSelectHouseById;
+  }, [onRentClick, handleSelectHouseById]);
 
-  return (
-    <div className={styles.mapContainer}>
-      <YandexMapWithNoSSR
-        center={[43.222, 76.8512]}
-        zoom={11}
-        markers={rentals.map((rental) => ({
+  // Мемоизируем маркеры для оптимизации
+  const markers = useMemo(() => {
+    return rentals.map((rental) => ({
           coordinates: [rental.latitude, rental.longitude] as [number, number],
           properties: {
             balloonContent: `
@@ -81,7 +80,15 @@ export default function RentalMap({ rentals, onRentClick, onSelectHouse, renting
           options: {
             iconColor: rental.is_rented ? '#ef4444' : '#22c55e',
           }
-        }))}
+        }));
+  }, [rentals, rentingHouseId, t]);
+
+  return (
+    <div className={styles.mapContainer}>
+      <YandexMapWithNoSSR
+        center={[43.222, 76.8512]}
+        zoom={11}
+        markers={markers}
       />
     </div>
   );

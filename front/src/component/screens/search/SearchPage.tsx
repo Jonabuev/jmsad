@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { MyComponent } from "@/component/star/Star";
@@ -9,6 +9,7 @@ import { fetchComplaintReasons, fetchTenants, fetchLandlords } from "@/api/searc
 import { getVerificationStatus } from "@/api/userApi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/component/store/store";
+import { useDebounce } from "@/component/hooks/useDebounce";
 import styles from "./SearchPage.module.scss";
 
 interface IComplaintReason {
@@ -115,11 +116,17 @@ const TenantRegistry: React.FC = () => {
     );
   };
 
-  const getTranslatedReasons = (reasonsStr: string) => {
+  const getTranslatedReasons = useCallback((reasonsStr: string) => {
     if (!reasonsStr) return "-";
     const keys = reasonsStr.split(",").map((s) => s.trim()).filter(Boolean);
     return keys.map((key) => t(`search.reason.${key}`)).join(", ");
-  };
+  }, [t]);
+
+  // Дебаунсинг для поисковых полей
+  const debouncedFullName = useDebounce(fullName, 500);
+  const debouncedIin = useDebounce(iin, 500);
+  const debouncedAddressQuery = useDebounce(addressQuery, 500);
+  const debouncedCourtScore = useDebounce(courtScore, 500);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -130,14 +137,14 @@ const TenantRegistry: React.FC = () => {
       }
       const params: Record<string, string> = {};
       if (searchQuery) params.search = searchQuery;
-      if(fullName) params.search = fullName;
-      if(iin) params.search = iin;
+      if(debouncedFullName) params.search = debouncedFullName;
+      if(debouncedIin) params.search = debouncedIin;
       if (startDate && endDate) {
         params.start_date = startDate;
         params.end_date = endDate;
       }
-      if (addressQuery) params.address = addressQuery;
-      if (courtScore) params.court_decision_score = courtScore;
+      if (debouncedAddressQuery) params.address = debouncedAddressQuery;
+      if (debouncedCourtScore) params.court_decision_score = debouncedCourtScore;
       if (selectedReasons.length > 0) {
         params.reasons = selectedReasons.join(",");
       }
@@ -146,9 +153,11 @@ const TenantRegistry: React.FC = () => {
         res = await fetchTenants(params, token);
       setUsers(res.data);
     } catch (error) {
-      console.error("Ошибка при загрузке:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Ошибка при загрузке:", error);
+      }
     }
-  }, [router, searchQuery, startDate, endDate, addressQuery, courtScore, selectedReasons, iin, fullName]);
+  }, [router, searchQuery, startDate, endDate, debouncedAddressQuery, debouncedCourtScore, selectedReasons, debouncedIin, debouncedFullName]);
 
   useEffect(() => {
     fetchUsers();

@@ -3,7 +3,7 @@ import type { AppProps } from "next/app";
 import { appWithTranslation } from "next-i18next";
 import { Provider, useDispatch } from "react-redux";
 import { store } from "@/component/store/store";
-import { useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/router";
 import { fetchUserProfile } from "@/component/store/auth/authSlice";
 import { AppDispatch } from "@/component/store/store";
@@ -29,6 +29,30 @@ const AppContent = (props: AppProps) => {
   
   // Используем хук для автоматического обновления токенов
   useAutoRefreshToken();
+  
+  // Мемоизируем проверку админ-страницы
+  const isAdminPageMemo = useMemo(() => router.pathname.startsWith("/admin"), [router.pathname]);
+
+  // Мемоизируем функцию инициализации аутентификации
+  const initializeAuth = useCallback(async () => {
+    try {
+      // Проверяем и очищаем истекшие токены при загрузке приложения
+      checkAndCleanExpiredTokens();
+      
+      const token = getValidAccessToken();
+      if (token) {
+        logger.log('Valid token found, restoring user profile...');
+        await dispatch(fetchUserProfile());
+        
+        // Push-уведомления будут инициализированы через PushNotificationPrompt
+        // когда пользователь явно даст разрешение
+      } else {
+        logger.log('No valid token found');
+      }
+    } catch (error) {
+      logger.error('Error during auth initialization:', error);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     // Проверяем, что мы на клиенте
@@ -36,26 +60,6 @@ const AppContent = (props: AppProps) => {
 
     // ✅ Инициализируем мониторинг производительности
     reportWebVitals();
-
-    const initializeAuth = async () => {
-      try {
-        // Проверяем и очищаем истекшие токены при загрузке приложения
-        checkAndCleanExpiredTokens();
-        
-        const token = getValidAccessToken();
-        if (token) {
-          logger.log('Valid token found, restoring user profile...');
-          await dispatch(fetchUserProfile());
-          
-          // Push-уведомления будут инициализированы через PushNotificationPrompt
-          // когда пользователь явно даст разрешение
-        } else {
-          logger.log('No valid token found');
-        }
-      } catch (error) {
-        logger.error('Error during auth initialization:', error);
-      }
-    };
 
     // Добавляем небольшую задержку для стабилизации состояния
     const timeoutId = setTimeout(() => {
@@ -65,12 +69,12 @@ const AppContent = (props: AppProps) => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [dispatch]);
+  }, [initializeAuth]);
 
   // Слушатель push-уведомлений настраивается в usePushNotifications хуке
 
   // Если это админ-страница, рендерим только контент без Header и Footer
-  if (isAdminPage) {
+  if (isAdminPageMemo) {
     return (
       <>
         <Head>

@@ -82,6 +82,15 @@ const nextConfig: NextConfig = {
       exclude: ['error', 'warn'],
     } : false,
   },
+  // Оптимизация производительности
+  compress: true,
+  poweredByHeader: false,
+  // Экспериментальные оптимизации
+  // ВНИМАНИЕ: optimizeCss требует установки 'critters': npm install critters --save-dev
+  // Если возникают проблемы, можно временно отключить эту опцию
+  experimental: {
+    optimizeCss: true,
+  },
 };
 
 export default nextConfig;

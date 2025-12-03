@@ -5,7 +5,7 @@
 }
 
 .container {
-  max-width: 64rem;
+  max-width: 48rem;
   margin: 0 auto;
   padding: 0 1rem;
 
@@ -285,17 +285,24 @@
 
 .descriptionTextarea {
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb;
   border-radius: 0.75rem;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   min-height: 7.5rem;
   resize: none;
+  background-color: #f9fafb;
   transition: all 0.2s ease;
+  font-size: 0.875rem;
 
   &:focus {
     outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: white;
+  }
+
+  &:hover {
+    background-color: white;
   }
 
   &::placeholder {
@@ -531,21 +538,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: white;
-  background-color: #2563eb;
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
   border: none;
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
 
-  &:hover {
-    background-color: #1d4ed8;
-    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-    transform: scale(1.05);
+  &:hover:not(:disabled) {
+    background: linear-gradient(90deg, #1d4ed8 0%, #1e40af 100%);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
   }
 
   &:focus {
