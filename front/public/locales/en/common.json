@@ -124,6 +124,7 @@
     },
     "confirmed": "Confirmed",
     "notConfirmed": "Not confirmed",
+    "confirm": "Confirm",
     "noPhone": "Phone not specified",
     "noIIN": "IIN not specified",
     "tenant": "Tenant",
