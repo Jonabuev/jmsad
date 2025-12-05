@@ -11,9 +11,10 @@ COPY package*.json ./
 # Устанавливаем зависимости с запасом по таймауту
 # ⚠️ Временное решение: используем npm install вместо npm ci, так как package-lock.json не синхронизирован
 # После обновления package-lock.json локально можно вернуть npm ci
+# ⚠️ Устанавливаем ВСЕ зависимости (включая devDependencies), так как TypeScript и другие dev-пакеты нужны для сборки
 RUN npm config set registry https://registry.npmmirror.com \
     && npm set fetch-timeout=600000 \
-    && npm install --omit=dev --no-audit --legacy-peer-deps
+    && npm install --no-audit --legacy-peer-deps
 
 
 
