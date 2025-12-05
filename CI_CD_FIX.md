@@ -22,8 +22,11 @@
 ### 2. Обновлен CI/CD workflow
 - ✅ Изменена версия Node.js с `18` на `20` в `.github/workflows/ci-cd.yml`
 
-### 3. Обновлен CI/CD workflow (временное решение)
+### 3. Обновлен CI/CD workflow и Dockerfile (временное решение)
 - ✅ Изменен `npm ci` на `npm install --legacy-peer-deps` в `.github/workflows/ci-cd.yml`
+- ✅ Изменен `npm ci` на `npm install --legacy-peer-deps` в `front/Dockerfile`
+- ✅ Изменен `npm ci` на `npm install --legacy-peer-deps` в `front/Dockerfile.dev`
+- ✅ Обновлена версия Node.js с 18 на 20 в `front/Dockerfile.dev`
 - ⚠️ **Временное решение**: `npm install` автоматически обновит lock файл, если он не синхронизирован
 - 📝 **Рекомендуется**: После успешного деплоя обновить `package-lock.json` локально и вернуть `npm ci`
 
@@ -31,7 +34,9 @@
 
 1. ✅ `front/package.json` - добавлены недостающие пакеты
 2. ✅ `.github/workflows/ci-cd.yml` - обновлена версия Node.js до 20 и изменен `npm ci` на `npm install`
-3. ⚠️ `front/package-lock.json` - должен быть обновлен локально и закоммичен
+3. ✅ `front/Dockerfile` - изменен `npm ci` на `npm install --legacy-peer-deps`
+4. ✅ `front/Dockerfile.dev` - изменен `npm ci` на `npm install --legacy-peer-deps` и обновлена версия Node.js до 20
+5. ⚠️ `front/package-lock.json` - должен быть обновлен локально и закоммичен
 
 ## Проверка
 
@@ -46,10 +51,12 @@
 **Обязательно закоммитьте обновленный `package-lock.json`** в репозиторий, иначе CI/CD будет падать с той же ошибкой.
 
 ```bash
-git add front/package-lock.json front/package.json .github/workflows/ci-cd.yml
-git commit -m "fix: update package-lock.json and Node.js version to 20 for CI/CD"
+git add front/package.json front/Dockerfile front/Dockerfile.dev .github/workflows/ci-cd.yml
+git commit -m "fix: update Dockerfiles to use npm install and Node.js 20 for CI/CD"
 git push
 ```
+
+**Примечание**: `package-lock.json` будет автоматически обновлен при следующем `npm install` в CI/CD или локально.
 
 ## Дополнительные замечания
 

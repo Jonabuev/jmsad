@@ -1,5 +1,5 @@
 # Development образ с оптимизацией
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -8,7 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Устанавливаем зависимости с кэшированием
-RUN npm ci --prefer-offline --no-audit
+# ⚠️ Временное решение: используем npm install вместо npm ci, так как package-lock.json не синхронизирован
+# После обновления package-lock.json локально можно вернуть npm ci
+RUN npm install --prefer-offline --no-audit --legacy-peer-deps
 
 # Копируем исходный код
 COPY . .

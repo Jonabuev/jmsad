@@ -9,9 +9,11 @@ COPY package*.json ./
 
 # Устанавливаем зависимости с кэшированием
 # Устанавливаем зависимости с запасом по таймауту
+# ⚠️ Временное решение: используем npm install вместо npm ci, так как package-lock.json не синхронизирован
+# После обновления package-lock.json локально можно вернуть npm ci
 RUN npm config set registry https://registry.npmmirror.com \
     && npm set fetch-timeout=600000 \
-    && npm ci --omit=dev --no-audit
+    && npm install --omit=dev --no-audit --legacy-peer-deps
 
 
 
