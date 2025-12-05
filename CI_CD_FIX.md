@@ -22,14 +22,16 @@
 ### 2. Обновлен CI/CD workflow
 - ✅ Изменена версия Node.js с `18` на `20` в `.github/workflows/ci-cd.yml`
 
-### 3. Обновлен package-lock.json
-- ✅ Выполнен `npm install` для синхронизации lock файла
+### 3. Обновлен CI/CD workflow (временное решение)
+- ✅ Изменен `npm ci` на `npm install --legacy-peer-deps` в `.github/workflows/ci-cd.yml`
+- ⚠️ **Временное решение**: `npm install` автоматически обновит lock файл, если он не синхронизирован
+- 📝 **Рекомендуется**: После успешного деплоя обновить `package-lock.json` локально и вернуть `npm ci`
 
 ## Измененные файлы
 
 1. ✅ `front/package.json` - добавлены недостающие пакеты
-2. ✅ `.github/workflows/ci-cd.yml` - обновлена версия Node.js до 20
-3. ✅ `front/package-lock.json` - автоматически обновлен после `npm install`
+2. ✅ `.github/workflows/ci-cd.yml` - обновлена версия Node.js до 20 и изменен `npm ci` на `npm install`
+3. ⚠️ `front/package-lock.json` - должен быть обновлен локально и закоммичен
 
 ## Проверка
 
@@ -44,10 +46,24 @@
 **Обязательно закоммитьте обновленный `package-lock.json`** в репозиторий, иначе CI/CD будет падать с той же ошибкой.
 
 ```bash
-git add front/package-lock.json
-git commit -m "chore: update package-lock.json with new dependencies"
+git add front/package-lock.json front/package.json .github/workflows/ci-cd.yml
+git commit -m "fix: update package-lock.json and Node.js version to 20 for CI/CD"
 git push
 ```
+
+## Дополнительные замечания
+
+Если после обновления `package-lock.json` все еще возникают ошибки в CI/CD:
+
+1. **Убедитесь, что используется Node.js 20+** в CI/CD
+2. **Проверьте версию npm** - рекомендуется использовать npm 10+
+3. **Если ошибки продолжаются**, попробуйте:
+   ```bash
+   # Удалить lock файл и пересоздать
+   rm front/package-lock.json
+   cd front
+   npm install
+   ```
 
 ---
 

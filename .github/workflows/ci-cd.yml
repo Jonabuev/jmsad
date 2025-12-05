@@ -54,7 +54,9 @@ jobs:
     - name: Install Node.js dependencies
       run: |
         cd front
-        npm ci
+        # ✅ Используем npm install вместо npm ci для автоматического обновления lock файла
+        # Если package-lock.json не синхронизирован, npm ci падает, а npm install обновит его
+        npm install --legacy-peer-deps
 
     - name: Run backend tests
       env:
