@@ -2,10 +2,32 @@ import React from 'react';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import ComplaintManagementWrapper from '@/component/admin/complaints/ComplaintManagementWrapper';
+import dynamic from 'next/dynamic';
 import { useAdminAuth } from '@/component/hooks/useAdminAuth';
-import AdminLayout from '@/component/admin/AdminLayout';
 import styles from './AdminComplaintsPage.module.scss';
+
+// ✅ Оптимизация: Ленивая загрузка тяжелых админ компонентов
+const AdminLayout = dynamic(() => import('@/component/admin/AdminLayout'), {
+  loading: () => (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Загрузка...</p>
+      </div>
+    </div>
+  ),
+});
+
+const ComplaintManagementWrapper = dynamic(() => import('@/component/admin/complaints/ComplaintManagementWrapper'), {
+  loading: () => (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Загрузка управления жалобами...</p>
+      </div>
+    </div>
+  ),
+});
 
 const AdminComplaintsPage: React.FC = () => {
   const { t } = useTranslation('common');

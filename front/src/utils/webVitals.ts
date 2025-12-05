@@ -40,19 +40,37 @@ function sendToAnalytics(metric: Metric) {
       });
     }
 
-    // Пример: Отправка на свой бэкенд
-    // fetch('/api/analytics/web-vitals', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     name: metric.name,
-    //     value: metric.value,
-    //     rating: metric.rating,
-    //     delta: metric.delta,
-    //     id: metric.id,
-    //     navigationType: metric.navigationType,
-    //   }),
-    // });
+    // ✅ Оптимизация: Отправка метрик на бэкенд (раскомментировать при необходимости)
+    // Отправляем только в production и только важные метрики
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+      // Используем sendBeacon для надежной отправки даже при закрытии страницы
+      const analyticsData = {
+        name: metric.name,
+        value: metric.value,
+        rating: metric.rating,
+        delta: metric.delta,
+        id: metric.id,
+        navigationType: metric.navigationType,
+        url: window.location.href,
+        timestamp: Date.now(),
+      };
+
+      // Используем sendBeacon для критических метрик
+      if (navigator.sendBeacon && ['LCP', 'FID', 'CLS', 'FCP', 'TTFB'].includes(metric.name)) {
+        const blob = new Blob([JSON.stringify(analyticsData)], { type: 'application/json' });
+        navigator.sendBeacon('/api/analytics/web-vitals', blob);
+      } else {
+        // Fallback на fetch
+        fetch('/api/analytics/web-vitals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(analyticsData),
+          keepalive: true, // Продолжать запрос даже после закрытия страницы
+        }).catch(() => {
+          // Игнорируем ошибки отправки метрик
+        });
+      }
+    }
 
     // Пример: Sentry Performance Monitoring
     // if (window.Sentry) {

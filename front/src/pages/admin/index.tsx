@@ -1,10 +1,32 @@
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import AdminDashboard from "@/component/admin/dashboard/AdminDashboard";
-import AdminLayout from "@/component/admin/AdminLayout";
+import dynamic from "next/dynamic";
 import { useAdminAuth } from "@/component/hooks/useAdminAuth";
 import { useTranslation } from "next-i18next";
 import styles from "./AdminPage.module.scss";
+
+// ✅ Оптимизация: Ленивая загрузка тяжелых админ компонентов
+const AdminLayout = dynamic(() => import("@/component/admin/AdminLayout"), {
+  loading: () => (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Загрузка...</p>
+      </div>
+    </div>
+  ),
+});
+
+const AdminDashboard = dynamic(() => import("@/component/admin/dashboard/AdminDashboard"), {
+  loading: () => (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Загрузка панели управления...</p>
+      </div>
+    </div>
+  ),
+});
 
 export default function AdminPage() {
   const { t } = useTranslation("common");

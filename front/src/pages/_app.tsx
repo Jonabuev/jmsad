@@ -5,6 +5,7 @@ import { Provider, useDispatch } from "react-redux";
 import { store } from "@/component/store/store";
 import { useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/router";
+import { SWRConfig } from "swr";
 import { fetchUserProfile } from "@/component/store/auth/authSlice";
 import { AppDispatch } from "@/component/store/store";
 import Header from "@/component/header/Header";
@@ -14,6 +15,7 @@ import { useTokenValidation } from "@/component/hooks/useTokenValidation";
 import { useAutoRefreshToken } from "@/component/hooks/useAutoRefreshToken";
 import { reportWebVitals } from "@/utils/webVitals";
 import { logger } from "@/utils/logger";
+import { swrConfig } from "@/component/hooks/swr";
 // Push-уведомления инициализируются через PushNotificationPrompt
 import Head from "next/head";
 
@@ -105,7 +107,10 @@ const AppContent = (props: AppProps) => {
 function App(props: AppProps) {
   return (
     <Provider store={store}>
-      <AppContent {...props} />
+      {/* ✅ Оптимизация: SWR Provider для кэширования данных */}
+      <SWRConfig value={swrConfig}>
+        <AppContent {...props} />
+      </SWRConfig>
     </Provider>
   );
 }

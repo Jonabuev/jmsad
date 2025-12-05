@@ -71,7 +71,7 @@ services:
       #   condition: service_healthy
     volumes:
       - backend_static_test:/app/staticfiles
-      - backend_media_test:/app/media
+      - ./media_test:/app/media:rw  # ✅ Исправление: используем bind mount для сохранения файлов между деплоями
       - ./backend/logs_test:/app/logs
     restart: unless-stopped
     networks:
@@ -141,7 +141,7 @@ services:
       - ./nginx_full_test.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
       - backend_static_test:/app/staticfiles:ro
-      - backend_media_test:/app/media:ro
+      - ./media_test:/app/media:ro  # ✅ Исправление: используем bind mount для синхронизации с бэкендом
       - ./certbot/www:/var/www/certbot:rw
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./nginx/snippets:/etc/nginx/snippets:ro
@@ -193,8 +193,7 @@ volumes:
   # redis_data_test:
   backend_static_test:
     driver: local
-  backend_media_test:
-    driver: local
+  # ✅ backend_media_test удален - используем bind mount ./media_test для сохранения файлов между деплоями
 
 networks:
   jmsad-test-network:

@@ -96,7 +96,7 @@ services:
         condition: service_healthy
     volumes:
       - backend_static:/app/staticfiles
-      - backend_media:/app/media
+      - ./media:/app/media:rw  # ✅ Исправление: используем bind mount вместо volume для сохранения файлов между деплоями
       - ./backend/logs:/app/logs
     restart: unless-stopped
     networks:
@@ -226,8 +226,7 @@ volumes:
     driver: local
   backend_static:
     driver: local
-  backend_media:
-    driver: local
+  # ✅ backend_media удален - используем bind mount ./media для сохранения файлов между деплоями
 
 networks:
   jmsad-network:

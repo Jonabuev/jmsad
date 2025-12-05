@@ -1,9 +1,31 @@
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import AdminLayout from "@/component/admin/AdminLayout";
-import PDFCheckTabs from "@/component/admin/pdf-check/PDFCheckTabs";
+import dynamic from "next/dynamic";
 import styles from "./PDFCheckPage.module.scss";
+
+// ✅ Оптимизация: Ленивая загрузка тяжелых админ компонентов
+const AdminLayout = dynamic(() => import("@/component/admin/AdminLayout"), {
+  loading: () => (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Загрузка...</p>
+      </div>
+    </div>
+  ),
+});
+
+const PDFCheckTabs = dynamic(() => import("@/component/admin/pdf-check/PDFCheckTabs"), {
+  loading: () => (
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingContent}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Загрузка проверки документов...</p>
+      </div>
+    </div>
+  ),
+});
 
 const PDFCheckPage = () => {
   const { t } = useTranslation("common");
